@@ -1,0 +1,70 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "Low severity recon finding. GuardDuty observed reconnaissance traffic against an EC2 instance.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Low severity recon finding.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nGuardDuty observed reconnaissance traffic against an EC2 instance."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nRecon:EC2/Portscan"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n2"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "**\n"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Port probe details*\nport 0 - "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Remote probe origin*\n\n - "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Blocked*\nfalse"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nInstance"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Instance ID*\ni-0123456789abcdef0"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Instance Type*\nt2.micro"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

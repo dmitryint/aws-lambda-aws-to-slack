@@ -1,0 +1,37 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "Auto Scaling triggered autoscaling:EC2_INSTANCE_LAUNCH for service AWS Auto Scaling.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/ec2/autoscaling/home?region=us-east-1#AutoScalingGroups:id=example-asg|example-asg - autoscaling:EC2_INSTANCE_LAUNCH\u003e*\n_\u003chttps://123456789012.signin.aws.amazon.com/console/ec2?region=us-east-1|AWS AutoScaling (us-east-1 - 123456789012)\u003e_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Auto Scaling triggered autoscaling:EC2_INSTANCE_LAUNCH for service AWS Auto Scaling."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nAWS Auto Scaling"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Event*\nautoscaling:EC2_INSTANCE_LAUNCH"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

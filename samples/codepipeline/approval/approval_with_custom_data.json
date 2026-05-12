@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:approval-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"region\":\"us-east-1\",\"consoleLink\":\"https://us-east-1.console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline\",\"approval\":{\"pipelineName\":\"example-pipeline\",\"stageName\":\"Approval\",\"actionName\":\"ManualApproval\",\"token\":\"abcd1234-1111-2222-3333-1234567890ab\",\"expires\":\"2024-06-01T17:00:00Z\",\"customData\":\"Please review the change set before approving.\",\"externalEntityLink\":\"https://example.com/review\",\"approvalReviewLink\":\"https://us-east-1.console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline/Approval/ManualApproval/approve/abcd1234-1111-2222-3333-1234567890ab\"}}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:approval-topic",
+        "Subject": "APPROVAL NEEDED: AWS CodePipeline example-pipeline for action ManualApproval"
+      }
+    }
+  ]
+}

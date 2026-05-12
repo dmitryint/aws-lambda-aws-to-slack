@@ -1,0 +1,17 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "example-cluster - ECS Container Instance State Change",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*example-cluster - ECS Container Instance State Change*\n_Amazon ECS - ECS Container Instance State Change_"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "Some Custom Event",
+  "source": "com.example.custom",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "message": "This is a custom application event that no specific parser handles.",
+    "customField": "value",
+    "level": "info"
+  }
+}

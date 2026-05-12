@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:alarms-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"AlarmName\":\"esai-prod-alb-5xx-count\",\"AlarmDescription\":\"ALB 5xx count above threshold (sparse-metric safe via FILL)\",\"AWSAccountId\":\"123456789012\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 out of the last 1 datapoints [12.0 (01/06/24 11:59:00)] was greater than or equal to the threshold (5.0).\",\"StateChangeTime\":\"2024-06-01T12:00:00.000+0000\",\"Region\":\"US East (N. Virginia)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-1:123456789012:alarm:esai-prod-alb-5xx-count\",\"OldStateValue\":\"OK\",\"Trigger\":{\"Period\":60,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Threshold\":5.0,\"TreatMissingData\":\"- TreatMissingData: notBreaching\",\"EvaluateLowSampleCountPercentile\":\"\",\"Metrics\":[{\"Id\":\"m1\",\"MetricStat\":{\"Metric\":{\"Namespace\":\"AWS/ApplicationELB\",\"MetricName\":\"HTTPCode_ELB_5XX_Count\",\"Dimensions\":[{\"value\":\"app/esai-prod-alb/0123456789abcdef\",\"name\":\"LoadBalancer\"}]},\"Period\":60,\"Stat\":\"Sum\"},\"ReturnData\":false},{\"Id\":\"e1\",\"Expression\":\"FILL(m1, 0)\",\"Label\":\"5xx (FILL zero)\",\"ReturnData\":true}]}}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:alarms-topic",
+        "Subject": "ALARM: \"esai-prod-alb-5xx-count\" in US East (N. Virginia)"
+      }
+    }
+  ]
+}

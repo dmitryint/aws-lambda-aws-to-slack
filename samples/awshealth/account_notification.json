@@ -1,0 +1,24 @@
+{
+  "version": "0",
+  "id": "121345678-1234-1234-1234-123456789012",
+  "detail-type": "AWS Health Event",
+  "source": "aws.health",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventArn": "arn:aws:health:us-east-1::event/IAM/AWS_IAM_OPERATIONAL_NOTIFICATION/AWS_IAM_OPERATIONAL_NOTIFICATION_0123456789",
+    "service": "IAM",
+    "eventTypeCode": "AWS_IAM_OPERATIONAL_NOTIFICATION",
+    "eventTypeCategory": "accountNotification",
+    "startTime": "Sat, 1 Jun 2024 11:30:00 GMT",
+    "eventDescription": [
+      {
+        "language": "en_US",
+        "latestDescription": "Your AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible."
+      }
+    ],
+    "affectedEntities": []
+  }
+}

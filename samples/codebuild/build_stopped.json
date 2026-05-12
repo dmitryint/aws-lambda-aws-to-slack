@@ -1,0 +1,48 @@
+{
+  "version": "0",
+  "id": "c030038d-8c4d-6141-9545-00ff7b7153ab",
+  "detail-type": "CodeBuild Build State Change",
+  "source": "aws.codebuild",
+  "account": "123456789012",
+  "time": "2024-06-01T12:05:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:codebuild:us-east-1:123456789012:build/example-project:abcd1234-1111-2222-3333-1234567890ab"],
+  "detail": {
+    "build-status": "STOPPED",
+    "project-name": "example-project",
+    "build-id": "arn:aws:codebuild:us-east-1:123456789012:build/example-project:abcd1234-1111-2222-3333-1234567890ab",
+    "additional-information": {
+      "cache": {"type": "NO_CACHE"},
+      "build-number": 42,
+      "timeout-in-minutes": 60,
+      "build-complete": true,
+      "initiator": "user/example-user",
+      "build-start-time": "Jun 1, 2024 12:00:00 PM",
+      "source": {
+        "buildspec": "",
+        "location": "https://github.com/example/repo",
+        "type": "GITHUB"
+      },
+      "artifact": {
+        "md5sum": "",
+        "sha256sum": "",
+        "location": "arn:aws:s3:::example-bucket/example-project"
+      },
+      "environment": {
+        "image": "aws/codebuild/standard:5.0",
+        "privileged-mode": false,
+        "compute-type": "BUILD_GENERAL1_SMALL",
+        "type": "LINUX_CONTAINER",
+        "environment-variables": []
+      },
+      "logs": {
+        "group-name": "/aws/codebuild/example-project",
+        "stream-name": "abcd1234-1111-2222-3333-1234567890ab",
+        "deep-link": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEvent:group=/aws/codebuild/example-project;stream=abcd1234-1111-2222-3333-1234567890ab"
+      }
+    },
+    "current-phase": "COMPLETED",
+    "current-phase-context": "[]",
+    "version": "1"
+  }
+}

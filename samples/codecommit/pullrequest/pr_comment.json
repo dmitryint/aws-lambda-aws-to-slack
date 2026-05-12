@@ -1,0 +1,28 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "CodeCommit Pull Request State Change",
+  "source": "aws.codecommit",
+  "account": "123456789012",
+  "time": "2024-06-01T12:10:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:codecommit:us-east-1:123456789012:example-repo"],
+  "detail": {
+    "callerUserArn": "arn:aws:iam::123456789012:user/example-user",
+    "creationDate": "Sat Jun 01 12:00:00 UTC 2024",
+    "description": "",
+    "destinationCommit": "0123456789abcdef0123456789abcdef01234567",
+    "destinationReference": "refs/heads/main",
+    "event": "commentOnPullRequestCreated",
+    "isMerged": "False",
+    "lastModifiedDate": "Sat Jun 01 12:10:00 UTC 2024",
+    "notificationBody": "A comment was made on the pull request.",
+    "pullRequestId": "1",
+    "pullRequestStatus": "Open",
+    "repositoryNames": ["example-repo"],
+    "revisionId": "0123456789abcdef0123456789abcdef01234567abcdef0123456789abcdef01",
+    "sourceCommit": "fedcba9876543210fedcba9876543210fedcba98",
+    "sourceReference": "refs/heads/feature-branch",
+    "title": "PR title here"
+  }
+}

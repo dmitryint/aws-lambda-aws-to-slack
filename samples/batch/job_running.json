@@ -1,0 +1,48 @@
+{
+  "version": "0",
+  "id": "abcd1234-ef56-7890-abcd-1234567890ab",
+  "detail-type": "Batch Job State Change",
+  "source": "aws.batch",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:batch:us-east-1:123456789012:job/abcd1234-1111-2222-3333-1234567890ab"],
+  "detail": {
+    "jobArn": "arn:aws:batch:us-east-1:123456789012:job/abcd1234-1111-2222-3333-1234567890ab",
+    "jobName": "example-job",
+    "jobId": "abcd1234-1111-2222-3333-1234567890ab",
+    "jobQueue": "arn:aws:batch:us-east-1:123456789012:job-queue/example-queue",
+    "status": "RUNNING",
+    "attempts": [
+      {
+        "container": {
+          "containerInstanceArn": "arn:aws:ecs:us-east-1:123456789012:container-instance/abcd1234",
+          "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/abcd1234",
+          "logStreamName": "example-job/default/abcd1234"
+        },
+        "startedAt": 1717243260000
+      }
+    ],
+    "createdAt": 1717243200000,
+    "startedAt": 1717243260000,
+    "retryStrategy": {"attempts": 1, "evaluateOnExit": []},
+    "dependsOn": [],
+    "jobDefinition": "arn:aws:batch:us-east-1:123456789012:job-definition/example:1",
+    "parameters": {},
+    "container": {
+      "image": "amazonlinux:2",
+      "vcpus": 1,
+      "memory": 512,
+      "command": ["echo", "hello"],
+      "jobRoleArn": "arn:aws:iam::123456789012:role/BatchJobRole",
+      "containerInstanceArn": "arn:aws:ecs:us-east-1:123456789012:container-instance/abcd1234",
+      "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/abcd1234",
+      "logStreamName": "example-job/default/abcd1234",
+      "volumes": [],
+      "environment": [],
+      "mountPoints": [],
+      "ulimits": []
+    },
+    "tags": {}
+  }
+}

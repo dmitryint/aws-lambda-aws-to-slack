@@ -1,0 +1,38 @@
+{
+  "attachments": [
+    {
+      "color": "good",
+      "fallback": "example-cluster - ECS Service Action - SERVICE_STEADY_STATE",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Amazon ECS - ECS Service Action*"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nSERVICE_STEADY_STATE"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service Logs*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Cluster*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

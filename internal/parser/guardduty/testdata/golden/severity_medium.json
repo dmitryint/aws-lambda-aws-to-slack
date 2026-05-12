@@ -1,0 +1,78 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "Medium severity unauthorized access finding. GuardDuty observed AWS API calls from a known malicious IP.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Medium severity unauthorized access finding.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nGuardDuty observed AWS API calls from a known malicious IP."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nUnauthorizedAccess:IAMUser/MaliciousIPCaller"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n5"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "**\n"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nsts.amazonaws.com - GetCallerIdentity"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*API origin*\n203.0.113.30\n - "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Location*\n - "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nAccessKey"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*AccessKeyId*\nAKIAIOSFODNN7EXAMPLE"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*PrincipalId*\nAROAJTAAAAAAAAAAAAAAA:example-session"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*User Type*\nAssumedRole"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*User Name*\nexample-role"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

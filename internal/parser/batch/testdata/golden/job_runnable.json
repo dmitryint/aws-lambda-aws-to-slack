@@ -1,0 +1,26 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "Batch Job Event example-job RUNNABLE",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Batch Job Event example-job*\n_AWS Batch Notification_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nRUNNABLE"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

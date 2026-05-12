@@ -1,0 +1,30 @@
+{
+  "attachments": [
+    {
+      "color": "danger",
+      "fallback": "\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e FAILED",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e has failed*\n_AWS CodeDeploy Notification_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nFAILED"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*DeploymentGroup*\nexample-deployment-group"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

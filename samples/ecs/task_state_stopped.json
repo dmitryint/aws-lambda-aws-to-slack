@@ -1,0 +1,49 @@
+{
+  "version": "0",
+  "id": "0efbccea-222d-61fc-c9f3-0123456789ab",
+  "detail-type": "ECS Task State Change",
+  "source": "aws.ecs",
+  "account": "123456789012",
+  "time": "2024-06-01T12:30:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:ecs:us-east-1:123456789012:task/example-cluster/0123456789abcdef0"
+  ],
+  "detail": {
+    "attachments": [],
+    "availabilityZone": "us-east-1a",
+    "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/example-cluster",
+    "containers": [
+      {
+        "containerArn": "arn:aws:ecs:us-east-1:123456789012:container/8214fb33-1792-47e5-a673-0123456789ab",
+        "lastStatus": "STOPPED",
+        "exitCode": 137,
+        "reason": "OutOfMemoryError: Container killed due to memory usage",
+        "name": "example-container",
+        "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/example:latest",
+        "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/example-cluster/0123456789abcdef0",
+        "networkInterfaces": [],
+        "cpu": "0"
+      }
+    ],
+    "createdAt": "2024-06-01T12:00:00Z",
+    "launchType": "FARGATE",
+    "cpu": "256",
+    "memory": "512",
+    "desiredStatus": "STOPPED",
+    "group": "service:example-service",
+    "lastStatus": "STOPPED",
+    "stopCode": "EssentialContainerExited",
+    "stoppedReason": "Essential container in task exited",
+    "stoppingAt": "2024-06-01T12:29:30Z",
+    "stoppedAt": "2024-06-01T12:30:00Z",
+    "overrides": {"containerOverrides": [{"name": "example-container"}]},
+    "startedBy": "ecs-svc/0123456789abcdef0",
+    "startedAt": "2024-06-01T12:01:30Z",
+    "updatedAt": "2024-06-01T12:30:00Z",
+    "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/example-cluster/0123456789abcdef0",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:123456789012:task-definition/example-container:1",
+    "version": 5,
+    "platformVersion": "1.4.0"
+  }
+}

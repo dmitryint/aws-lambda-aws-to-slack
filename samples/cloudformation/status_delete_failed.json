@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:cfn-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "StackId='arn:aws:cloudformation:us-east-1:123456789012:stack/example-stack/abcd1234-1111-2222-3333-1234567890ab'\nTimestamp='2024-06-01T12:00:00.000Z'\nEventId='abcd1234-DELETE_FAILED-event'\nLogicalResourceId='example-stack'\nNamespace='123456789012'\nPhysicalResourceId='arn:aws:cloudformation:us-east-1:123456789012:stack/example-stack/abcd1234-1111-2222-3333-1234567890ab'\nResourceProperties='null'\nResourceStatus='DELETE_FAILED'\nResourceStatusReason=''\nResourceType='AWS::CloudFormation::Stack'\nStackName='example-stack'\nClientRequestToken='null'\n",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:cfn-topic",
+        "Subject": "AWS CloudFormation Notification"
+      }
+    }
+  ]
+}

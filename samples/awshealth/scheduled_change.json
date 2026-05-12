@@ -1,0 +1,29 @@
+{
+  "version": "0",
+  "id": "121345678-1234-1234-1234-123456789012",
+  "detail-type": "AWS Health Event",
+  "source": "aws.health",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["i-0123456789abcdef0"],
+  "detail": {
+    "eventArn": "arn:aws:health:us-east-1::event/EC2/AWS_EC2_INSTANCE_RETIREMENT_SCHEDULED/AWS_EC2_INSTANCE_RETIREMENT_SCHEDULED_0123456789",
+    "service": "EC2",
+    "eventTypeCode": "AWS_EC2_INSTANCE_RETIREMENT_SCHEDULED",
+    "eventTypeCategory": "scheduledChange",
+    "startTime": "Sat, 8 Jun 2024 04:00:00 GMT",
+    "endTime": "Sat, 8 Jun 2024 05:00:00 GMT",
+    "eventDescription": [
+      {
+        "language": "en_US",
+        "latestDescription": "One or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time."
+      }
+    ],
+    "affectedEntities": [
+      {
+        "entityValue": "i-0123456789abcdef0"
+      }
+    ]
+  }
+}

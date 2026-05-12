@@ -1,0 +1,30 @@
+{
+  "attachments": [
+    {
+      "color": "good",
+      "fallback": "Assessment run started",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Assessment run started*\n_Amazon Inspector_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Target*\narn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Run*\n\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/run?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|arn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE/template/0-EXAMPLE/run/0-EXAMPLE\u003e\n"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

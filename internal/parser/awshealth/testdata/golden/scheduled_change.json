@@ -1,0 +1,42 @@
+{
+  "attachments": [
+    {
+      "color": "#439FE0",
+      "fallback": "One or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*AWS Health Event*\nOne or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Account ID*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nEC2"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Start Time*\nSat, 08 Jun 2024 04:00:00 UTC"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*End Time*\nSat, 08 Jun 2024 05:00:00 UTC"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Affected Entities*\ni-0123456789abcdef0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

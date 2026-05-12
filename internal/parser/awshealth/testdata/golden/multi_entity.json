@@ -1,0 +1,42 @@
+{
+  "attachments": [
+    {
+      "color": "#439FE0",
+      "fallback": "AWS has scheduled maintenance for one or more of your Amazon EC2 instances. The instances listed below will be rebooted during the maintenance window.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*AWS Health Event*\nAWS has scheduled maintenance for one or more of your Amazon EC2 instances. The instances listed below will be rebooted during the maintenance window."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Account ID*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nEC2"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Start Time*\nSat, 08 Jun 2024 04:00:00 UTC"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*End Time*\nSat, 08 Jun 2024 06:00:00 UTC"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Affected Entities*\ni-0123456789abcdef0\ni-0123456789abcdef1\ni-0123456789abcdef2"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

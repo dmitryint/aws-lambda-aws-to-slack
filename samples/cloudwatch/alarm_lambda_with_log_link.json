@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:alarms-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"AlarmName\":\"lambda-errors\",\"AlarmDescription\":\"Errors on aws-to-slack Lambda\",\"AWSAccountId\":\"123456789012\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 datapoint [3.0 (01/06/24 11:59:00)] was greater than or equal to the threshold (1.0).\",\"StateChangeTime\":\"2024-06-01T12:00:00.000+0000\",\"Region\":\"US East (N. Virginia)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-1:123456789012:alarm:lambda-errors\",\"OldStateValue\":\"OK\",\"Trigger\":{\"MetricName\":\"Errors\",\"Namespace\":\"AWS/Lambda\",\"StatisticType\":\"Statistic\",\"Statistic\":\"SUM\",\"Unit\":null,\"Dimensions\":[{\"value\":\"aws-to-slack\",\"name\":\"FunctionName\"}],\"Period\":60,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanOrEqualToThreshold\",\"Threshold\":1.0,\"TreatMissingData\":\"- TreatMissingData: notBreaching\",\"EvaluateLowSampleCountPercentile\":\"\"}}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:alarms-topic",
+        "Subject": "ALARM: \"lambda-errors\" in US East (N. Virginia)"
+      }
+    }
+  ]
+}

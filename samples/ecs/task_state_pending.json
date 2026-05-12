@@ -1,0 +1,51 @@
+{
+  "version": "0",
+  "id": "0efbccea-222d-61fc-c9f3-0123456789ab",
+  "detail-type": "ECS Task State Change",
+  "source": "aws.ecs",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:ecs:us-east-1:123456789012:task/example-cluster/0123456789abcdef0"
+  ],
+  "detail": {
+    "attachments": [
+      {
+        "id": "c11519c0-1c1d-49b1-b746-0123456789ab",
+        "type": "eni",
+        "status": "PRECREATED",
+        "details": [
+          {"name": "subnetId", "value": "subnet-0123456789abcdef0"}
+        ]
+      }
+    ],
+    "availabilityZone": "us-east-1a",
+    "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/example-cluster",
+    "containers": [
+      {
+        "containerArn": "arn:aws:ecs:us-east-1:123456789012:container/8214fb33-1792-47e5-a673-0123456789ab",
+        "lastStatus": "PENDING",
+        "name": "example-container",
+        "image": "123456789012.dkr.ecr.us-east-1.amazonaws.com/example:latest",
+        "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/example-cluster/0123456789abcdef0",
+        "networkInterfaces": [],
+        "cpu": "0"
+      }
+    ],
+    "createdAt": "2024-06-01T12:00:00.96Z",
+    "launchType": "FARGATE",
+    "cpu": "256",
+    "memory": "512",
+    "desiredStatus": "RUNNING",
+    "group": "service:example-service",
+    "lastStatus": "PROVISIONING",
+    "overrides": {"containerOverrides": [{"name": "example-container"}]},
+    "startedBy": "ecs-svc/0123456789abcdef0",
+    "updatedAt": "2024-06-01T12:00:00.96Z",
+    "taskArn": "arn:aws:ecs:us-east-1:123456789012:task/example-cluster/0123456789abcdef0",
+    "taskDefinitionArn": "arn:aws:ecs:us-east-1:123456789012:task-definition/example-container:1",
+    "version": 1,
+    "platformVersion": "1.4.0"
+  }
+}

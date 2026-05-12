@@ -1,0 +1,37 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "example-pipeline \u003e\u003e APPROVAL REQUIRED",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://us-east-1.console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline|example-pipeline\u003e*\n_AWS CodePipeline (123456789012)_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Approval required within 5 hours for Approval / ManualApproval\nPlease review the change set before approving."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Review URL*\nhttps://example.com/review"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Approval URL*\nhttps://us-east-1.console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline/Approval/ManualApproval/approve/abcd1234-1111-2222-3333-1234567890ab"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "We have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*AWS Health Abuse Event*\nWe have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Account ID*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nABUSE"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Start Time*\nSat, 01 Jun 2024 11:30:00 UTC"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Affected Entities*\ni-0123456789abcdef0"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

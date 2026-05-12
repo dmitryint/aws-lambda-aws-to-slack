@@ -1,0 +1,80 @@
+{
+  "version": "0",
+  "id": "cd2d702e-ab31-411b-9344-0123456789ab",
+  "detail-type": "GuardDuty Finding",
+  "source": "aws.guardduty",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "schemaVersion": "2.0",
+    "accountId": "123456789012",
+    "region": "us-east-1",
+    "partition": "aws",
+    "id": "abcd1234-1111-2222-3333-1234567890ab",
+    "arn": "arn:aws:guardduty:us-east-1:123456789012:detector/12abc34d567e8fa901bc2d34eEXAMPLE/finding/abcd1234-1111-2222-3333-1234567890ab",
+    "type": "Persistence:Kubernetes/ContainerWithSensitiveMount",
+    "resource": {
+      "resourceType": "EKSCluster",
+      "eksClusterDetails": {
+        "name": "example-cluster",
+        "arn": "arn:aws:eks:us-east-1:123456789012:cluster/example-cluster",
+        "vpcId": "vpc-0123456789abcdef0",
+        "status": "ACTIVE",
+        "createdAt": "2024-05-01T12:00:00Z",
+        "platformVersion": "eks.5"
+      },
+      "kubernetesDetails": {
+        "kubernetesUserDetails": {
+          "username": "kubernetes-admin",
+          "uid": "abcd1234",
+          "groups": ["system:masters"]
+        },
+        "kubernetesWorkloadDetails": {
+          "name": "example-pod",
+          "type": "pods",
+          "uid": "1234abcd",
+          "namespace": "default",
+          "containers": [
+            {
+              "name": "example-container",
+              "image": "example/image:latest",
+              "imagePrefix": "example",
+              "volumeMounts": [
+                {"name": "host-root", "mountPath": "/host"}
+              ],
+              "securityContext": {"privileged": true}
+            }
+          ]
+        }
+      }
+    },
+    "service": {
+      "serviceName": "guardduty",
+      "detectorId": "12abc34d567e8fa901bc2d34eEXAMPLE",
+      "action": {
+        "actionType": "KUBERNETES_API_CALL",
+        "kubernetesApiCallAction": {
+          "requestUri": "/api/v1/namespaces/default/pods",
+          "verb": "create",
+          "remoteIpDetails": {"ipAddressV4": "203.0.113.80"},
+          "statusCode": 201,
+          "sourceIPs": ["203.0.113.80"]
+        }
+      },
+      "resourceRole": "TARGET",
+      "additionalInfo": {},
+      "evidence": null,
+      "eventFirstSeen": "2024-06-01T11:55:00.000Z",
+      "eventLastSeen": "2024-06-01T12:00:00.000Z",
+      "archived": false,
+      "count": 1
+    },
+    "severity": 5,
+    "createdAt": "2024-06-01T12:00:00.000Z",
+    "updatedAt": "2024-06-01T12:00:00.000Z",
+    "title": "A container was launched with a sensitive host path mounted.",
+    "description": "A privileged container was launched with the host root filesystem mounted, increasing the impact of a container escape."
+  }
+}

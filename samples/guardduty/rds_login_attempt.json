@@ -1,0 +1,68 @@
+{
+  "version": "0",
+  "id": "cd2d702e-ab31-411b-9344-0123456789ab",
+  "detail-type": "GuardDuty Finding",
+  "source": "aws.guardduty",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "schemaVersion": "2.0",
+    "accountId": "123456789012",
+    "region": "us-east-1",
+    "partition": "aws",
+    "id": "abcd1234-1111-2222-3333-1234567890ab",
+    "arn": "arn:aws:guardduty:us-east-1:123456789012:detector/12abc34d567e8fa901bc2d34eEXAMPLE/finding/abcd1234-1111-2222-3333-1234567890ab",
+    "type": "CredentialAccess:RDS/MaliciousIPCaller.FailedLogin",
+    "resource": {
+      "resourceType": "RDSDBInstance",
+      "rdsDbInstanceDetails": {
+        "dbInstanceIdentifier": "example-db",
+        "engine": "aurora-postgresql",
+        "engineVersion": "13.7",
+        "dbClusterIdentifier": "example-cluster",
+        "dbInstanceArn": "arn:aws:rds:us-east-1:123456789012:db:example-db",
+        "tags": []
+      },
+      "rdsDbUserDetails": {
+        "user": "postgres",
+        "application": "psql",
+        "database": "postgres",
+        "ssl": "TLSv1.2",
+        "authMethod": "PASSWORD"
+      }
+    },
+    "service": {
+      "serviceName": "guardduty",
+      "detectorId": "12abc34d567e8fa901bc2d34eEXAMPLE",
+      "action": {
+        "actionType": "RDS_LOGIN_ATTEMPT",
+        "rdsLoginAttemptAction": {
+          "remoteIpDetails": {
+            "ipAddressV4": "203.0.113.60",
+            "organization": {"asn": "65001", "asnOrg": "Example ISP"},
+            "country": {"countryName": "Unknown"},
+            "city": {"cityName": "Unknown"},
+            "geoLocation": {"lat": 0.0, "lon": 0.0}
+          },
+          "loginAttributes": [
+            {"user": "postgres", "application": "psql", "failedLoginAttempts": 12, "successfulLoginAttempts": 0}
+          ]
+        }
+      },
+      "resourceRole": "TARGET",
+      "additionalInfo": {"threatName": "Brute force"},
+      "evidence": null,
+      "eventFirstSeen": "2024-06-01T11:55:00.000Z",
+      "eventLastSeen": "2024-06-01T12:00:00.000Z",
+      "archived": false,
+      "count": 12
+    },
+    "severity": 5,
+    "createdAt": "2024-06-01T12:00:00.000Z",
+    "updatedAt": "2024-06-01T12:00:00.000Z",
+    "title": "An unusual number of failed login attempts on RDS database from a known malicious IP.",
+    "description": "An unusual number of failed RDS login attempts have been observed."
+  }
+}

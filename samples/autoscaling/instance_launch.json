@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:asg-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"StatusCode\":\"InProgress\",\"Service\":\"AWS Auto Scaling\",\"AutoScalingGroupName\":\"example-asg\",\"Description\":\"Launching a new EC2 instance: i-0123456789abcdef0\",\"ActivityId\":\"abcd1234-ef56-7890-abcd-1234567890ab\",\"Event\":\"autoscaling:EC2_INSTANCE_LAUNCH\",\"Details\":{\"Availability Zone\":\"us-east-1a\",\"Subnet ID\":\"subnet-0123456789abcdef0\"},\"AutoScalingGroupARN\":\"arn:aws:autoscaling:us-east-1:123456789012:autoScalingGroup:abcd1234-1111-2222-3333-1234567890ab:autoScalingGroupName/example-asg\",\"Progress\":50,\"Time\":\"2024-06-01T12:00:00.000Z\",\"AccountId\":\"123456789012\",\"RequestId\":\"abcd1234-ef56-7890-abcd-1234567890ab\",\"StatusMessage\":\"\",\"EndTime\":\"2024-06-01T12:00:00.000Z\",\"EC2InstanceId\":\"i-0123456789abcdef0\",\"StartTime\":\"2024-06-01T11:59:00.000Z\",\"Cause\":\"At 2024-06-01T11:59:00Z a user request created an AutoScalingGroup changing the desired capacity from 0 to 1. At 2024-06-01T11:59:30Z an instance was started in response to a difference between desired and actual capacity, increasing the capacity from 0 to 1.\"}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:asg-topic",
+        "Subject": "Auto Scaling: launch for group \"example-asg\""
+      }
+    }
+  ]
+}

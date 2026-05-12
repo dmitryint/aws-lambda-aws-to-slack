@@ -1,0 +1,62 @@
+{
+  "attachments": [
+    {
+      "color": "danger",
+      "fallback": "High severity trojan finding. EC2 instance is querying a blackhole domain associated with malware.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*High severity trojan finding.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nEC2 instance is querying a blackhole domain associated with malware."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nTrojan:EC2/BlackholeTraffic"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n8"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "**\n"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Unknown Action Type (${actionType})*\n{\n  \"actionType\": \"DNS_REQUEST\",\n  \"dnsRequestAction\": {\n    \"blocked\": false,\n    \"domain\": \"blackhole.example.com\",\n    \"protocol\": \"UDP\"\n  }\n}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nInstance"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Instance ID*\ni-0123456789abcdef0"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Instance Type*\nt2.micro"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

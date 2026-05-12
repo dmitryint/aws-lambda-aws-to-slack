@@ -1,0 +1,16 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "CodePipeline Pipeline Execution State Change",
+  "source": "aws.codepipeline",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:codepipeline:us-east-1:123456789012:example-pipeline"],
+  "detail": {
+    "pipeline": "example-pipeline",
+    "execution-id": "01234567-0123-0123-0123-0123456789ab",
+    "state": "STOPPED",
+    "version": 1
+  }
+}

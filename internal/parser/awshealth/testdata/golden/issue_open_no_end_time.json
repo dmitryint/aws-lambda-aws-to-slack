@@ -1,0 +1,34 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "We are investigating increased API error rates and latencies for EC2 in the US-EAST-1 Region.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*AWS Health Event*\nWe are investigating increased API error rates and latencies for EC2 in the US-EAST-1 Region."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Account ID*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nEC2"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Start Time*\nSat, 01 Jun 2024 11:30:00 UTC"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

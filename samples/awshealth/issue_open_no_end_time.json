@@ -1,0 +1,24 @@
+{
+  "version": "0",
+  "id": "121345678-1234-1234-1234-123456789012",
+  "detail-type": "AWS Health Event",
+  "source": "aws.health",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "eventArn": "arn:aws:health:us-east-1::event/EC2/AWS_EC2_OPERATIONAL_ISSUE/AWS_EC2_OPERATIONAL_ISSUE_0123456789",
+    "service": "EC2",
+    "eventTypeCode": "AWS_EC2_OPERATIONAL_ISSUE",
+    "eventTypeCategory": "issue",
+    "startTime": "Sat, 1 Jun 2024 11:30:00 GMT",
+    "eventDescription": [
+      {
+        "language": "en_US",
+        "latestDescription": "We are investigating increased API error rates and latencies for EC2 in the US-EAST-1 Region."
+      }
+    ],
+    "affectedEntities": []
+  }
+}

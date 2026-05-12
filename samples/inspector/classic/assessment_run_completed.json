@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:inspector-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"event\":\"ASSESSMENT_RUN_COMPLETED\",\"template\":\"arn:aws:inspector:us-east-1:316112463485:target/0-EXAMPLE/template/0-EXAMPLE\",\"target\":\"arn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE\",\"run\":\"arn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE/template/0-EXAMPLE/run/0-EXAMPLE\",\"findingsCount\":\"{arn:aws:inspector:us-east-1:316112463485:rulespackage/0-gEjTy7T7=12,arn:aws:inspector:us-east-1:316112463485:rulespackage/0-R01qwB5Q=3}\"}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:inspector-topic",
+        "Subject": "Amazon Inspector notification"
+      }
+    }
+  ]
+}

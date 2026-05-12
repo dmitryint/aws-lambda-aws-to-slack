@@ -1,0 +1,34 @@
+{
+  "attachments": [
+    {
+      "color": "#439FE0",
+      "fallback": "example-repo: Pull Request #1 was merged",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/codecommit/home?region=us-east-1#/repository/example-repo/pull-request/1|Pull Request #1 was merged\u003e*\n_AWS CodeCommit_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Repository*\nexample-repo"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Pull Request Title*\nPR title here"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Caller ARN*\narn:aws:iam::123456789012:user/example-user"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

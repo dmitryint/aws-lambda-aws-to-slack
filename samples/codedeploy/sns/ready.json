@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:codedeploy-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"region\":\"us-east-1\",\"accountId\":\"123456789012\",\"eventTriggerName\":\"deployment-trigger\",\"applicationName\":\"example-app\",\"deploymentId\":\"d-EXAMPLE123\",\"deploymentGroupName\":\"example-deployment-group\",\"createTime\":\"Sat Jun 01 12:00:00 UTC 2024\",\"completeTime\":\"Sat Jun 01 12:05:00 UTC 2024\",\"status\":\"READY\"}\n",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:codedeploy-topic",
+        "Subject": "AWS CodeDeploy READY notification"
+      }
+    }
+  ]
+}

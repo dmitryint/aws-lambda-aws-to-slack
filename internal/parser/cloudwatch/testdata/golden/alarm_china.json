@@ -1,0 +1,37 @@
+{
+  "attachments": [
+    {
+      "color": "danger",
+      "fallback": "cn-alarm state is now ALARM:\nThreshold Crossed",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.amazonaws.cn/cloudwatch/home?region=cn-north-1#alarm:name=cn-alarm|cn-alarm\u003e*\n_AWS CloudWatch Alarm (123456789012)_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Threshold Crossed"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*State Change*\nOK → ALARM"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nChina (Beijing)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:ses-bounce-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"notificationType\":\"Bounce\",\"bounce\":{\"bounceType\":\"Permanent\",\"bounceSubType\":\"OnAccountSuppressionList\",\"bouncedRecipients\":[{\"emailAddress\":\"recipient@example.com\",\"action\":\"failed\",\"status\":\"5.1.1\",\"diagnosticCode\":\"smtp; 550 5.1.1 user unknown\"}],\"timestamp\":\"2024-06-01T12:00:00.000Z\",\"feedbackId\":\"01000156c9eef6c1-abcdef01-2345-6789-abcd-1234567890ab-000000\",\"remoteMtaIp\":\"198.51.100.10\",\"reportingMTA\":\"dns; mta.example.com\"},\"mail\":{\"timestamp\":\"2024-06-01T11:59:30.000Z\",\"messageId\":\"01000156c9eeec48-abcdef01-2345-6789-abcd-1234567890ab-000000\",\"source\":\"sender@example.com\",\"sourceArn\":\"arn:aws:ses:us-east-1:123456789012:identity/example.com\",\"sourceIp\":\"10.0.0.10\",\"sendingAccountId\":\"123456789012\",\"destination\":[\"recipient@example.com\"],\"headersTruncated\":false,\"headers\":[{\"name\":\"From\",\"value\":\"sender@example.com\"},{\"name\":\"To\",\"value\":\"recipient@example.com\"},{\"name\":\"Subject\",\"value\":\"Example bounce\"}],\"commonHeaders\":{\"from\":[\"sender@example.com\"],\"to\":[\"recipient@example.com\"],\"messageId\":\"01000156c9eeec48-EXAMPLE\",\"subject\":\"Example bounce\"}}}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:ses-bounce-topic",
+        "Subject": "Amazon SES Email Event Notification"
+      }
+    }
+  ]
+}

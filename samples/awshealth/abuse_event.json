@@ -1,0 +1,28 @@
+{
+  "version": "0",
+  "id": "121345678-1234-1234-1234-123456789012",
+  "detail-type": "AWS Health Abuse Event",
+  "source": "aws.health",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "global",
+  "resources": ["i-0123456789abcdef0"],
+  "detail": {
+    "eventArn": "arn:aws:health:global::event/ABUSE/AWS_ABUSE_DOS_REPORT/AWS_ABUSE_DOS_REPORT_0123456789",
+    "service": "ABUSE",
+    "eventTypeCode": "AWS_ABUSE_DOS_REPORT",
+    "eventTypeCategory": "issue",
+    "startTime": "Sat, 1 Jun 2024 11:30:00 GMT",
+    "eventDescription": [
+      {
+        "language": "en_US",
+        "latestDescription": "We have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources."
+      }
+    ],
+    "affectedEntities": [
+      {
+        "entityValue": "i-0123456789abcdef0"
+      }
+    ]
+  }
+}

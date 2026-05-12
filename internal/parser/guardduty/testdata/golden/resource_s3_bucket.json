@@ -1,0 +1,66 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "The S3 account-level block public access feature was disabled. The S3 account-level block public access feature was disabled, exposing buckets to public access.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*The S3 account-level block public access feature was disabled.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nThe S3 account-level block public access feature was disabled, exposing buckets to public access."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nPolicy:S3/AccountBlockPublicAccessDisabled"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n5"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "**\n"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\ns3.amazonaws.com - DeleteAccountPublicAccessBlock"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*API origin*\n\n - "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Location*\n - "
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nS3Bucket"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Unknown Resource Type (S3Bucket)*\n{\n  \"accessKeyDetails\": {\n    \"accessKeyId\": \"AKIAIOSFODNN7EXAMPLE\",\n    \"principalId\": \"AROAJTAAAAAAAAAAAAAAA:example-session\",\n    \"userName\": \"example-role\",\n    \"userType\": \"AssumedRole\"\n  },\n  \"resourceType\": \"S3Bucket\",\n  \"s3BucketDetails\": [\n    {\n      \"arn\": \"arn:aws:s3:::example-bucket\",\n      \"createdAt\": \"2024-05-01T12:00:00Z\",\n      \"defaultServerSideEncryption\": {\n        \"encryptionType\": \"AES256\"\n      },\n      \"name\": \"example-bucket\",\n      \"owner\": {\n        \"id\": \"abcd1234567890\"\n      },\n      \"publicAccess\": {\n        \"effectivePermission\": \"PUBLIC\",\n        \"permissionConfiguration\": {\n          \"bucketLevelPermissions\": {\n            \"bucketLevelPermissions\": \"PUBLIC\"\n          }\n        }\n      },\n      \"tags\": [],\n      \"type\": \"Destination\"\n    }\n  ]\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

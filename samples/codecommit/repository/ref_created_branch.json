@@ -1,0 +1,20 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "CodeCommit Repository State Change",
+  "source": "aws.codecommit",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:codecommit:us-east-1:123456789012:example-repo"],
+  "detail": {
+    "event": "referenceCreated",
+    "repositoryName": "example-repo",
+    "repositoryId": "abcd1234-1111-2222-3333-1234567890ab",
+    "referenceType": "branch",
+    "referenceName": "feature-branch",
+    "referenceFullName": "refs/heads/feature-branch",
+    "commitId": "0123456789abcdef0123456789abcdef01234567",
+    "callerUserArn": "arn:aws:iam::123456789012:user/example-user"
+  }
+}

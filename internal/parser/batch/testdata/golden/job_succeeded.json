@@ -1,0 +1,34 @@
+{
+  "attachments": [
+    {
+      "color": "good",
+      "fallback": "Batch Job Event example-job SUCCEEDED",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*example-job succeeded*\n_AWS Batch Notification_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nSUCCEEDED"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Reason*\nEssential container in task exited"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Logs*\n\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/aws/batch/job;stream=example-job/default/abcd1234;|View Logs\u003e"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

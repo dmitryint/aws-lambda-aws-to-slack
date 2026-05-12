@@ -1,0 +1,30 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e CREATED",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e has started deploying*\n_AWS CodeDeploy Notification_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nCREATED"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*DeploymentGroup*\nexample-deployment-group"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

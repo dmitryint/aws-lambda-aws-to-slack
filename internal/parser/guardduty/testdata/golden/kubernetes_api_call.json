@@ -1,0 +1,58 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "Kubernetes API call from a known malicious IP address. The Kubernetes API was called from an IP address on a custom threat list.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Kubernetes API call from a known malicious IP address.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nThe Kubernetes API was called from an IP address on a custom threat list."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nDiscovery:Kubernetes/MaliciousIPCaller.Custom"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n5"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Generic*\nCustomList"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Unknown Action Type (${actionType})*\n{\n  \"actionType\": \"KUBERNETES_API_CALL\",\n  \"kubernetesApiCallAction\": {\n    \"parameters\": \"namespace=default\",\n    \"remoteIpDetails\": {\n      \"city\": {\n        \"cityName\": \"Unknown\"\n      },\n      \"country\": {\n        \"countryName\": \"Unknown\"\n      },\n      \"geoLocation\": {\n        \"lat\": 0,\n        \"lon\": 0\n      },\n      \"ipAddressV4\": \"203.0.113.50\",\n      \"organization\": {\n        \"asn\": \"65001\",\n        \"asnOrg\": \"Example ISP\"\n      }\n    },\n    \"requestUri\": \"/api/v1/pods\",\n    \"sourceIPs\": [\n      \"203.0.113.50\"\n    ],\n    \"statusCode\": 200,\n    \"userAgent\": \"kubectl/v1.27.0\",\n    \"verb\": \"list\"\n  }\n}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nEKSCluster"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Unknown Resource Type (EKSCluster)*\n{\n  \"eksClusterDetails\": {\n    \"arn\": \"arn:aws:eks:us-east-1:123456789012:cluster/example-cluster\",\n    \"createdAt\": \"2024-05-01T12:00:00Z\",\n    \"name\": \"example-cluster\",\n    \"platformVersion\": \"eks.5\",\n    \"status\": \"ACTIVE\",\n    \"vpcId\": \"vpc-0123456789abcdef0\"\n  },\n  \"kubernetesDetails\": {\n    \"kubernetesUserDetails\": {\n      \"groups\": [\n        \"system:masters\"\n      ],\n      \"uid\": \"abcd1234\",\n      \"username\": \"kubernetes-admin\"\n    },\n    \"kubernetesWorkloadDetails\": null\n  },\n  \"resourceType\": \"EKSCluster\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

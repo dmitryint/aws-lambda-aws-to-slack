@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:ses-received-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"notificationType\":\"Received\",\"mail\":{\"timestamp\":\"2024-06-01T12:00:00.000Z\",\"source\":\"sender@example.com\",\"messageId\":\"01000156c9eeec48-EXAMPLE\",\"destination\":[\"recipient@example.com\"],\"headersTruncated\":false,\"headers\":[{\"name\":\"From\",\"value\":\"sender@example.com\"},{\"name\":\"To\",\"value\":\"recipient@example.com\"},{\"name\":\"Subject\",\"value\":\"Plain text email\"},{\"name\":\"Date\",\"value\":\"Sat, 1 Jun 2024 12:00:00 +0000\"},{\"name\":\"Content-Type\",\"value\":\"text/plain; charset=UTF-8\"}],\"commonHeaders\":{\"returnPath\":\"sender@example.com\",\"from\":[\"sender@example.com\"],\"date\":\"Sat, 1 Jun 2024 12:00:00 +0000\",\"to\":[\"recipient@example.com\"],\"messageId\":\"01000156c9eeec48-EXAMPLE\",\"subject\":\"Plain text email\"}},\"receipt\":{\"timestamp\":\"2024-06-01T12:00:00.000Z\",\"processingTimeMillis\":322,\"recipients\":[\"recipient@example.com\"],\"spamVerdict\":{\"status\":\"PASS\"},\"virusVerdict\":{\"status\":\"PASS\"},\"spfVerdict\":{\"status\":\"PASS\"},\"dkimVerdict\":{\"status\":\"PASS\"},\"dmarcVerdict\":{\"status\":\"PASS\"},\"action\":{\"type\":\"SNS\",\"topicArn\":\"arn:aws:sns:us-east-1:123456789012:ses-received-topic\",\"encoding\":\"UTF8\"}},\"content\":\"Return-Path: <sender@example.com>\\nFrom: sender@example.com\\nTo: recipient@example.com\\nSubject: Plain text email\\n\\nHello! This is a plain text email body.\\n\"}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:ses-received-topic",
+        "Subject": "Amazon SES Email Receipt Notification"
+      }
+    }
+  ]
+}

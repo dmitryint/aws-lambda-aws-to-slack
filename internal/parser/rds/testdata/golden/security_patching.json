@@ -1,0 +1,24 @@
+{
+  "attachments": [
+    {
+      "color": "#439FE0",
+      "fallback": "example-db: DB instance has applied a mandatory security patch",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/rds/home?region=us-east-1#dbinstance:id=example-db|example-db\u003e*\n_Amazon RDS_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "DB instance has applied a mandatory security patch"
+          }
+        }
+      ]
+    }
+  ]
+}

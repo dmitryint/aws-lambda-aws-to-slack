@@ -1,0 +1,69 @@
+{
+  "version": "0",
+  "id": "cd2d702e-ab31-411b-9344-0123456789ab",
+  "detail-type": "GuardDuty Finding",
+  "source": "aws.guardduty",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "schemaVersion": "2.0",
+    "accountId": "123456789012",
+    "region": "us-east-1",
+    "partition": "aws",
+    "id": "abcd1234-1111-2222-3333-1234567890ab",
+    "arn": "arn:aws:guardduty:us-east-1:123456789012:detector/12abc34d567e8fa901bc2d34eEXAMPLE/finding/abcd1234-1111-2222-3333-1234567890ab",
+    "type": "Recon:IAMUser/MaliciousIPCaller",
+    "resource": {
+      "resourceType": "AccessKey",
+      "accessKeyDetails": {
+        "accessKeyId": "AKIAIOSFODNN7EXAMPLE",
+        "principalId": "AROAJTAAAAAAAAAAAAAAA:example-session",
+        "userType": "AssumedRole",
+        "userName": "example-role"
+      }
+    },
+    "service": {
+      "serviceName": "guardduty",
+      "detectorId": "12abc34d567e8fa901bc2d34eEXAMPLE",
+      "action": {
+        "actionType": "AWS_API_CALL",
+        "awsApiCallAction": {
+          "api": "ListBuckets",
+          "serviceName": "s3.amazonaws.com",
+          "callerType": "Remote IP",
+          "remoteIpDetails": {
+            "ipAddressV4": "203.0.113.30",
+            "organization": {
+              "asn": "65001",
+              "asnOrg": "Example ISP",
+              "isp": "Example ISP",
+              "org": "Example Org"
+            },
+            "country": {"countryName": "Russia"},
+            "city": {"cityName": "Moscow"},
+            "geoLocation": {"lat": 55.7558, "lon": 37.6173}
+          },
+          "affectedResources": {}
+        }
+      },
+      "resourceRole": "TARGET",
+      "additionalInfo": {"threatName": "Generic", "threatListName": "ProofPoint"},
+      "evidence": {
+        "threatIntelligenceDetails": [
+          {"threatListName": "ProofPoint", "threatNames": ["MaliciousIPCaller"]}
+        ]
+      },
+      "eventFirstSeen": "2024-06-01T11:55:00.000Z",
+      "eventLastSeen": "2024-06-01T12:00:00.000Z",
+      "archived": false,
+      "count": 1
+    },
+    "severity": 5,
+    "createdAt": "2024-06-01T12:00:00.000Z",
+    "updatedAt": "2024-06-01T12:00:00.000Z",
+    "title": "API ListBuckets was invoked from a known malicious IP address.",
+    "description": "An API commonly used to discover S3 buckets was invoked from a known malicious source IP."
+  }
+}

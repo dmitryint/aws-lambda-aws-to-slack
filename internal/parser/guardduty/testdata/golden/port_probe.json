@@ -1,0 +1,86 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "Unprotected port on EC2 instance i-0123456789abcdef0 is being probed. EC2 instance has an unprotected port which is being probed by a known malicious host.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Unprotected port on EC2 instance i-0123456789abcdef0 is being probed.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nEC2 instance has an unprotected port which is being probed by a known malicious host."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nRecon:EC2/PortProbeUnprotectedPort"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n2"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*PortProbe*\nProofPoint"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Port probe details*\nport 22 - SSH"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Remote probe origin*\n203.0.113.20\nExample ISP - Example Org"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Blocked*\nfalse"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*First Event Time*\n2024-06-01T11:55:00.000Z"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Last Event Time*\n2024-06-01T12:00:00.000Z"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Event count*\n5"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nInstance"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Instance ID*\ni-0123456789abcdef0"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Instance Type*\nt2.micro"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Name*\nexample-instance"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

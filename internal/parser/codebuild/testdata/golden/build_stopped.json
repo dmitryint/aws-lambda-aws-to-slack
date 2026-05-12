@@ -1,0 +1,30 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "example-project STOPPED",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/codesuite/codebuild/projects/example-project/build/example-project%3Aabcd1234-1111-2222-3333-1234567890ab/?region=us-east-1|example-project\u003e*\n_AWS CodeBuild (123456789012)_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nSTOPPED"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Logs*\n\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/aws/codebuild/example-project;start=PT5M|View Logs\u003e"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "attachments": [
+    {
+      "color": "danger",
+      "fallback": "CVE-2024-EXAMPLE: A critical vulnerability was found in the libssl1.1 package on the container image.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/inspector/v2/home?region=us-east-1#/findings?findingArn=arn%3Aaws%3Ainspector2%3Aus-east-1%3A123456789012%3Afinding%2Fabcd1234567890abcdef0123|CVE-2024-EXAMPLE — CVE-2024-EXAMPLE - libssl1.1\u003e*\n_Amazon Inspector_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "A critical vulnerability was found in the libssl1.1 package on the container image."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\nCRITICAL"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Score*\n9.8"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Fix available*\nYES"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Exploit available*\nYES"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource*\nECR example-repo (sha256:abcdef012345)"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012 (us-east-1)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

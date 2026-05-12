@@ -1,0 +1,70 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "An unusual number of failed login attempts on RDS database from a known malicious IP. An unusual number of failed RDS login attempts have been observed.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*An unusual number of failed login attempts on RDS database from a known malicious IP.*\n_Amazon GuardDuty_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Description*\nAn unusual number of failed RDS login attempts have been observed."
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Account*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nus-east-1"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Type*\nCredentialAccess:RDS/MaliciousIPCaller.FailedLogin"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Severity*\n5"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Brute force*\n"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Unknown Action Type (${actionType})*\n{\n  \"actionType\": \"RDS_LOGIN_ATTEMPT\",\n  \"rdsLoginAttemptAction\": {\n    \"loginAttributes\": [\n      {\n        \"application\": \"psql\",\n        \"failedLoginAttempts\": 12,\n        \"successfulLoginAttempts\": 0,\n        \"user\": \"postgres\"\n      }\n    ],\n    \"remoteIpDetails\": {\n      \"city\": {\n        \"cityName\": \"Unknown\"\n      },\n      \"country\": {\n        \"countryName\": \"Unknown\"\n      },\n      \"geoLocation\": {\n        \"lat\": 0,\n        \"lon\": 0\n      },\n      \"ipAddressV4\": \"203.0.113.60\",\n      \"organization\": {\n        \"asn\": \"65001\",\n        \"asnOrg\": \"Example ISP\"\n      }\n    }\n  }\n}"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*First Event Time*\n2024-06-01T11:55:00.000Z"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Last Event Time*\n2024-06-01T12:00:00.000Z"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Event count*\n12"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Resource Type*\nRDSDBInstance"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Unknown Resource Type (RDSDBInstance)*\n{\n  \"rdsDbInstanceDetails\": {\n    \"dbClusterIdentifier\": \"example-cluster\",\n    \"dbInstanceArn\": \"arn:aws:rds:us-east-1:123456789012:db:example-db\",\n    \"dbInstanceIdentifier\": \"example-db\",\n    \"engine\": \"aurora-postgresql\",\n    \"engineVersion\": \"13.7\",\n    \"tags\": []\n  },\n  \"rdsDbUserDetails\": {\n    \"application\": \"psql\",\n    \"authMethod\": \"PASSWORD\",\n    \"database\": \"postgres\",\n    \"ssl\": \"TLSv1.2\",\n    \"user\": \"postgres\"\n  },\n  \"resourceType\": \"RDSDBInstance\"\n}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

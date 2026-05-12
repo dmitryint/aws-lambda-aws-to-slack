@@ -1,0 +1,53 @@
+{
+  "version": "0",
+  "id": "cd2d702e-ab31-411b-9344-0123456789ab",
+  "detail-type": "GuardDuty Finding",
+  "source": "aws.guardduty",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "schemaVersion": "2.0",
+    "accountId": "123456789012",
+    "region": "us-east-1",
+    "partition": "aws",
+    "id": "abcd1234-1111-2222-3333-1234567890ab",
+    "arn": "arn:aws:guardduty:us-east-1:123456789012:detector/12abc34d567e8fa901bc2d34eEXAMPLE/finding/abcd1234-1111-2222-3333-1234567890ab",
+    "type": "Trojan:EC2/BlackholeTraffic",
+    "resource": {
+      "resourceType": "Instance",
+      "instanceDetails": {
+        "instanceId": "i-0123456789abcdef0",
+        "instanceType": "t2.micro",
+        "availabilityZone": "us-east-1a",
+        "imageId": "ami-0123456789abcdef0",
+        "tags": []
+      }
+    },
+    "service": {
+      "serviceName": "guardduty",
+      "detectorId": "12abc34d567e8fa901bc2d34eEXAMPLE",
+      "action": {
+        "actionType": "DNS_REQUEST",
+        "dnsRequestAction": {
+          "domain": "blackhole.example.com",
+          "protocol": "UDP",
+          "blocked": false
+        }
+      },
+      "resourceRole": "ACTOR",
+      "additionalInfo": {},
+      "evidence": null,
+      "eventFirstSeen": "2024-06-01T11:55:00.000Z",
+      "eventLastSeen": "2024-06-01T12:00:00.000Z",
+      "archived": false,
+      "count": 1
+    },
+    "severity": 8,
+    "createdAt": "2024-06-01T12:00:00.000Z",
+    "updatedAt": "2024-06-01T12:00:00.000Z",
+    "title": "High severity trojan finding.",
+    "description": "EC2 instance is querying a blackhole domain associated with malware."
+  }
+}

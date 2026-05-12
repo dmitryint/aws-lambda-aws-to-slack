@@ -1,0 +1,19 @@
+{
+  "version": "0",
+  "id": "0efbccea-222d-61fc-c9f3-0123456789ab",
+  "detail-type": "ECS Deployment State Change",
+  "source": "aws.ecs",
+  "account": "123456789012",
+  "time": "2024-06-01T12:20:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:ecs:us-east-1:123456789012:service/example-cluster/example-service"
+  ],
+  "detail": {
+    "eventType": "INFO",
+    "eventName": "SERVICE_DEPLOYMENT_IN_PROGRESS",
+    "deploymentId": "ecs-svc/0123456789abcdef0",
+    "updatedAt": "2024-06-01T12:20:00Z",
+    "reason": "ECS deployment ecs-svc/0123456789abcdef0 in progress."
+  }
+}

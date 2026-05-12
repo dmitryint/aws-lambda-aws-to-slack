@@ -1,0 +1,38 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "example-repo: New tag created in repository example-repo",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/codecommit/home?region=us-east-1#/repository/example-repo|New tag created in repository example-repo\u003e*\n_AWS CodeCommit_"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Repository*\nexample-repo"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Tag*\nv1.0.0"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Caller ARN*\narn:aws:iam::123456789012:user/example-user"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Commit Message*\ndeterministic commit subject"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

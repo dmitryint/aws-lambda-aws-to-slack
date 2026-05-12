@@ -1,0 +1,22 @@
+{
+  "Records": [
+    {
+      "EventVersion": "1.0",
+      "EventSubscriptionArn": "arn:aws:sns:us-east-1:123456789012:alarms-topic:21be56ed-a058-49f5-8c98-aedd2564c486",
+      "EventSource": "aws:sns",
+      "Sns": {
+        "SignatureVersion": "1",
+        "Timestamp": "2024-06-01T12:00:00.000Z",
+        "Signature": "tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==",
+        "SigningCertUrl": "https://sns.us-east-1.amazonaws.com/SimpleNotificationService-ac565b8b1a6c5d002d285f9598aa1d9b.pem",
+        "MessageId": "95df01b4-ee98-5cb9-9903-4c221d41eb5e",
+        "Message": "{\"AlarmName\":\"metric-math-alarm\",\"AlarmDescription\":\"Anomaly detection on requests per minute\",\"AWSAccountId\":\"123456789012\",\"NewStateValue\":\"ALARM\",\"NewStateReason\":\"Threshold Crossed: 1 datapoint [125.0 (01/06/24 11:59:00)] was greater than the upper thresholds [100.0 (01/06/24 11:59:00)].\",\"StateChangeTime\":\"2024-06-01T12:00:00.000+0000\",\"Region\":\"US East (N. Virginia)\",\"AlarmArn\":\"arn:aws:cloudwatch:us-east-1:123456789012:alarm:metric-math-alarm\",\"OldStateValue\":\"OK\",\"Trigger\":{\"Period\":60,\"EvaluationPeriods\":1,\"ComparisonOperator\":\"GreaterThanThreshold\",\"Threshold\":100.0,\"TreatMissingData\":\"- TreatMissingData: missing\",\"EvaluateLowSampleCountPercentile\":\"\",\"Metrics\":[{\"Id\":\"m1\",\"MetricStat\":{\"Metric\":{\"Namespace\":\"AWS/ApplicationELB\",\"MetricName\":\"RequestCount\",\"Dimensions\":[{\"value\":\"app/example-alb/0123456789abcdef\",\"name\":\"LoadBalancer\"}]},\"Period\":60,\"Stat\":\"Sum\"},\"ReturnData\":false},{\"Id\":\"e1\",\"Expression\":\"FILL(m1, 0)\",\"Label\":\"Filled\",\"ReturnData\":true}]}}",
+        "MessageAttributes": {},
+        "Type": "Notification",
+        "UnsubscribeUrl": "https://sns.us-east-1.amazonaws.com/unsubscribe",
+        "TopicArn": "arn:aws:sns:us-east-1:123456789012:alarms-topic",
+        "Subject": "ALARM: \"metric-math-alarm\" in US East (N. Virginia)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,75 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "Inspector2 Finding",
+  "source": "aws.inspector2",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:inspector2:us-east-1:123456789012:finding/abcd1234"],
+  "detail": {
+    "awsAccountId": "123456789012",
+    "description": "A high-severity vulnerability was found in the kernel package on an EC2 instance.",
+    "findingArn": "arn:aws:inspector2:us-east-1:123456789012:finding/ec21234567890abcdef0123",
+    "firstObservedAt": "Jun 1, 2024, 12:00:00 PM",
+    "lastObservedAt": "Jun 1, 2024, 12:00:00 PM",
+    "packageVulnerabilityDetails": {
+      "cvss": [{"baseScore": 7.8, "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H", "source": "NVD", "version": "3.1"}],
+      "referenceUrls": ["https://nvd.nist.gov/vuln/detail/CVE-2024-EC2"],
+      "relatedVulnerabilities": [],
+      "source": "AMAZON_CVE",
+      "sourceUrl": "https://nvd.nist.gov/vuln/detail/CVE-2024-EC2",
+      "vendorCreatedAt": "Jun 1, 2024, 12:00:00 PM",
+      "vendorSeverity": "Important",
+      "vulnerabilityId": "CVE-2024-EC2",
+      "vulnerablePackages": [
+        {
+          "arch": "X86_64",
+          "epoch": 0,
+          "name": "kernel",
+          "packageManager": "OS",
+          "release": "1.amzn2",
+          "version": "5.10.0"
+        }
+      ]
+    },
+    "remediation": {"recommendation": {"text": "Update kernel package and reboot."}},
+    "resources": [
+      {
+        "details": {
+          "awsEc2Instance": {
+            "iamInstanceProfileArn": "arn:aws:iam::123456789012:instance-profile/example-profile",
+            "imageId": "ami-0123456789abcdef0",
+            "ipV4Addresses": ["10.0.0.10"],
+            "keyName": "example-key",
+            "launchedAt": "May 30, 2024, 12:00:00 PM",
+            "platform": "AMAZON_LINUX_2",
+            "subnetId": "subnet-0123456789abcdef0",
+            "type": "t2.micro",
+            "vpcId": "vpc-0123456789abcdef0"
+          }
+        },
+        "id": "i-0123456789abcdef0",
+        "partition": "aws",
+        "region": "us-east-1",
+        "tags": {"Name": "example-instance"},
+        "type": "AWS_EC2_INSTANCE"
+      }
+    ],
+    "severity": "HIGH",
+    "status": "ACTIVE",
+    "title": "CVE-2024-EC2 - kernel",
+    "type": "PACKAGE_VULNERABILITY",
+    "updatedAt": "Jun 1, 2024, 12:00:00 PM",
+    "inspectorScore": 7.8,
+    "inspectorScoreDetails": {
+      "adjustedCvss": {
+        "score": 7.8,
+        "scoringVector": "CVSS:3.1/AV:L/AC:L/PR:L/UI:N/S:U/C:H/I:H/A:H",
+        "version": "3.1"
+      }
+    },
+    "fixAvailable": "YES",
+    "exploitAvailable": "NO"
+  }
+}

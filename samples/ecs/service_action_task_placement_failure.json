@@ -1,0 +1,20 @@
+{
+  "version": "0",
+  "id": "0efbccea-222d-61fc-c9f3-0123456789ab",
+  "detail-type": "ECS Service Action",
+  "source": "aws.ecs",
+  "account": "123456789012",
+  "time": "2024-06-01T12:10:00Z",
+  "region": "us-east-1",
+  "resources": [
+    "arn:aws:ecs:us-east-1:123456789012:service/example-cluster/example-service"
+  ],
+  "detail": {
+    "eventType": "WARN",
+    "eventName": "SERVICE_TASK_PLACEMENT_FAILURE",
+    "clusterArn": "arn:aws:ecs:us-east-1:123456789012:cluster/example-cluster",
+    "capacityProviderArns": [],
+    "reason": "RESOURCE:MEMORY",
+    "createdAt": "2024-06-01T12:10:00Z"
+  }
+}

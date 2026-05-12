@@ -1,0 +1,37 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "example-alarm state is now INSUFFICIENT_DATA:\nInsufficient Data: 1 datapoint was unknown.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#alarm:name=example-alarm|example-alarm\u003e*\n_AWS CloudWatch Alarm (123456789012)_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "Insufficient Data: 1 datapoint was unknown."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*State Change*\nOK → INSUFFICIENT_DATA"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Region*\nUS East (N. Virginia)"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

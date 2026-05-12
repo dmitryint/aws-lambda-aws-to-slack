@@ -1,0 +1,45 @@
+{
+  "attachments": [
+    {
+      "color": "danger",
+      "fallback": "Complaint: Mozilla/5.0",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Example complaint*\n_Amazon SES - Complaint: Mozilla/5.0_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "recipient@example.com"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*From*\nsender@example.com"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*To*\nrecipient@example.com"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*UserAgent*\nMozilla/5.0"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Complain Type*\nauth-failure"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

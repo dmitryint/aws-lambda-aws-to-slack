@@ -1,0 +1,45 @@
+{
+  "attachments": [
+    {
+      "color": "#439FE0",
+      "fallback": "Bounce: Transient - AttachmentRejected",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Example bounce*\n_Amazon SES - Bounce: Transient - AttachmentRejected_"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "recipient@example.com — failed; 5.1.1; smtp; 550 5.1.1 user unknown"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*From*\nsender@example.com"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*To*\nrecipient@example.com"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*BounceType*\nTransient"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*BounceSubType*\nAttachmentRejected"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

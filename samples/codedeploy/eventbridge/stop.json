@@ -1,0 +1,18 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "CodeDeploy Deployment State-change Notification",
+  "source": "aws.codedeploy",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:codedeploy:us-east-1:123456789012:application:example-app"],
+  "detail": {
+    "instanceGroupId": "abcd1234-1111-2222-3333-1234567890ab",
+    "region": "us-east-1",
+    "application": "example-app",
+    "deploymentId": "d-EXAMPLE123",
+    "state": "STOP",
+    "deploymentGroup": "example-deployment-group"
+  }
+}

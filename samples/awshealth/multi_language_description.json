@@ -1,0 +1,28 @@
+{
+  "version": "0",
+  "id": "121345678-1234-1234-1234-123456789012",
+  "detail-type": "AWS Health Event",
+  "source": "aws.health",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "ap-northeast-1",
+  "resources": [],
+  "detail": {
+    "eventArn": "arn:aws:health:ap-northeast-1::event/EC2/AWS_EC2_OPERATIONAL_NOTIFICATION/AWS_EC2_OPERATIONAL_NOTIFICATION_0123456789",
+    "service": "EC2",
+    "eventTypeCode": "AWS_EC2_OPERATIONAL_NOTIFICATION",
+    "eventTypeCategory": "accountNotification",
+    "startTime": "Sat, 1 Jun 2024 11:30:00 GMT",
+    "eventDescription": [
+      {
+        "language": "ja_JP",
+        "latestDescription": "お客様のAWSアカウントに関する重要なお知らせがあります。"
+      },
+      {
+        "language": "en_US",
+        "latestDescription": "An important notification regarding your AWS account is available."
+      }
+    ],
+    "affectedEntities": []
+  }
+}

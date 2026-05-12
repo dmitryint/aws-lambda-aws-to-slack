@@ -1,0 +1,17 @@
+{
+  "attachments": [
+    {
+      "color": "#dddddd",
+      "fallback": "ECS Deployment State Change",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*ECS Deployment State Change*\n_Amazon ECS - ECS Deployment State Change_"
+          }
+        }
+      ]
+    }
+  ]
+}

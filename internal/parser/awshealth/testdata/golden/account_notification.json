@@ -1,0 +1,34 @@
+{
+  "attachments": [
+    {
+      "color": "#439FE0",
+      "fallback": "Your AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*AWS Health Event*\nYour AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Account ID*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nIAM"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Start Time*\nSat, 01 Jun 2024 11:30:00 UTC"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

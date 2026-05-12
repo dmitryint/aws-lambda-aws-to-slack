@@ -1,0 +1,68 @@
+{
+  "version": "0",
+  "id": "01234567-EXAMPLE",
+  "detail-type": "Inspector2 Finding",
+  "source": "aws.inspector2",
+  "account": "123456789012",
+  "time": "2024-06-01T12:00:00Z",
+  "region": "us-east-1",
+  "resources": ["arn:aws:inspector2:us-east-1:123456789012:finding/abcd1234"],
+  "detail": {
+    "awsAccountId": "123456789012",
+    "description": "A high-severity vulnerability was found in the requests Python package bundled with the Lambda function.",
+    "findingArn": "arn:aws:inspector2:us-east-1:123456789012:finding/lmbd1234567890abcdef0123",
+    "firstObservedAt": "Jun 1, 2024, 12:00:00 PM",
+    "lastObservedAt": "Jun 1, 2024, 12:00:00 PM",
+    "packageVulnerabilityDetails": {
+      "cvss": [{"baseScore": 7.5, "scoringVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H", "source": "NVD", "version": "3.1"}],
+      "referenceUrls": ["https://nvd.nist.gov/vuln/detail/CVE-2024-LAMBDA"],
+      "relatedVulnerabilities": [],
+      "source": "PYPI_CVE",
+      "sourceUrl": "https://nvd.nist.gov/vuln/detail/CVE-2024-LAMBDA",
+      "vendorCreatedAt": "Jun 1, 2024, 12:00:00 PM",
+      "vendorSeverity": "High",
+      "vulnerabilityId": "CVE-2024-LAMBDA",
+      "vulnerablePackages": [
+        {
+          "epoch": 0,
+          "name": "requests",
+          "packageManager": "PYPI",
+          "version": "2.30.0"
+        }
+      ]
+    },
+    "remediation": {"recommendation": {"text": "Upgrade requests to 2.31.0 or later."}},
+    "resources": [
+      {
+        "details": {
+          "awsLambdaFunction": {
+            "functionArn": "arn:aws:lambda:us-east-1:123456789012:function:example-fn",
+            "functionName": "example-fn",
+            "runtime": "PYTHON_3_11",
+            "version": "$LATEST"
+          }
+        },
+        "id": "arn:aws:lambda:us-east-1:123456789012:function:example-fn",
+        "partition": "aws",
+        "region": "us-east-1",
+        "tags": {},
+        "type": "AWS_LAMBDA_FUNCTION"
+      }
+    ],
+    "severity": "HIGH",
+    "status": "ACTIVE",
+    "title": "CVE-2024-LAMBDA - requests",
+    "type": "PACKAGE_VULNERABILITY",
+    "updatedAt": "Jun 1, 2024, 12:00:00 PM",
+    "inspectorScore": 7.5,
+    "inspectorScoreDetails": {
+      "adjustedCvss": {
+        "score": 7.5,
+        "scoringVector": "CVSS:3.1/AV:N/AC:L/PR:N/UI:N/S:U/C:N/I:N/A:H",
+        "version": "3.1"
+      }
+    },
+    "fixAvailable": "YES",
+    "exploitAvailable": "NO"
+  }
+}

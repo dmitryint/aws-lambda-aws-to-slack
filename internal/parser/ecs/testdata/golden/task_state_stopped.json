@@ -1,0 +1,50 @@
+{
+  "attachments": [
+    {
+      "color": "danger",
+      "fallback": "example-cluster - ECS Task State Change - STOPPED",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*Amazon ECS - ECS Task State Change*"
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Task*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/tasks/0123456789abcdef0/details|0123456789abcdef0\u003e"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Status*\nSTOPPED"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Desired Status*\nSTOPPED"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Reason*\nEssential container in task exited"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service Logs*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Cluster*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

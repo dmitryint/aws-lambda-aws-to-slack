@@ -1,0 +1,38 @@
+{
+  "attachments": [
+    {
+      "color": "warning",
+      "fallback": "Between 11:30 AM and 12:45 PM PDT we experienced elevated API error rates for EC2 in the US-EAST-1 Region. The issue has been resolved and the service is operating normally.",
+      "blocks": [
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
+            "text": "*AWS Health Event*\nBetween 11:30 AM and 12:45 PM PDT we experienced elevated API error rates for EC2 in the US-EAST-1 Region. The issue has been resolved and the service is operating normally."
+          }
+        },
+        {
+          "type": "section",
+          "fields": [
+            {
+              "type": "mrkdwn",
+              "text": "*Account ID*\n123456789012"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Service*\nEC2"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*Start Time*\nSat, 01 Jun 2024 11:30:00 UTC"
+            },
+            {
+              "type": "mrkdwn",
+              "text": "*End Time*\nSat, 01 Jun 2024 12:45:00 UTC"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
