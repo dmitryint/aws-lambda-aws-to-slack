@@ -16,13 +16,6 @@ jobs:
           go-version: '1.26'
           cache: true
 
-      - name: install golangci-lint
-        uses: golangci/golangci-lint-action@v7
-        with:
-          version: v2.12.2
-          args: --version
-          install-mode: binary
-
       - name: tidy is clean
         run: |
           make tidy
@@ -37,7 +30,9 @@ jobs:
         run: make vet
 
       - name: lint
-        run: make lint
+        uses: golangci/golangci-lint-action@v7
+        with:
+          version: v2.12.2
 
       - name: test
         run: make test
