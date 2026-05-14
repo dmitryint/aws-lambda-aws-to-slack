@@ -53,7 +53,12 @@
             {
               "type": "mrkdwn",
               "text": "*Event count*\n12"
-            },
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
             {
               "type": "mrkdwn",
               "text": "*Resource Type*\nRDSDBInstance"

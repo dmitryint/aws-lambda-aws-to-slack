@@ -53,7 +53,12 @@
             {
               "type": "mrkdwn",
               "text": "*Resource Type*\nAccessKey"
-            },
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
             {
               "type": "mrkdwn",
               "text": "*AccessKeyId*\nAKIAIOSFODNN7EXAMPLE"

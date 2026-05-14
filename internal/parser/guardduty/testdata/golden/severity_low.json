@@ -53,7 +53,12 @@
             {
               "type": "mrkdwn",
               "text": "*Resource Type*\nInstance"
-            },
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
             {
               "type": "mrkdwn",
               "text": "*Instance ID*\ni-0123456789abcdef0"

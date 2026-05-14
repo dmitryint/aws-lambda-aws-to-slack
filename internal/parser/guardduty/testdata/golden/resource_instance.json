@@ -53,7 +53,12 @@
             {
               "type": "mrkdwn",
               "text": "*Instance Type*\nt2.micro"
-            },
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
             {
               "type": "mrkdwn",
               "text": "*Name*\nexample-instance"

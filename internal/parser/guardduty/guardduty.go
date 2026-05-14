@@ -197,10 +197,8 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	fields = append(fields, renderResource(f.ResourceTyp.ResourceType, f.Resource)...)
 
 	color := severityColor(f.Severity)
-	blocks := []slack.Block{
-		slack.SectionBlock("*" + f.Title + "*\n_Amazon GuardDuty_"),
-		slack.FieldsSection(fields),
-	}
+	blocks := []slack.Block{slack.SectionBlock("*" + f.Title + "*\n_Amazon GuardDuty_")}
+	blocks = append(blocks, slack.FieldsSections(fields)...)
 	fallback := fmt.Sprintf("%s %s", f.Title, f.Description)
 	return slack.NewMessage(color, fallback, blocks...), nil
 }

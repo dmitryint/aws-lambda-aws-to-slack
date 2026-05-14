@@ -143,7 +143,7 @@ func (c *Client) Post(ctx context.Context, m *Message) error {
 		var hr *httpError
 		switch {
 		case errors.As(perr, &hr) && hr.terminal:
-			return fmt.Errorf("%w: %d", ErrTerminal, hr.status)
+			return fmt.Errorf("%w: %d: %s", ErrTerminal, hr.status, hr.body)
 		case errors.As(perr, &hr) && hr.retryAfter != "":
 			// 429: backoffFor will read retryHeader to compute the wait.
 			_ = retryHeader

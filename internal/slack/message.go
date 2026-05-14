@@ -106,3 +106,26 @@ func ImageBlock(url, altText string) Block {
 func FieldsSection(fields []TextObject) Block {
 	return Block{Type: BlockTypeSection, Fields: fields}
 }
+
+// MaxFieldsPerSection is Slack's hard limit on Block Kit section.fields.
+// Posts exceeding it return 400 invalid_blocks.
+const MaxFieldsPerSection = 10
+
+// FieldsSections splits a field list across one or more section blocks so no
+// single section exceeds Slack's MaxFieldsPerSection limit. Parsers whose
+// field count depends on external data (resource trailers, dynamic tag rows,
+// etc.) should use this instead of FieldsSection.
+func FieldsSections(fields []TextObject) []Block {
+	if len(fields) == 0 {
+		return nil
+	}
+	blocks := make([]Block, 0, (len(fields)+MaxFieldsPerSection-1)/MaxFieldsPerSection)
+	for i := 0; i < len(fields); i += MaxFieldsPerSection {
+		end := i + MaxFieldsPerSection
+		if end > len(fields) {
+			end = len(fields)
+		}
+		blocks = append(blocks, FieldsSection(fields[i:end]))
+	}
+	return blocks
+}

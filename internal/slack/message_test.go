@@ -80,6 +80,55 @@ func TestFieldsSection_Wrapping(t *testing.T) {
 	}
 }
 
+func TestFieldsSections_ChunksToSlackLimit(t *testing.T) {
+	cases := []struct {
+		name       string
+		fieldCount int
+		wantSizes  []int
+	}{
+		{"nil_input", 0, nil},
+		{"one_field", 1, []int{1}},
+		{"exactly_limit", MaxFieldsPerSection, []int{10}},
+		{"limit_plus_one", MaxFieldsPerSection + 1, []int{10, 1}},
+		{"multi_chunk", 25, []int{10, 10, 5}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			fields := make([]TextObject, tc.fieldCount)
+			for i := range fields {
+				fields[i] = TextObject{Type: TextTypeMrkdwn, Text: "v"}
+			}
+			got := FieldsSections(fields)
+			var gotSizes []int
+			for _, b := range got {
+				if b.Type != BlockTypeSection {
+					t.Fatalf("block type: %q", b.Type)
+				}
+				gotSizes = append(gotSizes, len(b.Fields))
+			}
+			if diff := cmp.Diff(tc.wantSizes, gotSizes); diff != "" {
+				t.Fatalf("chunk sizes (-want +got):\n%s", diff)
+			}
+		})
+	}
+}
+
+func TestFieldsSections_PreservesOrder(t *testing.T) {
+	fields := make([]TextObject, 15)
+	for i := range fields {
+		fields[i] = TextObject{Type: TextTypeMrkdwn, Text: string(rune('a' + i))}
+	}
+	got := FieldsSections(fields)
+	if len(got) != 2 {
+		t.Fatalf("want 2 sections, got %d", len(got))
+	}
+	merged := append([]TextObject{}, got[0].Fields...)
+	merged = append(merged, got[1].Fields...)
+	if diff := cmp.Diff(fields, merged); diff != "" {
+		t.Fatalf("order not preserved (-want +got):\n%s", diff)
+	}
+}
+
 func TestMessageJSON_OmitsEmptyFields(t *testing.T) {
 	m := NewMessage(ColorOK, "fb", SectionBlock("hi"))
 	out, err := json.Marshal(m)

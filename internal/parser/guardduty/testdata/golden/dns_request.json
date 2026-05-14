@@ -53,7 +53,12 @@
             {
               "type": "mrkdwn",
               "text": "*Event count*\n3"
-            },
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
             {
               "type": "mrkdwn",
               "text": "*Resource Type*\nInstance"

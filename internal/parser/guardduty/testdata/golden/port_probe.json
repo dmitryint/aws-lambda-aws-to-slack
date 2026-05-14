@@ -53,7 +53,12 @@
             {
               "type": "mrkdwn",
               "text": "*First Event Time*\n2024-06-01T11:55:00.000Z"
-            },
+            }
+          ]
+        },
+        {
+          "type": "section",
+          "fields": [
             {
               "type": "mrkdwn",
               "text": "*Last Event Time*\n2024-06-01T12:00:00.000Z"
