@@ -1,10 +1,12 @@
 package inspector2
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
 	"errors"
 	"flag"
+	"log/slog"
 	"os"
 	"path/filepath"
 	"strings"
@@ -35,9 +37,13 @@ func TestInspector2_Match(t *testing.T) {
 		raw  string
 		want bool
 	}{
-		{name: "by-source", raw: `{"source":"aws.inspector2"}`, want: true},
-		{name: "by-detail-type", raw: `{"detail-type":"Inspector2 Finding"}`, want: true},
-		{name: "wrong-source-and-type", raw: `{"source":"aws.inspector","detail-type":"X"}`, want: false},
+		{name: "high-by-source", raw: `{"source":"aws.inspector2","detail":{"severity":"HIGH"}}`, want: true},
+		{name: "critical-by-detail-type", raw: `{"detail-type":"Inspector2 Finding","detail":{"severity":"CRITICAL"}}`, want: true},
+		{name: "medium-rejected", raw: `{"source":"aws.inspector2","detail":{"severity":"MEDIUM"}}`, want: false},
+		{name: "low-rejected", raw: `{"source":"aws.inspector2","detail":{"severity":"LOW"}}`, want: false},
+		{name: "informational-rejected", raw: `{"source":"aws.inspector2","detail":{"severity":"INFORMATIONAL"}}`, want: false},
+		{name: "missing-detail-block", raw: `{"source":"aws.inspector2"}`, want: false},
+		{name: "wrong-source-and-type", raw: `{"source":"aws.inspector","detail-type":"X","detail":{"severity":"HIGH"}}`, want: false},
 		{name: "empty", raw: `{}`, want: false},
 	}
 	p := New()
@@ -54,33 +60,13 @@ func TestInspector2_Match(t *testing.T) {
 	}
 }
 
-func TestInspector2_Parse_MediumIsSilenced(t *testing.T) {
+// TestInspector2_Match_MediumSampleFallsThrough asserts the canonical
+// medium-severity sample fails Match so the router lets the generic
+// catch-all render it as a raw dump.
+func TestInspector2_Match_MediumSampleFallsThrough(t *testing.T) {
 	ev := readEvent(t, filepath.Join(samplesRoot, "finding_medium_silenced.json"))
-	msg, err := New().Parse(context.Background(), ev)
-	if err != nil {
-		t.Fatalf("Parse: %v", err)
-	}
-	if msg != nil {
-		t.Fatalf("MEDIUM severity should be silenced, got %+v", msg)
-	}
-}
-
-func TestInspector2_Parse_LowAndInfoSilenced(t *testing.T) {
-	for _, sev := range []string{"LOW", "INFORMATIONAL"} {
-		t.Run(sev, func(t *testing.T) {
-			raw := `{"source":"aws.inspector2","detail":{"severity":"` + sev + `","awsAccountId":"1"}}`
-			ev, err := envelope.New(json.RawMessage(raw))
-			if err != nil {
-				t.Fatalf("envelope.New: %v", err)
-			}
-			msg, perr := New().Parse(context.Background(), ev)
-			if perr != nil {
-				t.Fatalf("Parse: %v", perr)
-			}
-			if msg != nil {
-				t.Fatalf("%s should be silenced", sev)
-			}
-		})
+	if New().Match(ev) {
+		t.Fatal("MEDIUM severity must not match — should fall through to generic")
 	}
 }
 
@@ -157,6 +143,49 @@ func TestInspector2_Parse_DedupHit_Silences(t *testing.T) {
 	wantKey := "CVE-2024-LAMBDA#AWS_LAMBDA_FUNCTION#arn:aws:lambda:us-east-1:123456789012:function:example-fn"
 	if d.gotKey != wantKey {
 		t.Fatalf("dedup key = %q, want %q", d.gotKey, wantKey)
+	}
+}
+
+// TestInspector2_Parse_DedupHit_LogsDeduped asserts the INFO log line that
+// gives operators visibility into dedup decisions in CloudWatch Logs.
+func TestInspector2_Parse_DedupHit_LogsDeduped(t *testing.T) {
+	ev := readEvent(t, filepath.Join(samplesRoot, "finding_high_lambda.json"))
+	d := &fakeDedup{firstSeen: false}
+
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	if _, err := NewWithDedup(d).WithLogger(logger).Parse(context.Background(), ev); err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+
+	out := buf.String()
+	wantKey := "CVE-2024-LAMBDA#AWS_LAMBDA_FUNCTION#arn:aws:lambda:us-east-1:123456789012:function:example-fn"
+	for _, sub := range []string{
+		`"msg":"inspector2 alert deduped"`,
+		`"dedup_key":"` + wantKey + `"`,
+		`"severity":"HIGH"`,
+		`"resource_type":"AWS_LAMBDA_FUNCTION"`,
+	} {
+		if !strings.Contains(out, sub) {
+			t.Fatalf("log output missing %q\nfull log:\n%s", sub, out)
+		}
+	}
+}
+
+// TestInspector2_Parse_DedupMiss_LogsReserved asserts that a first-sighting
+// also emits an INFO log so operators can grep for newly raised alerts.
+func TestInspector2_Parse_DedupMiss_LogsReserved(t *testing.T) {
+	ev := readEvent(t, filepath.Join(samplesRoot, "finding_high_lambda.json"))
+	d := &fakeDedup{firstSeen: true}
+
+	var buf bytes.Buffer
+	logger := slog.New(slog.NewJSONHandler(&buf, &slog.HandlerOptions{Level: slog.LevelInfo}))
+	if _, err := NewWithDedup(d).WithLogger(logger).Parse(context.Background(), ev); err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+
+	if !strings.Contains(buf.String(), `"msg":"inspector2 alert reserved"`) {
+		t.Fatalf("expected 'alert reserved' info log, got:\n%s", buf.String())
 	}
 }
 
@@ -341,6 +370,9 @@ func TestInspector2_SampleGoldens(t *testing.T) {
 	for _, entry := range entries {
 		fname := entry.Name()
 		if !strings.HasSuffix(fname, ".json") {
+			continue
+		}
+		if strings.Contains(fname, "silenced") || strings.Contains(fname, "fallthrough") {
 			continue
 		}
 		t.Run(fname, func(t *testing.T) {

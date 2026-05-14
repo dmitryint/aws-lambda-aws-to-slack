@@ -13,11 +13,11 @@ import (
 // first one whose Match returns true. The "generic" parser is registered
 // last so it acts as a catch-all (asserted by the handler wiring).
 //
-// The router walks the entire matching set in order: if a matched parser
-// returns a "silenced" result (nil message + nil error), control falls
-// through to the next matched parser. A parser returning an error is
-// collected but does not halt the walk, so a later parser can still
-// produce a message.
+// Match is the claim: the first parser whose Match returns true owns the
+// event, and its Parse result is terminal — regardless of whether Parse
+// returns a message or `(nil, nil)` (deliberate silence). A parser whose
+// Parse returns an error is the exception: the error is collected and the
+// walk continues so a later parser can still produce a message.
 type Router struct {
 	parsers []parser.Parser
 }
@@ -41,13 +41,12 @@ func (r *Router) Parsers() []parser.Parser {
 	return out
 }
 
-// Route walks the registered parsers and returns the message produced by
-// the first match that emits a non-nil result. Returns (nil, nil) when no
-// parser matches or every match was silenced.
-//
-// Errors from individual parser.Parse calls are collected and returned as
-// a wrapped error only if no successful message was produced — successful
-// downstream sends always take precedence.
+// Route walks the registered parsers and stops at the first match. The
+// matched parser's Parse result is final: a non-nil message is returned
+// for posting; (nil, nil) silences the event entirely. The only
+// exception is an error from Parse — the walk continues so a later
+// parser can still produce a message, and the last error is returned only
+// if no parser succeeded.
 func (r *Router) Route(ctx context.Context, e *envelope.Event) (*slack.Message, error) {
 	var lastErr error
 	for _, p := range r.parsers {
@@ -59,9 +58,7 @@ func (r *Router) Route(ctx context.Context, e *envelope.Event) (*slack.Message, 
 			lastErr = fmt.Errorf("parser %s: %w", p.Name(), err)
 			continue
 		}
-		if msg != nil {
-			return msg, nil
-		}
+		return msg, nil
 	}
 	return nil, lastErr
 }

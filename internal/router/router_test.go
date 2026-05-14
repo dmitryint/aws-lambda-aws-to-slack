@@ -54,8 +54,10 @@ func TestRoute_SingleMatchReturnsMessage(t *testing.T) {
 	}
 }
 
-func TestRoute_SilencedParserFallsThrough(t *testing.T) {
-	// A returns (nil, nil) — "matched but silenced".
+func TestRoute_SilencedParserIsTerminal(t *testing.T) {
+	// A matches and returns (nil, nil) — "matched but silenced". The router
+	// must stop walking; B (a catch-all that would otherwise render) is
+	// never consulted.
 	a := &fakeParser{name: "a", matches: true, msg: nil}
 	b := &fakeParser{name: "b", matches: true, msg: slack.NewMessage(slack.ColorOK, "from-b")}
 	r := New()
@@ -66,11 +68,14 @@ func TestRoute_SilencedParserFallsThrough(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Route: %v", err)
 	}
-	if got == nil || got.Attachments[0].Fallback != "from-b" {
-		t.Fatalf("expected fallback 'from-b', got %+v", got)
+	if got != nil {
+		t.Fatalf("expected nil message (silenced), got %+v", got)
 	}
-	if a.calls != 1 || b.calls != 1 {
-		t.Fatalf("walk count: a=%d b=%d", a.calls, b.calls)
+	if a.calls != 1 {
+		t.Fatalf("parser a should be called once, got %d", a.calls)
+	}
+	if b.calls != 0 {
+		t.Fatalf("parser b must not be called after a silences the event, got %d calls", b.calls)
 	}
 }
 

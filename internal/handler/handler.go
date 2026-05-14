@@ -201,10 +201,20 @@ func (h *Handler) processRecord(ctx context.Context, rec *envelope.Event) error 
 		return fmt.Errorf("route: %w", err)
 	}
 	if msg == nil {
+		h.log.InfoContext(ctx, "record silenced",
+			"source", rec.Source(),
+			"subject", rec.Subject(),
+			"detail_type", rec.DetailType(),
+		)
 		return nil
 	}
 	if perr := h.slack.Post(ctx, msg); perr != nil {
 		return fmt.Errorf("slack post: %w", perr)
 	}
+	h.log.InfoContext(ctx, "alert posted",
+		"source", rec.Source(),
+		"subject", rec.Subject(),
+		"detail_type", rec.DetailType(),
+	)
 	return nil
 }

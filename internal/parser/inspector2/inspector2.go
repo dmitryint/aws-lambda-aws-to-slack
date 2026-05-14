@@ -2,7 +2,8 @@
 // findings. Matches when the EventBridge source is "aws.inspector2" or the
 // detail-type equals "Inspector2 Finding".
 //
-// LOW / MEDIUM / INFORMATIONAL severities are silenced (return nil, nil).
+// Only HIGH / CRITICAL findings claim the event — lower severities fail
+// Match so the generic parser renders them as raw-event dumps.
 // HIGH renders as a warning attachment; CRITICAL as a danger attachment.
 // The parser ties into the dedup package to suppress repeat alerts for the
 // same (vulnerabilityId, resourceType, resourceFamily) triple within the
@@ -13,6 +14,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log/slog"
 	"net/url"
 	"regexp"
 	"strconv"
@@ -63,6 +65,7 @@ var inspector2ArnRegionRE = regexp.MustCompile(`^arn:[^:]+:inspector2:([^:]+):`)
 // Parser renders Slack messages for Inspector2 findings.
 type Parser struct {
 	dedup dedup.Deduplicator
+	log   *slog.Logger
 }
 
 // New returns a Parser without dedup. Tests that don't need to assert dedup
@@ -88,16 +91,43 @@ func NewFromConfig(cfg aws.Config, tableName string, ttlDays int) *Parser {
 	return &Parser{dedup: store}
 }
 
+// WithLogger overrides the default slog.Default() logger. Tests inject a
+// buffer-backed handler to assert log output.
+func (p *Parser) WithLogger(l *slog.Logger) *Parser {
+	p.log = l
+	return p
+}
+
+// logger returns the configured logger, falling back to slog.Default().
+func (p *Parser) logger() *slog.Logger {
+	if p.log != nil {
+		return p.log
+	}
+	return slog.Default()
+}
+
 // Name returns the stable parser identifier.
 func (Parser) Name() string { return name }
 
-// Match returns true when the EventBridge source identifies an Inspector2
-// finding or the detail-type matches.
+// Match claims Inspector2 EventBridge findings whose severity is HIGH or
+// CRITICAL. Lower-severity findings (LOW / MEDIUM / INFORMATIONAL) fail
+// Match so the generic catch-all renders them as a raw dump — the
+// specialized renderer is reserved for actionable severities.
 func (Parser) Match(e *envelope.Event) bool {
-	if e.Source() == sourceInspector2 {
-		return true
+	if e.Source() != sourceInspector2 && e.DetailType() != detailTypeInspector2 {
+		return false
 	}
-	return e.DetailType() == detailTypeInspector2
+	raw := e.Get("detail")
+	if len(raw) == 0 {
+		return false
+	}
+	var probe struct {
+		Severity string `json:"severity"`
+	}
+	if err := json.Unmarshal(raw, &probe); err != nil {
+		return false
+	}
+	return probe.Severity == severityHigh || probe.Severity == severityCritical
 }
 
 // finding captures the subset of detail.* fields the parser reads.
@@ -162,9 +192,6 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, 
 	if !ok {
 		return nil, fmt.Errorf("inspector2: detail block missing or malformed")
 	}
-	if f.Severity != severityHigh && f.Severity != severityCritical {
-		return nil, nil
-	}
 
 	res := firstResource(f.Resources)
 	dedupKey := buildDedupKey(f, res)
@@ -181,8 +208,22 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, 
 		}
 		firstSeen, err := p.dedup.TryReserve(ctx, dedupKey, meta)
 		if err == nil && !firstSeen {
+			p.logger().InfoContext(ctx, "inspector2 alert deduped",
+				"dedup_key", dedupKey,
+				"finding_arn", f.FindingArn,
+				"severity", f.Severity,
+				"resource_type", res.Type,
+				"region", region,
+			)
 			return nil, nil
 		}
+		p.logger().InfoContext(ctx, "inspector2 alert reserved",
+			"dedup_key", dedupKey,
+			"finding_arn", f.FindingArn,
+			"severity", f.Severity,
+			"resource_type", res.Type,
+			"region", region,
+		)
 	}
 
 	color := slack.ColorWarning

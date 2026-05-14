@@ -154,6 +154,17 @@ func TestRouter_WaveSixCoverage(t *testing.T) {
 							nonGenericMatches = append(nonGenericMatches, p.Name())
 						}
 					}
+					// "silenced" / "fallthrough" samples are intentional
+					// generic-only cases — the specialized parser must NOT
+					// claim them.
+					fallthroughSample := strings.Contains(name, "silenced") || strings.Contains(name, "fallthrough")
+					if fallthroughSample {
+						if len(nonGenericMatches) != 0 {
+							t.Fatalf("fallthrough sample %s should reach generic, but %v claimed it",
+								name, nonGenericMatches)
+						}
+						return
+					}
 					if len(nonGenericMatches) != 1 {
 						t.Fatalf("expected exactly 1 non-generic parser match, got %d: %v",
 							len(nonGenericMatches), nonGenericMatches)
