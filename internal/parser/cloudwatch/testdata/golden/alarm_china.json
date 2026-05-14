@@ -15,6 +15,13 @@
           "type": "section",
           "text": {
             "type": "mrkdwn",
+            "text": "*Description*\nChina region alarm"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
             "text": "Threshold Crossed"
           }
         },

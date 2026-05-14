@@ -15,6 +15,13 @@
           "type": "section",
           "text": {
             "type": "mrkdwn",
+            "text": "*Description*\nExample alarm description"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
             "text": "Insufficient Data: 1 datapoint was unknown."
           }
         },

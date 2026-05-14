@@ -275,6 +275,111 @@ func compareGolden(t *testing.T, msg any, dir, sampleName string) {
 	}
 }
 
+func TestCloudwatch_Parse_DescriptionBlock(t *testing.T) {
+	cases := []struct {
+		name        string
+		description string
+		want        bool
+	}{
+		{"populated", "Errors on aws-to-slack Lambda", true},
+		{"empty_string", "", false},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			inner, err := json.Marshal(map[string]any{
+				"AlarmName":        "x",
+				"AlarmDescription": tc.description,
+				"NewStateValue":    "ALARM",
+				"NewStateReason":   "Threshold crossed",
+				"Region":           "US East (N. Virginia)",
+			})
+			if err != nil {
+				t.Fatalf("marshal: %v", err)
+			}
+			ev, err := envelope.New(json.RawMessage(buildSNS(string(inner))))
+			if err != nil {
+				t.Fatalf("envelope.New: %v", err)
+			}
+			msg, err := New().Parse(context.Background(), ev.Records()[0])
+			if err != nil {
+				t.Fatalf("Parse: %v", err)
+			}
+			block, found := findDescriptionBlock(msg)
+			if found != tc.want {
+				t.Fatalf("description block present = %v, want %v", found, tc.want)
+			}
+			if !tc.want {
+				return
+			}
+			if got, want := block.Text.Text, "*Description*\n"+tc.description; got != want {
+				t.Fatalf("description text = %q, want %q", got, want)
+			}
+		})
+	}
+}
+
+func TestCloudwatch_Parse_DescriptionPlacement(t *testing.T) {
+	inner := `{"AlarmName":"x","AlarmDescription":"why this alarm matters",` +
+		`"NewStateValue":"ALARM","NewStateReason":"Threshold crossed",` +
+		`"Region":"US East (N. Virginia)"}`
+	ev, err := envelope.New(json.RawMessage(buildSNS(inner)))
+	if err != nil {
+		t.Fatalf("envelope.New: %v", err)
+	}
+	msg, err := New().Parse(context.Background(), ev.Records()[0])
+	if err != nil {
+		t.Fatalf("Parse: %v", err)
+	}
+	blocks := msg.Attachments[0].Blocks
+	if len(blocks) < 3 {
+		t.Fatalf("want at least 3 blocks (header, description, reason), got %d", len(blocks))
+	}
+	if blocks[0].Text == nil || !strings.Contains(blocks[0].Text.Text, "AWS CloudWatch Alarm") {
+		t.Fatalf("blocks[0] is not the header: %+v", blocks[0])
+	}
+	if blocks[1].Text == nil || !strings.HasPrefix(blocks[1].Text.Text, "*Description*\n") {
+		t.Fatalf("blocks[1] is not the description: %+v", blocks[1])
+	}
+	if blocks[2].Text == nil || !strings.Contains(blocks[2].Text.Text, "Threshold crossed") {
+		t.Fatalf("blocks[2] is not the reason: %+v", blocks[2])
+	}
+}
+
+func findDescriptionBlock(msg any) (block struct {
+	Type string
+	Text *struct{ Type, Text string }
+}, found bool,
+) {
+	b, err := json.Marshal(msg)
+	if err != nil {
+		return block, false
+	}
+	var m struct {
+		Attachments []struct {
+			Blocks []struct {
+				Type string `json:"type"`
+				Text *struct {
+					Type string `json:"type"`
+					Text string `json:"text"`
+				} `json:"text,omitempty"`
+			} `json:"blocks"`
+		} `json:"attachments"`
+	}
+	if err := json.Unmarshal(b, &m); err != nil {
+		return block, false
+	}
+	for _, att := range m.Attachments {
+		for _, blk := range att.Blocks {
+			if blk.Text != nil && strings.HasPrefix(blk.Text.Text, "*Description*\n") {
+				block.Type = blk.Type
+				block.Text = &struct{ Type, Text string }{blk.Text.Type, blk.Text.Text}
+				return block, true
+			}
+		}
+	}
+	return block, false
+}
+
 func messageContains(msg any, sub string) bool {
 	b, err := json.Marshal(msg)
 	if err != nil {

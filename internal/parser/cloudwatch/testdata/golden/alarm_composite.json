@@ -15,6 +15,13 @@
           "type": "section",
           "text": {
             "type": "mrkdwn",
+            "text": "*Description*\nComposite alarm of ALARM(child-a) AND ALARM(child-b)"
+          }
+        },
+        {
+          "type": "section",
+          "text": {
+            "type": "mrkdwn",
             "text": "arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-a transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC AND arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-b transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC"
           }
         },

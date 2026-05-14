@@ -183,6 +183,9 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, 
 	text := buildReasonText(m, e.Time(), region)
 
 	blocks := []slack.Block{slack.SectionBlock(header)}
+	if m.AlarmDescription != "" {
+		blocks = append(blocks, slack.SectionBlock("*Description*\n"+m.AlarmDescription))
+	}
 	if text != "" {
 		blocks = append(blocks, slack.SectionBlock(text))
 	}
