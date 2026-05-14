@@ -1,44 +1,21 @@
 {
-  "attachments": [
+  "Source": "cloudwatch",
+  "Severity": 5,
+  "Title": "govcloud-alarm",
+  "TitleURL": "https://console.amazonaws-us-gov.com/cloudwatch/home?region=us-gov-west-1#alarm:name=govcloud-alarm",
+  "Subtitle": "AWS CloudWatch Alarm (123456789012)",
+  "Summary": "*Description*\nGovCloud region alarm\n\nThreshold Crossed",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "govcloud-alarm state is now ALARM:\nThreshold Crossed",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.amazonaws-us-gov.com/cloudwatch/home?region=us-gov-west-1#alarm:name=govcloud-alarm|govcloud-alarm\u003e*\n_AWS CloudWatch Alarm (123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Description*\nGovCloud region alarm"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "Threshold Crossed"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*State Change*\nOK → ALARM"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nGovCloud (US-West)"
-            }
-          ]
-        }
-      ]
+      "Key": "State Change",
+      "Value": "OK → ALARM"
+    },
+    {
+      "Key": "Region",
+      "Value": "GovCloud (US-West)"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "govcloud-alarm state is now ALARM:\nThreshold Crossed",
+  "Footnotes": null
 }

@@ -1,17 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "#dddddd",
-      "fallback": "example-cluster - ECS Container Instance State Change",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*example-cluster - ECS Container Instance State Change*\n_Amazon ECS - ECS Container Instance State Change_"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "ecs",
+  "Severity": 3,
+  "Title": "example-cluster - ECS Container Instance State Change",
+  "TitleURL": "",
+  "Subtitle": "Amazon ECS - ECS Container Instance State Change",
+  "Summary": "",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "example-cluster - ECS Container Instance State Change",
+  "Footnotes": null
 }

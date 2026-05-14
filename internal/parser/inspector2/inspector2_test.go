@@ -16,6 +16,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -79,8 +80,8 @@ func TestInspector2_Parse_HighRendersWarning(t *testing.T) {
 	if msg == nil {
 		t.Fatal("Parse: nil message")
 	}
-	if got := msg.Attachments[0].Color; got != "warning" {
-		t.Fatalf("color = %q, want warning", got)
+	if msg.Severity != notify.SeverityWarning {
+		t.Fatalf("severity = %s, want %s", msg.Severity, notify.SeverityWarning)
 	}
 }
 
@@ -93,8 +94,8 @@ func TestInspector2_Parse_CriticalRendersDanger(t *testing.T) {
 	if msg == nil {
 		t.Fatal("Parse: nil message")
 	}
-	if got := msg.Attachments[0].Color; got != "danger" {
-		t.Fatalf("color = %q, want danger", got)
+	if msg.Severity != notify.SeverityCritical {
+		t.Fatalf("severity = %s, want %s", msg.Severity, notify.SeverityCritical)
 	}
 }
 

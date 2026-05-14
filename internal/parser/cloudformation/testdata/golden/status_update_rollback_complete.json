@@ -1,30 +1,21 @@
 {
-  "attachments": [
+  "Source": "cloudformation",
+  "Severity": 4,
+  "Title": "Stack update rollback complete",
+  "TitleURL": "https://console.aws.amazon.com/cloudformation/home?region=us-east-1#stacks/arn%3Aaws%3Acloudformation%3Aus-east-1%3A123456789012%3Astack%2Fexample-stack%2Fabcd1234-1111-2222-3333-1234567890ab/events",
+  "Subtitle": "AWS CloudFormation",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "example-stack: Stack update rollback complete",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/cloudformation/home?region=us-east-1#stacks/arn%3Aaws%3Acloudformation%3Aus-east-1%3A123456789012%3Astack%2Fexample-stack%2Fabcd1234-1111-2222-3333-1234567890ab/events|Stack update rollback complete\u003e*\n_AWS CloudFormation_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Stack Name*\nexample-stack"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nUPDATE_ROLLBACK_COMPLETE"
-            }
-          ]
-        }
-      ]
+      "Key": "Stack Name",
+      "Value": "example-stack"
+    },
+    {
+      "Key": "Status",
+      "Value": "UPDATE_ROLLBACK_COMPLETE"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-stack: Stack update rollback complete",
+  "Footnotes": null
 }

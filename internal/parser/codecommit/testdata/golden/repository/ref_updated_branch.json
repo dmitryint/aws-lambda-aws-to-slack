@@ -1,38 +1,29 @@
 {
-  "attachments": [
+  "Source": "codecommit-repository",
+  "Severity": 3,
+  "Title": "New commit pushed to repository example-repo",
+  "TitleURL": "https://console.aws.amazon.com/codecommit/home?region=us-east-1#/repository/example-repo",
+  "Subtitle": "AWS CodeCommit",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "#dddddd",
-      "fallback": "example-repo: New commit pushed to repository example-repo",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codecommit/home?region=us-east-1#/repository/example-repo|New commit pushed to repository example-repo\u003e*\n_AWS CodeCommit_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Repository*\nexample-repo"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Branch*\nfeature-branch"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Caller ARN*\narn:aws:iam::123456789012:user/example-user"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Commit Message*\ndeterministic commit subject"
-            }
-          ]
-        }
-      ]
+      "Key": "Repository",
+      "Value": "example-repo"
+    },
+    {
+      "Key": "Branch",
+      "Value": "feature-branch"
+    },
+    {
+      "Key": "Caller ARN",
+      "Value": "arn:aws:iam::123456789012:user/example-user"
+    },
+    {
+      "Key": "Commit Message",
+      "Value": "deterministic commit subject"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-repo: New commit pushed to repository example-repo",
+  "Footnotes": null
 }

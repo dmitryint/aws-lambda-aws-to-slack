@@ -14,6 +14,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -76,16 +77,16 @@ func TestCloudwatch_Match(t *testing.T) {
 	}
 }
 
-func TestCloudwatch_StateColor(t *testing.T) {
-	cases := map[string]string{
-		"OK":                "good",
-		"ALARM":             "danger",
-		"INSUFFICIENT_DATA": "warning",
-		"OTHER":             "#dddddd",
+func TestCloudwatch_StateSeverity(t *testing.T) {
+	cases := map[string]notify.Severity{
+		"OK":                notify.SeverityOK,
+		"ALARM":             notify.SeverityCritical,
+		"INSUFFICIENT_DATA": notify.SeverityWarning,
+		"OTHER":             notify.SeverityNotice,
 	}
 	for state, want := range cases {
-		if got := stateColor(state); got != want {
-			t.Fatalf("stateColor(%s) = %q, want %q", state, got, want)
+		if got := stateSeverity(state); got != want {
+			t.Fatalf("stateSeverity(%s) = %s, want %s", state, got, want)
 		}
 	}
 }
@@ -275,7 +276,7 @@ func compareGolden(t *testing.T, msg any, dir, sampleName string) {
 	}
 }
 
-func TestCloudwatch_Parse_DescriptionBlock(t *testing.T) {
+func TestCloudwatch_Parse_DescriptionInSummary(t *testing.T) {
 	cases := []struct {
 		name        string
 		description string
@@ -304,15 +305,10 @@ func TestCloudwatch_Parse_DescriptionBlock(t *testing.T) {
 			if err != nil {
 				t.Fatalf("Parse: %v", err)
 			}
-			block, found := findDescriptionBlock(msg)
+			descMarker := "*Description*\n" + tc.description
+			found := tc.description != "" && strings.Contains(msg.Summary, descMarker)
 			if found != tc.want {
-				t.Fatalf("description block present = %v, want %v", found, tc.want)
-			}
-			if !tc.want {
-				return
-			}
-			if got, want := block.Text.Text, "*Description*\n"+tc.description; got != want {
-				t.Fatalf("description text = %q, want %q", got, want)
+				t.Fatalf("description present in summary = %v, want %v (summary=%q)", found, tc.want, msg.Summary)
 			}
 		})
 	}
@@ -330,54 +326,18 @@ func TestCloudwatch_Parse_DescriptionPlacement(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
 	}
-	blocks := msg.Attachments[0].Blocks
-	if len(blocks) < 3 {
-		t.Fatalf("want at least 3 blocks (header, description, reason), got %d", len(blocks))
+	if msg.Title != "x" {
+		t.Fatalf("title = %q, want %q", msg.Title, "x")
 	}
-	if blocks[0].Text == nil || !strings.Contains(blocks[0].Text.Text, "AWS CloudWatch Alarm") {
-		t.Fatalf("blocks[0] is not the header: %+v", blocks[0])
+	if !strings.Contains(msg.Subtitle, "AWS CloudWatch Alarm") {
+		t.Fatalf("subtitle missing alarm marker: %q", msg.Subtitle)
 	}
-	if blocks[1].Text == nil || !strings.HasPrefix(blocks[1].Text.Text, "*Description*\n") {
-		t.Fatalf("blocks[1] is not the description: %+v", blocks[1])
+	if !strings.HasPrefix(msg.Summary, "*Description*\n") {
+		t.Fatalf("summary should start with description: %q", msg.Summary)
 	}
-	if blocks[2].Text == nil || !strings.Contains(blocks[2].Text.Text, "Threshold crossed") {
-		t.Fatalf("blocks[2] is not the reason: %+v", blocks[2])
+	if !strings.Contains(msg.Summary, "Threshold crossed") {
+		t.Fatalf("summary missing reason: %q", msg.Summary)
 	}
-}
-
-func findDescriptionBlock(msg any) (block struct {
-	Type string
-	Text *struct{ Type, Text string }
-}, found bool,
-) {
-	b, err := json.Marshal(msg)
-	if err != nil {
-		return block, false
-	}
-	var m struct {
-		Attachments []struct {
-			Blocks []struct {
-				Type string `json:"type"`
-				Text *struct {
-					Type string `json:"type"`
-					Text string `json:"text"`
-				} `json:"text,omitempty"`
-			} `json:"blocks"`
-		} `json:"attachments"`
-	}
-	if err := json.Unmarshal(b, &m); err != nil {
-		return block, false
-	}
-	for _, att := range m.Attachments {
-		for _, blk := range att.Blocks {
-			if blk.Text != nil && strings.HasPrefix(blk.Text.Text, "*Description*\n") {
-				block.Type = blk.Type
-				block.Text = &struct{ Type, Text string }{blk.Text.Type, blk.Text.Text}
-				return block, true
-			}
-		}
-	}
-	return block, false
 }
 
 func messageContains(msg any, sub string) bool {

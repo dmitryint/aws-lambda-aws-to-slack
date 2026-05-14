@@ -8,7 +8,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -25,7 +25,7 @@ const (
 	prMergedFalse = "False"
 )
 
-// PullRequestParser renders Slack messages for CodeCommit Pull Request State
+// PullRequestParser renders Notifications for CodeCommit Pull Request State
 // Change EventBridge events.
 type PullRequestParser struct{}
 
@@ -57,8 +57,8 @@ func (PullRequestParser) Match(e *envelope.Event) bool {
 	return matchesSource(e) && e.DetailType() == detailTypePullRequest
 }
 
-// Parse renders the Slack message for a CodeCommit pull-request event.
-func (PullRequestParser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CodeCommit pull-request event.
+func (PullRequestParser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	d, ok := decodePullRequest(e)
 	if !ok {
 		return nil, fmt.Errorf("codecommit-pullrequest: detail block missing or malformed")
@@ -69,20 +69,19 @@ func (PullRequestParser) Parse(_ context.Context, e *envelope.Event) (*slack.Mes
 		repoName = d.RepositoryNames[0]
 	}
 
-	title, color := pullRequestTitleAndColor(d)
+	title, severity := pullRequestTitleAndSeverity(d)
 	region := e.Region()
 	prURL := pullRequestConsoleURL(region, repoName, d.PullRequestID)
 
-	header := fmt.Sprintf("*%s*\n_%s_", slack.Link(prURL, title), authorBase)
-	blocks := []slack.Block{slack.SectionBlock(header)}
-
-	fields := buildPullRequestFields(d, repoName)
-	if len(fields) > 0 {
-		blocks = append(blocks, slack.FieldsSection(fields))
-	}
-
-	fallback := fmt.Sprintf("%s: %s", repoName, title)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   pullRequestName,
+		Severity: severity,
+		Title:    title,
+		TitleURL: prURL,
+		Subtitle: authorBase,
+		Fields:   buildPullRequestFields(d, repoName),
+		Fallback: fmt.Sprintf("%s: %s", repoName, title),
+	}, nil
 }
 
 // decodePullRequest extracts the typed detail block from the inner event.
@@ -98,47 +97,39 @@ func decodePullRequest(e *envelope.Event) (pullRequestDetail, bool) {
 	return d, true
 }
 
-// pullRequestTitleAndColor maps the (event, status, isMerged) tuple to the
-// Slack title and color. Unknown combinations fall through to the neutral
-// base title.
-func pullRequestTitleAndColor(d pullRequestDetail) (title, color string) {
+// pullRequestTitleAndSeverity maps the (event, status, isMerged) tuple to the
+// title and severity. Per the spec, destructive events on closed unmerged
+// PRs are Warning (destructive on protected ref); merges and source-branch
+// updates are normal commit/PR activity (Notice).
+func pullRequestTitleAndSeverity(d pullRequestDetail) (title string, severity notify.Severity) {
 	base := fmt.Sprintf("Pull Request #%s", d.PullRequestID)
 	switch {
 	case d.Event == prEventMergeStatusUpdated && d.PullRequestStatus == prStatusClosed && d.IsMerged == prMergedTrue:
-		return base + " was merged", slack.ColorAccent
+		return base + " was merged", notify.SeverityNotice
 	case d.Event == prEventStatusChanged && d.PullRequestStatus == prStatusClosed && d.IsMerged == prMergedFalse:
-		return base + " was closed", slack.ColorCritical
+		return base + " was closed", notify.SeverityWarning
 	case d.Event == prEventCreated:
-		return base + " was opened", slack.ColorOK
+		return base + " was opened", notify.SeverityNotice
 	case d.Event == prEventSourceBranchUpdated:
-		return base + " source branch was updated", slack.ColorWarning
+		return base + " source branch was updated", notify.SeverityNotice
 	default:
-		return base, slack.ColorNeutral
+		return base, notify.SeverityNotice
 	}
 }
 
 // buildPullRequestFields returns the Repository / Pull Request Title /
 // Caller ARN field rows, each conditional on the underlying value being
 // non-empty.
-func buildPullRequestFields(d pullRequestDetail, repoName string) []slack.TextObject {
-	fields := make([]slack.TextObject, 0, 3)
+func buildPullRequestFields(d pullRequestDetail, repoName string) []notify.Field {
+	fields := make([]notify.Field, 0, 3)
 	if repoName != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + fieldRepository + "*\n" + repoName,
-		})
+		fields = append(fields, notify.Field{Key: fieldRepository, Value: repoName})
 	}
 	if d.Title != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Pull Request Title*\n" + d.Title,
-		})
+		fields = append(fields, notify.Field{Key: "Pull Request Title", Value: d.Title})
 	}
 	if d.CallerUserArn != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + fieldCallerARN + "*\n" + d.CallerUserArn,
-		})
+		fields = append(fields, notify.Field{Key: fieldCallerARN, Value: d.CallerUserArn})
 	}
 	return fields
 }

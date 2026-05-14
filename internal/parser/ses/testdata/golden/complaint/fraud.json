@@ -1,45 +1,29 @@
 {
-  "attachments": [
+  "Source": "ses-complaint",
+  "Severity": 4,
+  "Title": "Example complaint",
+  "TitleURL": "",
+  "Subtitle": "Amazon SES - Complaint: Mozilla/5.0",
+  "Summary": "recipient@example.com",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "Complaint: Mozilla/5.0",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Example complaint*\n_Amazon SES - Complaint: Mozilla/5.0_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "recipient@example.com"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*From*\nsender@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*To*\nrecipient@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*UserAgent*\nMozilla/5.0"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Complain Type*\nfraud"
-            }
-          ]
-        }
-      ]
+      "Key": "From",
+      "Value": "sender@example.com"
+    },
+    {
+      "Key": "To",
+      "Value": "recipient@example.com"
+    },
+    {
+      "Key": "UserAgent",
+      "Value": "Mozilla/5.0"
+    },
+    {
+      "Key": "Complain Type",
+      "Value": "fraud"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Complaint: Mozilla/5.0",
+  "Footnotes": null
 }

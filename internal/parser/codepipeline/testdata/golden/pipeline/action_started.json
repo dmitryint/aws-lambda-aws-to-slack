@@ -1,24 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "#439FE0",
-      "fallback": "example-pipeline \u003e\u003e STARTED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline|example-pipeline [Action: Source/SourceAction] \u003e\u003e STARTED\u003e*\n_AWS CodePipeline (123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "ExecID 01234567-0123-0123-0123-0123456789ab is now STARTED at Action Source/SourceAction (type: CodeCommit / Source)"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "codepipeline",
+  "Severity": 3,
+  "Title": "example-pipeline [Action: Source/SourceAction] \u003e\u003e STARTED",
+  "TitleURL": "https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline",
+  "Subtitle": "AWS CodePipeline (123456789012)",
+  "Summary": "ExecID 01234567-0123-0123-0123-0123456789ab is now STARTED at Action Source/SourceAction (type: CodeCommit / Source)",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "example-pipeline \u003e\u003e STARTED",
+  "Footnotes": null
 }

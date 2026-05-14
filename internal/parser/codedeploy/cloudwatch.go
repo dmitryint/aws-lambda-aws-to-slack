@@ -6,7 +6,7 @@ import (
 	"fmt"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -39,21 +39,22 @@ func (CloudWatchParser) Match(e *envelope.Event) bool {
 	return e.Source() == sourceCodeDeploy
 }
 
-// Parse renders the Slack message for a CodeDeploy state-change event.
-func (CloudWatchParser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CodeDeploy state-change event.
+func (CloudWatchParser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	d, ok := decodeCloudWatchDetail(e)
 	if !ok {
 		return nil, fmt.Errorf("codedeploy-cloudwatch: detail block missing or malformed")
 	}
 	outcome := cloudWatchOutcome(d.State)
-	return renderMessage(renderInput{
+	return renderNotification(renderInput{
+		source:          cloudWatchName,
 		region:          e.Region(),
 		application:     d.Application,
 		deploymentID:    d.DeploymentID,
 		deploymentGroup: d.DeploymentGroup,
 		status:          d.State,
 		titleSuffix:     outcome.titleSuffix,
-		color:           outcome.color,
+		severity:        outcome.severity,
 	}), nil
 }
 

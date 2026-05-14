@@ -1,7 +1,8 @@
-// Package batch renders Slack messages for AWS Batch EventBridge events.
-// Matches when the EventBridge source is "aws.batch". The detail block
-// carries the Batch job state machine (SUBMITTED → PENDING → RUNNABLE →
-// STARTING → RUNNING → SUCCEEDED | FAILED).
+// Package batch renders AWS Batch EventBridge events into the
+// transport-neutral notify.Notification shape. Matches when the
+// EventBridge source is "aws.batch". The detail block carries the Batch job
+// state machine (SUBMITTED → PENDING → RUNNABLE → STARTING → RUNNING →
+// SUCCEEDED | FAILED).
 package batch
 
 import (
@@ -11,7 +12,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -20,8 +21,12 @@ const (
 
 	statusSucceeded = "SUCCEEDED"
 	statusFailed    = "FAILED"
+	statusRunnable  = "RUNNABLE"
+	statusRunning   = "RUNNING"
 
 	logsPath = "cloudwatch/home"
+
+	authorBatch = "AWS Batch Notification"
 )
 
 // Parser handles AWS Batch EventBridge events.
@@ -56,48 +61,36 @@ type attemptContainer struct {
 	LogStreamName string `json:"logStreamName"`
 }
 
-// Parse renders the Slack message for a Batch job state change.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a Batch job state change.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	d, ok := decodeDetail(e)
 	if !ok {
 		return nil, fmt.Errorf("batch: detail block missing or malformed")
 	}
 
-	color, title := titleAndColor(d.JobName, d.Status)
+	severity, title := severityAndTitle(d.JobName, d.Status)
 	region := e.Region()
 
-	fields := make([]slack.TextObject, 0, 3)
-	fields = append(fields, slack.TextObject{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Status*\n" + d.Status,
-	})
+	fields := make([]notify.Field, 0, 3)
+	fields = append(fields, notify.Field{Key: "Status", Value: d.Status})
 	if d.StatusReason != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Reason*\n" + d.StatusReason,
-		})
+		fields = append(fields, notify.Field{Key: "Reason", Value: d.StatusReason})
 	}
-
 	if logStream := firstLogStream(d.Attempts); logStream != "" {
-		fragment := fmt.Sprintf(
-			"logEventViewer:group=/aws/batch/job;stream=%s;",
-			logStream,
-		)
+		fragment := fmt.Sprintf("logEventViewer:group=/aws/batch/job;stream=%s;", logStream)
 		logsURL := console.URLWithFragment(region, logsPath, fragment)
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Logs*\n" + slack.Link(logsURL, "View Logs"),
-		})
-	}
-
-	author := "AWS Batch Notification"
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.FieldsSection(fields),
+		fields = append(fields, notify.Field{Key: "Logs", Value: notify.Link(logsURL, "View Logs")})
 	}
 
 	fallback := fmt.Sprintf("Batch Job Event %s %s", d.JobName, d.Status)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    title,
+		Subtitle: authorBatch,
+		Fields:   fields,
+		Fallback: fallback,
+	}, nil
 }
 
 // decodeDetail extracts the typed detail block from the inner event message.
@@ -124,19 +117,20 @@ func firstLogStream(attempts []attempt) string {
 	return attempts[0].Container.LogStreamName
 }
 
-// titleAndColor maps the Batch job status to (color, title). The Batch job
-// state machine is SUBMITTED → PENDING → RUNNABLE → STARTING → RUNNING →
-// {SUCCEEDED | FAILED}; only the terminal states alter the title and color
-// — every other transition renders the default neutral color with a
-// generic title. The Reason field is omitted when statusReason is empty.
-func titleAndColor(jobName, status string) (color, title string) {
+// severityAndTitle maps the Batch job status to (severity, title). The Batch
+// job state machine is SUBMITTED → PENDING → RUNNABLE → STARTING → RUNNING →
+// {SUCCEEDED | FAILED}; only the terminal states alter the title — every
+// other transition renders the generic title at Notice severity.
+func severityAndTitle(jobName, status string) (notify.Severity, string) {
 	base := "Batch Job Event " + jobName
 	switch status {
 	case statusSucceeded:
-		return slack.ColorOK, jobName + " succeeded"
+		return notify.SeverityOK, jobName + " succeeded"
 	case statusFailed:
-		return slack.ColorCritical, jobName + " failed"
+		return notify.SeverityCritical, jobName + " failed"
+	case statusRunnable, statusRunning:
+		return notify.SeverityNotice, base
 	default:
-		return slack.ColorNeutral, base
+		return notify.SeverityNotice, base
 	}
 }

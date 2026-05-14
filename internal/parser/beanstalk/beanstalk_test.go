@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -91,25 +92,25 @@ func TestBeanstalk_Parse_SilencesUnparseableBody(t *testing.T) {
 	}
 }
 
-func TestClassify_ColorTable(t *testing.T) {
+func TestClassify_SeverityTable(t *testing.T) {
 	cases := []struct {
 		name string
 		text string
-		want string
+		want notify.Severity
 	}{
-		{name: "ok", text: "Environment health has transitioned from YELLOW to Ok", want: "good"},
-		{name: "red-critical", text: "Environment health has transitioned from Ok to RED", want: "danger"},
-		{name: "yellow-warning", text: "Environment health has transitioned from Ok to YELLOW", want: "warning"},
-		{name: "deploy-failed", text: "Failed to deploy application.", want: "danger"},
-		{name: "aborted-operation", text: "The environment update aborted operation. ok", want: "warning"},
-		{name: "removed-instance", text: "Removed instance i-12345 from the environment", want: "warning"},
+		{name: "info", text: "Environment health has transitioned from YELLOW to Ok", want: notify.SeverityInfo},
+		{name: "red-critical", text: "Environment health has transitioned from Ok to RED", want: notify.SeverityCritical},
+		{name: "yellow-warning", text: "Environment health has transitioned from Ok to YELLOW", want: notify.SeverityWarning},
+		{name: "deploy-failed", text: "Failed to deploy application.", want: notify.SeverityCritical},
+		{name: "aborted-operation", text: "The environment update aborted operation. ok", want: notify.SeverityWarning},
+		{name: "removed-instance", text: "Removed instance i-12345 from the environment", want: notify.SeverityWarning},
 		// When both lists match, the second `if` block wins — warning overrides critical.
-		{name: "warning-overrides-critical", text: "transitioned to RED and to YELLOW", want: "warning"},
+		{name: "warning-overrides-critical", text: "transitioned to RED and to YELLOW", want: notify.SeverityWarning},
 	}
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
 			if got := classify(tc.text); got != tc.want {
-				t.Fatalf("classify = %q, want %q", got, tc.want)
+				t.Fatalf("classify = %s, want %s", got, tc.want)
 			}
 		})
 	}

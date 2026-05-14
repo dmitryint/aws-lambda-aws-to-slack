@@ -5,8 +5,8 @@ import (
 	"fmt"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
 )
 
 // Router owns the ordered list of parsers and dispatches each event to the
@@ -42,23 +42,23 @@ func (r *Router) Parsers() []parser.Parser {
 }
 
 // Route walks the registered parsers and stops at the first match. The
-// matched parser's Parse result is final: a non-nil message is returned
-// for posting; (nil, nil) silences the event entirely. The only
-// exception is an error from Parse — the walk continues so a later
-// parser can still produce a message, and the last error is returned only
-// if no parser succeeded.
-func (r *Router) Route(ctx context.Context, e *envelope.Event) (*slack.Message, error) {
+// matched parser's Parse result is final: a non-nil Notification is
+// returned for delivery; (nil, nil) silences the event entirely. The
+// only exception is an error from Parse — the walk continues so a later
+// parser can still produce a Notification, and the last error is returned
+// only if no parser succeeded.
+func (r *Router) Route(ctx context.Context, e *envelope.Event) (*notify.Notification, error) {
 	var lastErr error
 	for _, p := range r.parsers {
 		if !p.Match(e) {
 			continue
 		}
-		msg, err := p.Parse(ctx, e)
+		n, err := p.Parse(ctx, e)
 		if err != nil {
 			lastErr = fmt.Errorf("parser %s: %w", p.Name(), err)
 			continue
 		}
-		return msg, nil
+		return n, nil
 	}
 	return nil, lastErr
 }

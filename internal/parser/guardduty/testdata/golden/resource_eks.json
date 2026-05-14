@@ -1,58 +1,49 @@
 {
-  "attachments": [
+  "Source": "guardduty",
+  "Severity": 4,
+  "Title": "A container was launched with a sensitive host path mounted.",
+  "TitleURL": "",
+  "Subtitle": "Amazon GuardDuty",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "A container was launched with a sensitive host path mounted. A privileged container was launched with the host root filesystem mounted, increasing the impact of a container escape.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*A container was launched with a sensitive host path mounted.*\n_Amazon GuardDuty_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Description*\nA privileged container was launched with the host root filesystem mounted, increasing the impact of a container escape."
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Account*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nus-east-1"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Type*\nPersistence:Kubernetes/ContainerWithSensitiveMount"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Severity*\n5"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "**\n"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Unknown Action Type (${actionType})*\n{\n  \"actionType\": \"KUBERNETES_API_CALL\",\n  \"kubernetesApiCallAction\": {\n    \"remoteIpDetails\": {\n      \"ipAddressV4\": \"203.0.113.80\"\n    },\n    \"requestUri\": \"/api/v1/namespaces/default/pods\",\n    \"sourceIPs\": [\n      \"203.0.113.80\"\n    ],\n    \"statusCode\": 201,\n    \"verb\": \"create\"\n  }\n}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Resource Type*\nEKSCluster"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Unknown Resource Type (EKSCluster)*\n{\n  \"eksClusterDetails\": {\n    \"arn\": \"arn:aws:eks:us-east-1:123456789012:cluster/example-cluster\",\n    \"createdAt\": \"2024-05-01T12:00:00Z\",\n    \"name\": \"example-cluster\",\n    \"platformVersion\": \"eks.5\",\n    \"status\": \"ACTIVE\",\n    \"vpcId\": \"vpc-0123456789abcdef0\"\n  },\n  \"kubernetesDetails\": {\n    \"kubernetesUserDetails\": {\n      \"groups\": [\n        \"system:masters\"\n      ],\n      \"uid\": \"abcd1234\",\n      \"username\": \"kubernetes-admin\"\n    },\n    \"kubernetesWorkloadDetails\": {\n      \"containers\": [\n        {\n          \"image\": \"example/image:latest\",\n          \"imagePrefix\": \"example\",\n          \"name\": \"example-container\",\n          \"securityContext\": {\n            \"privileged\": true\n          },\n          \"volumeMounts\": [\n            {\n              \"mountPath\": \"/host\",\n              \"name\": \"host-root\"\n            }\n          ]\n        }\n      ],\n      \"name\": \"example-pod\",\n      \"namespace\": \"default\",\n      \"type\": \"pods\",\n      \"uid\": \"1234abcd\"\n    }\n  },\n  \"resourceType\": \"EKSCluster\"\n}"
-            }
-          ]
-        }
-      ]
+      "Key": "Description",
+      "Value": "A privileged container was launched with the host root filesystem mounted, increasing the impact of a container escape."
+    },
+    {
+      "Key": "Account",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Region",
+      "Value": "us-east-1"
+    },
+    {
+      "Key": "Type",
+      "Value": "Persistence:Kubernetes/ContainerWithSensitiveMount"
+    },
+    {
+      "Key": "Severity",
+      "Value": "5"
+    },
+    {
+      "Key": "",
+      "Value": ""
+    },
+    {
+      "Key": "Unknown Action Type (${actionType})",
+      "Value": "{\n  \"actionType\": \"KUBERNETES_API_CALL\",\n  \"kubernetesApiCallAction\": {\n    \"remoteIpDetails\": {\n      \"ipAddressV4\": \"203.0.113.80\"\n    },\n    \"requestUri\": \"/api/v1/namespaces/default/pods\",\n    \"sourceIPs\": [\n      \"203.0.113.80\"\n    ],\n    \"statusCode\": 201,\n    \"verb\": \"create\"\n  }\n}"
+    },
+    {
+      "Key": "Resource Type",
+      "Value": "EKSCluster"
+    },
+    {
+      "Key": "Unknown Resource Type (EKSCluster)",
+      "Value": "{\n  \"eksClusterDetails\": {\n    \"arn\": \"arn:aws:eks:us-east-1:123456789012:cluster/example-cluster\",\n    \"createdAt\": \"2024-05-01T12:00:00Z\",\n    \"name\": \"example-cluster\",\n    \"platformVersion\": \"eks.5\",\n    \"status\": \"ACTIVE\",\n    \"vpcId\": \"vpc-0123456789abcdef0\"\n  },\n  \"kubernetesDetails\": {\n    \"kubernetesUserDetails\": {\n      \"groups\": [\n        \"system:masters\"\n      ],\n      \"uid\": \"abcd1234\",\n      \"username\": \"kubernetes-admin\"\n    },\n    \"kubernetesWorkloadDetails\": {\n      \"containers\": [\n        {\n          \"image\": \"example/image:latest\",\n          \"imagePrefix\": \"example\",\n          \"name\": \"example-container\",\n          \"securityContext\": {\n            \"privileged\": true\n          },\n          \"volumeMounts\": [\n            {\n              \"mountPath\": \"/host\",\n              \"name\": \"host-root\"\n            }\n          ]\n        }\n      ],\n      \"name\": \"example-pod\",\n      \"namespace\": \"default\",\n      \"type\": \"pods\",\n      \"uid\": \"1234abcd\"\n    }\n  },\n  \"resourceType\": \"EKSCluster\"\n}"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "A container was launched with a sensitive host path mounted. A privileged container was launched with the host root filesystem mounted, increasing the impact of a container escape.",
+  "Footnotes": null
 }

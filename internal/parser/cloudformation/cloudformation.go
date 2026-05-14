@@ -1,6 +1,6 @@
-// Package cloudformation renders Slack messages for AWS CloudFormation SNS
-// stack-event notifications. Matches when the SNS Subject begins with
-// "AWS CloudFormation Notification".
+// Package cloudformation renders AWS CloudFormation SNS stack-event
+// notifications into the transport-neutral notify.Notification shape.
+// Matches when the SNS Subject begins with "AWS CloudFormation Notification".
 package cloudformation
 
 import (
@@ -12,7 +12,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -22,36 +22,38 @@ const (
 	keyStackName  = "StackName"
 	keyLogicalID  = "LogicalResourceId"
 	keyStatus     = "ResourceStatus"
+
+	authorCloudFormation = "AWS CloudFormation"
 )
 
-// statusMapping carries the rendered title and color for one CloudFormation
+// statusMapping carries the rendered title and severity for one CloudFormation
 // stack status. Kept private so consumers go through statusMappings.
 type statusMapping struct {
-	title string
-	color string
+	title    string
+	severity notify.Severity
 }
 
-// statusMappings is the literal status → (title, color) table. Any status
-// not in this table renders with an empty title and an empty color, which
-// Slack then drops.
+// statusMappings is the literal status → (title, severity) table.
+// `*_FAILED` → Critical, `*_ROLLBACK_COMPLETE` → Warning, `*_COMPLETE` (success)
+// → OK, `*_IN_PROGRESS` → Notice.
 var statusMappings = map[string]statusMapping{
-	"CREATE_COMPLETE":                              {"Stack creation complete", slack.ColorOK},
-	"CREATE_IN_PROGRESS":                           {"Stack creation in progress", slack.ColorAccent},
-	"CREATE_FAILED":                                {"Stack creation failed", slack.ColorCritical},
-	"DELETE_COMPLETE":                              {"Stack deletion complete", slack.ColorOK},
-	"DELETE_FAILED":                                {"Stack deletion failed", slack.ColorCritical},
-	"DELETE_IN_PROGRESS":                           {"Stack deletion in progress", slack.ColorAccent},
-	"REVIEW_IN_PROGRESS":                           {"Stack review in progress", slack.ColorAccent},
-	"ROLLBACK_COMPLETE":                            {"Stack rollback complete", slack.ColorWarning},
-	"ROLLBACK_FAILED":                              {"Stack rollback failed", slack.ColorCritical},
-	"ROLLBACK_IN_PROGRESS":                         {"Stack rollback in progress", slack.ColorWarning},
-	"UPDATE_COMPLETE":                              {"Stack update complete", slack.ColorOK},
-	"UPDATE_COMPLETE_CLEANUP_IN_PROGRESS":          {"Stack update complete, cleanup in progress", slack.ColorAccent},
-	"UPDATE_IN_PROGRESS":                           {"Stack update in progress", slack.ColorAccent},
-	"UPDATE_ROLLBACK_COMPLETE":                     {"Stack update rollback complete", slack.ColorWarning},
-	"UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS": {"Stack update rollback complete, cleanup in progress", slack.ColorWarning},
-	"UPDATE_ROLLBACK_FAILED":                       {"Stack update rollback failed", slack.ColorCritical},
-	"UPDATE_ROLLBACK_IN_PROGRESS":                  {"Stack update rollback in progress", slack.ColorWarning},
+	"CREATE_COMPLETE":                              {"Stack creation complete", notify.SeverityOK},
+	"CREATE_IN_PROGRESS":                           {"Stack creation in progress", notify.SeverityNotice},
+	"CREATE_FAILED":                                {"Stack creation failed", notify.SeverityCritical},
+	"DELETE_COMPLETE":                              {"Stack deletion complete", notify.SeverityOK},
+	"DELETE_FAILED":                                {"Stack deletion failed", notify.SeverityCritical},
+	"DELETE_IN_PROGRESS":                           {"Stack deletion in progress", notify.SeverityNotice},
+	"REVIEW_IN_PROGRESS":                           {"Stack review in progress", notify.SeverityNotice},
+	"ROLLBACK_COMPLETE":                            {"Stack rollback complete", notify.SeverityWarning},
+	"ROLLBACK_FAILED":                              {"Stack rollback failed", notify.SeverityCritical},
+	"ROLLBACK_IN_PROGRESS":                         {"Stack rollback in progress", notify.SeverityWarning},
+	"UPDATE_COMPLETE":                              {"Stack update complete", notify.SeverityOK},
+	"UPDATE_COMPLETE_CLEANUP_IN_PROGRESS":          {"Stack update complete, cleanup in progress", notify.SeverityNotice},
+	"UPDATE_IN_PROGRESS":                           {"Stack update in progress", notify.SeverityNotice},
+	"UPDATE_ROLLBACK_COMPLETE":                     {"Stack update rollback complete", notify.SeverityWarning},
+	"UPDATE_ROLLBACK_COMPLETE_CLEANUP_IN_PROGRESS": {"Stack update rollback complete, cleanup in progress", notify.SeverityWarning},
+	"UPDATE_ROLLBACK_FAILED":                       {"Stack update rollback failed", notify.SeverityCritical},
+	"UPDATE_ROLLBACK_IN_PROGRESS":                  {"Stack update rollback in progress", notify.SeverityWarning},
 }
 
 // Parser handles CloudFormation stack-event SNS notifications.
@@ -70,12 +72,12 @@ func (Parser) Match(e *envelope.Event) bool {
 	return strings.HasPrefix(e.Subject(), subjectPrefix)
 }
 
-// Parse renders the Slack message for a CloudFormation stack event. Returns
+// Parse renders the Notification for a CloudFormation stack event. Returns
 // (nil, nil) for two silencing paths:
 //   - body does not parse into key/value pairs (no LogicalResourceId or
 //     StackName).
 //   - resource event for a non-stack member (LogicalResourceId != StackName).
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	body := stringMessage(e.Message())
 	fields := parseQuotedKeyValueLines(body)
 	if _, ok := fields[keyLogicalID]; !ok {
@@ -107,19 +109,23 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 		"stacks/"+encodedStackID+"/events",
 	)
 
-	title := slack.Link(consoleURL, mapping.title)
-	author := "AWS CloudFormation"
-
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.FieldsSection([]slack.TextObject{
-			{Type: slack.TextTypeMrkdwn, Text: "*Stack Name*\n" + stackName},
-			{Type: slack.TextTypeMrkdwn, Text: "*Status*\n" + status},
-		}),
+	severity := mapping.severity
+	if severity == notify.SeverityUnknown {
+		severity = notify.SeverityNotice
 	}
 
-	fallback := fmt.Sprintf("%s: %s", stackName, mapping.title)
-	return slack.NewMessage(mapping.color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    mapping.title,
+		TitleURL: consoleURL,
+		Subtitle: authorCloudFormation,
+		Fields: []notify.Field{
+			{Key: "Stack Name", Value: stackName},
+			{Key: "Status", Value: status},
+		},
+		Fallback: fmt.Sprintf("%s: %s", stackName, mapping.title),
+	}, nil
 }
 
 // stringMessage extracts the inner SNS message as a plain string.

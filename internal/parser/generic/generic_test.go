@@ -103,15 +103,14 @@ func TestGeneric_StringMessage(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
 	}
-	if msg == nil || len(msg.Attachments) == 0 {
-		t.Fatal("expected non-nil message with attachments")
+	if msg == nil {
+		t.Fatal("expected non-nil notification")
 	}
-	att := msg.Attachments[0]
-	if att.Color == "" {
-		t.Fatal("attachment Color must be set")
+	if msg.Title != "Custom" {
+		t.Fatalf("title = %q, want %q", msg.Title, "Custom")
 	}
-	if len(att.Blocks) < 2 {
-		t.Fatalf("expected >=2 blocks for string body, got %d", len(att.Blocks))
+	if !strings.Contains(msg.Summary, "hello world") {
+		t.Fatalf("summary should contain string body, got %q", msg.Summary)
 	}
 }
 
@@ -151,14 +150,13 @@ func TestGeneric_LargeObjectFallsBackToCodeBlock(t *testing.T) {
 	if msg == nil {
 		t.Fatal("expected message")
 	}
-	// When key count > maxFields, the second block is a section with a
-	// code-fenced text — not a fields-section.
-	if len(msg.Attachments[0].Blocks) < 2 {
-		t.Fatal("expected at least 2 blocks")
+	// When key count > maxFields, the renderer routes the payload into a
+	// pretty-printed code block in Summary rather than per-field rows.
+	if len(msg.Fields) != 0 {
+		t.Fatalf("expected code-block path, got %d fields", len(msg.Fields))
 	}
-	body := msg.Attachments[0].Blocks[1]
-	if body.Fields != nil {
-		t.Fatal("expected code-block path, got fields section")
+	if !strings.HasPrefix(msg.Summary, "```") {
+		t.Fatalf("expected summary to start with code fence, got %q", msg.Summary)
 	}
 }
 
@@ -173,10 +171,9 @@ func TestGeneric_VersionEmptyValueSkipped(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
 	}
-	fields := msg.Attachments[0].Blocks[1].Fields
-	for _, f := range fields {
-		if strings.Contains(f.Text, "*version*") {
-			t.Fatalf("version with empty value should be skipped: %v", f)
+	for _, f := range msg.Fields {
+		if f.Key == "version" {
+			t.Fatalf("version with empty value should be skipped: %+v", f)
 		}
 	}
 }

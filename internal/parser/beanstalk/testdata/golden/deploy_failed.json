@@ -1,37 +1,21 @@
 {
-  "attachments": [
+  "Source": "beanstalk",
+  "Severity": 5,
+  "Title": "example-app / example-env",
+  "TitleURL": "http://example-env.elasticbeanstalk.com",
+  "Subtitle": "AWS Elastic Beanstalk",
+  "Summary": "Failed to deploy application.",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "example-app / example-env: Failed to deploy application.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttp://example-env.elasticbeanstalk.com|example-app / example-env\u003e*\n_AWS Elastic Beanstalk_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "Failed to deploy application."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Application*\nexample-app"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Environment*\nexample-env"
-            }
-          ]
-        }
-      ]
+      "Key": "Application",
+      "Value": "example-app"
+    },
+    {
+      "Key": "Environment",
+      "Value": "example-env"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-app / example-env: Failed to deploy application.",
+  "Footnotes": null
 }

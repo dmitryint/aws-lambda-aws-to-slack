@@ -1,6 +1,7 @@
-// Package guardduty renders Slack messages for Amazon GuardDuty findings.
-// Events arrive over EventBridge with source "aws.guardduty", or over SNS
-// carrying the same detail body. Either path is accepted.
+// Package guardduty renders Amazon GuardDuty findings into the
+// transport-neutral notify.Notification shape. Events arrive over
+// EventBridge with source "aws.guardduty", or over SNS carrying the same
+// detail body. Either path is accepted.
 //
 // The parser branches on detail.service.action.actionType for the body
 // (PORT_PROBE, AWS_API_CALL, anything else → JSON dump) and on
@@ -16,7 +17,7 @@ import (
 	"fmt"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -31,6 +32,8 @@ const (
 
 	severityMediumGate = 4
 	severityHighGate   = 7
+
+	subtitleAmazon = "Amazon GuardDuty"
 )
 
 // Parser handles GuardDuty findings from EventBridge or SNS.
@@ -180,8 +183,8 @@ type accessKeyResource struct {
 	} `json:"accessKeyDetails"`
 }
 
-// Parse renders the Slack message for a GuardDuty finding.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a GuardDuty finding.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	f, ok := decodeFinding(e)
 	if !ok {
 		return nil, fmt.Errorf("guardduty: detail block missing or malformed")
@@ -190,17 +193,19 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	fields := buildHeaderFields(f)
 	fields = append(fields, renderAction(f.Service.Action)...)
 	fields = append(fields, renderCountFields(f.Service)...)
-	fields = append(fields, slack.TextObject{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Resource Type*\n" + f.ResourceTyp.ResourceType,
-	})
+	fields = append(fields, notify.Field{Key: "Resource Type", Value: f.ResourceTyp.ResourceType})
 	fields = append(fields, renderResource(f.ResourceTyp.ResourceType, f.Resource)...)
 
-	color := severityColor(f.Severity)
-	blocks := []slack.Block{slack.SectionBlock("*" + f.Title + "*\n_Amazon GuardDuty_")}
-	blocks = append(blocks, slack.FieldsSections(fields)...)
+	severity := severityFor(f.Severity)
 	fallback := fmt.Sprintf("%s %s", f.Title, f.Description)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    f.Title,
+		Subtitle: subtitleAmazon,
+		Fields:   fields,
+		Fallback: fallback,
+	}, nil
 }
 
 // decodeFinding pulls the typed view over the EventBridge detail block.
@@ -222,24 +227,21 @@ func decodeFinding(e *envelope.Event) (finding, bool) {
 // buildHeaderFields emits Description / Account / Region / Type / Severity /
 // (threatName, threatListName). The threat row is always pushed even when
 // both values are empty.
-func buildHeaderFields(f finding) []slack.TextObject {
-	fields := make([]slack.TextObject, 0, 6)
+func buildHeaderFields(f finding) []notify.Field {
+	fields := make([]notify.Field, 0, 6)
 	fields = append(fields,
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Description*\n" + f.Description},
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Account*\n" + f.AccountID},
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Region*\n" + f.Region},
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Type*\n" + f.Type},
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Severity*\n" + formatSeverity(f.Severity)},
-		slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*%s*\n%s", f.Service.AdditionalInfo.ThreatName, f.Service.AdditionalInfo.ThreatListName),
-		},
+		notify.Field{Key: "Description", Value: f.Description},
+		notify.Field{Key: "Account", Value: f.AccountID},
+		notify.Field{Key: "Region", Value: f.Region},
+		notify.Field{Key: "Type", Value: f.Type},
+		notify.Field{Key: "Severity", Value: formatSeverity(f.Severity)},
+		notify.Field{Key: f.Service.AdditionalInfo.ThreatName, Value: f.Service.AdditionalInfo.ThreatListName},
 	)
 	return fields
 }
 
 // renderAction dispatches the action-type branches.
-func renderAction(raw json.RawMessage) []slack.TextObject {
+func renderAction(raw json.RawMessage) []notify.Field {
 	var env actionEnvelope
 	if len(raw) > 0 {
 		_ = json.Unmarshal(raw, &env)
@@ -256,7 +258,7 @@ func renderAction(raw json.RawMessage) []slack.TextObject {
 
 // renderPortProbe builds the port-probe fields, reading only
 // portProbeDetails[0] and pushing empty strings when the slice is empty.
-func renderPortProbe(blk *portProbeActionBlock) []slack.TextObject {
+func renderPortProbe(blk *portProbeActionBlock) []notify.Field {
 	var first portProbeDetailItem
 	blocked := false
 	if blk != nil {
@@ -267,46 +269,28 @@ func renderPortProbe(blk *portProbeActionBlock) []slack.TextObject {
 	}
 	port := first.LocalPortDetails
 	remote := first.RemoteIPDetails
-	return []slack.TextObject{
-		{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*Port probe details*\nport %s - %s", formatInt(port.Port), port.PortName),
-		},
-		{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*Remote probe origin*\n%s\n%s - %s",
-				remote.IPAddressV4, remote.Organization.ISP, remote.Organization.Org),
-		},
-		{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*Blocked*\n%t", blocked),
-		},
+	return []notify.Field{
+		{Key: "Port probe details", Value: fmt.Sprintf("port %s - %s", formatInt(port.Port), port.PortName)},
+		{Key: "Remote probe origin", Value: fmt.Sprintf("%s\n%s - %s",
+			remote.IPAddressV4, remote.Organization.ISP, remote.Organization.Org)},
+		{Key: "Blocked", Value: fmt.Sprintf("%t", blocked)},
 	}
 }
 
 // renderAWSAPICall builds the AWS_API_CALL fields.
-func renderAWSAPICall(blk *awsAPICallActionBlk) []slack.TextObject {
+func renderAWSAPICall(blk *awsAPICallActionBlk) []notify.Field {
 	if blk == nil {
 		blk = &awsAPICallActionBlk{}
 	}
-	return []slack.TextObject{
-		{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*Service*\n%s - %s", blk.ServiceName, blk.API),
-		},
-		{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*API origin*\n%s\n%s - %s",
-				blk.RemoteIPDetails.IPAddressV4,
-				blk.RemoteIPDetails.Organization.ISP,
-				blk.RemoteIPDetails.Organization.Org),
-		},
-		{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*Location*\n%s - %s",
-				blk.RemoteIPDetails.Country.CountryName,
-				blk.RemoteIPDetails.City.CityName),
-		},
+	return []notify.Field{
+		{Key: "Service", Value: fmt.Sprintf("%s - %s", blk.ServiceName, blk.API)},
+		{Key: "API origin", Value: fmt.Sprintf("%s\n%s - %s",
+			blk.RemoteIPDetails.IPAddressV4,
+			blk.RemoteIPDetails.Organization.ISP,
+			blk.RemoteIPDetails.Organization.Org)},
+		{Key: "Location", Value: fmt.Sprintf("%s - %s",
+			blk.RemoteIPDetails.Country.CountryName,
+			blk.RemoteIPDetails.City.CityName)},
 	}
 }
 
@@ -314,28 +298,25 @@ func renderAWSAPICall(blk *awsAPICallActionBlk) []slack.TextObject {
 // have no specialized renderer. The title carries the literal
 // "${actionType}" sequence verbatim; the body is a pretty-printed JSON
 // dump of detail.service.action.
-func renderUnknownAction(raw json.RawMessage) []slack.TextObject {
+func renderUnknownAction(raw json.RawMessage) []notify.Field {
 	pretty := prettyJSON(raw)
-	return []slack.TextObject{{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Unknown Action Type (${actionType})*\n" + pretty,
-	}}
+	return []notify.Field{{Key: "Unknown Action Type (${actionType})", Value: pretty}}
 }
 
 // renderCountFields adds the first/last/event-count rows when count > 1.
-func renderCountFields(svc findingService) []slack.TextObject {
+func renderCountFields(svc findingService) []notify.Field {
 	if svc.Count <= 1 {
 		return nil
 	}
-	return []slack.TextObject{
-		{Type: slack.TextTypeMrkdwn, Text: "*First Event Time*\n" + svc.EventFirstSeen},
-		{Type: slack.TextTypeMrkdwn, Text: "*Last Event Time*\n" + svc.EventLastSeen},
-		{Type: slack.TextTypeMrkdwn, Text: "*Event count*\n" + formatInt(svc.Count)},
+	return []notify.Field{
+		{Key: "First Event Time", Value: svc.EventFirstSeen},
+		{Key: "Last Event Time", Value: svc.EventLastSeen},
+		{Key: "Event count", Value: formatInt(svc.Count)},
 	}
 }
 
 // renderResource emits resource-specific rows.
-func renderResource(resourceType string, raw json.RawMessage) []slack.TextObject {
+func renderResource(resourceType string, raw json.RawMessage) []notify.Field {
 	switch resourceType {
 	case resourceInstance:
 		return renderInstance(raw)
@@ -347,36 +328,33 @@ func renderResource(resourceType string, raw json.RawMessage) []slack.TextObject
 }
 
 // renderInstance renders the Instance resource trailer.
-func renderInstance(raw json.RawMessage) []slack.TextObject {
+func renderInstance(raw json.RawMessage) []notify.Field {
 	var r instanceResource
 	if len(raw) > 0 {
 		_ = json.Unmarshal(raw, &r)
 	}
-	out := make([]slack.TextObject, 0, 2+len(r.InstanceDetails.Tags))
+	out := make([]notify.Field, 0, 2+len(r.InstanceDetails.Tags))
 	out = append(out,
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Instance ID*\n" + r.InstanceDetails.InstanceID},
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*Instance Type*\n" + r.InstanceDetails.InstanceType},
+		notify.Field{Key: "Instance ID", Value: r.InstanceDetails.InstanceID},
+		notify.Field{Key: "Instance Type", Value: r.InstanceDetails.InstanceType},
 	)
 	for _, tag := range r.InstanceDetails.Tags {
-		out = append(out, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + tag.Key + "*\n" + tag.Value,
-		})
+		out = append(out, notify.Field{Key: tag.Key, Value: tag.Value})
 	}
 	return out
 }
 
 // renderAccessKey renders the AccessKey resource trailer.
-func renderAccessKey(raw json.RawMessage) []slack.TextObject {
+func renderAccessKey(raw json.RawMessage) []notify.Field {
 	var r accessKeyResource
 	if len(raw) > 0 {
 		_ = json.Unmarshal(raw, &r)
 	}
-	return []slack.TextObject{
-		{Type: slack.TextTypeMrkdwn, Text: "*AccessKeyId*\n" + r.AccessKeyDetails.AccessKeyID},
-		{Type: slack.TextTypeMrkdwn, Text: "*PrincipalId*\n" + r.AccessKeyDetails.PrincipalID},
-		{Type: slack.TextTypeMrkdwn, Text: "*User Type*\n" + r.AccessKeyDetails.UserType},
-		{Type: slack.TextTypeMrkdwn, Text: "*User Name*\n" + r.AccessKeyDetails.UserName},
+	return []notify.Field{
+		{Key: "AccessKeyId", Value: r.AccessKeyDetails.AccessKeyID},
+		{Key: "PrincipalId", Value: r.AccessKeyDetails.PrincipalID},
+		{Key: "User Type", Value: r.AccessKeyDetails.UserType},
+		{Key: "User Name", Value: r.AccessKeyDetails.UserName},
 	}
 }
 
@@ -384,26 +362,22 @@ func renderAccessKey(raw json.RawMessage) []slack.TextObject {
 // types — the full resource block is dumped as pretty JSON. This covers
 // S3Bucket, EKSCluster, RDSDBInstance, Lambda, Container, and any future
 // resource type GuardDuty introduces.
-func renderUnknownResource(resourceType string, raw json.RawMessage) []slack.TextObject {
+func renderUnknownResource(resourceType string, raw json.RawMessage) []notify.Field {
 	pretty := prettyJSON(raw)
-	return []slack.TextObject{{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Unknown Resource Type (" + resourceType + ")*\n" + pretty,
-	}}
+	return []notify.Field{{Key: "Unknown Resource Type (" + resourceType + ")", Value: pretty}}
 }
 
-// severityColor maps the GuardDuty severity float to a Slack color. The
+// severityFor maps the GuardDuty severity float to a Severity. The
 // comparisons are strict `>` (`severity > 4` warning; `severity > 7`
-// critical), so 4 stays neutral and 7 stays warning. The boundary values
-// matter — keep them exact.
-func severityColor(severity float64) string {
+// critical), so 4 stays Notice and 7 stays Warning.
+func severityFor(severity float64) notify.Severity {
 	if severity > severityHighGate {
-		return slack.ColorCritical
+		return notify.SeverityCritical
 	}
 	if severity > severityMediumGate {
-		return slack.ColorWarning
+		return notify.SeverityWarning
 	}
-	return slack.ColorNeutral
+	return notify.SeverityNotice
 }
 
 // formatSeverity formats a severity value, dropping the trailing ".0" on

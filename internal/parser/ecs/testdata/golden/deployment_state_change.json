@@ -1,17 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "#dddddd",
-      "fallback": "ECS Deployment State Change",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*ECS Deployment State Change*\n_Amazon ECS - ECS Deployment State Change_"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "ecs",
+  "Severity": 3,
+  "Title": "ECS Deployment State Change",
+  "TitleURL": "",
+  "Subtitle": "Amazon ECS - ECS Deployment State Change",
+  "Summary": "",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "ECS Deployment State Change",
+  "Footnotes": null
 }

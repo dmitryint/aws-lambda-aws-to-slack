@@ -1,30 +1,21 @@
 {
-  "attachments": [
+  "Source": "cloudformation",
+  "Severity": 3,
+  "Title": "Stack update complete, cleanup in progress",
+  "TitleURL": "https://console.aws.amazon.com/cloudformation/home?region=us-east-1#stacks/arn%3Aaws%3Acloudformation%3Aus-east-1%3A123456789012%3Astack%2Fexample-stack%2Fabcd1234-1111-2222-3333-1234567890ab/events",
+  "Subtitle": "AWS CloudFormation",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "#439FE0",
-      "fallback": "example-stack: Stack update complete, cleanup in progress",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/cloudformation/home?region=us-east-1#stacks/arn%3Aaws%3Acloudformation%3Aus-east-1%3A123456789012%3Astack%2Fexample-stack%2Fabcd1234-1111-2222-3333-1234567890ab/events|Stack update complete, cleanup in progress\u003e*\n_AWS CloudFormation_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Stack Name*\nexample-stack"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nUPDATE_COMPLETE_CLEANUP_IN_PROGRESS"
-            }
-          ]
-        }
-      ]
+      "Key": "Stack Name",
+      "Value": "example-stack"
+    },
+    {
+      "Key": "Status",
+      "Value": "UPDATE_COMPLETE_CLEANUP_IN_PROGRESS"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-stack: Stack update complete, cleanup in progress",
+  "Footnotes": null
 }

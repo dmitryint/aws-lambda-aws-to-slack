@@ -1,24 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "danger",
-      "fallback": "example-pipeline \u003e\u003e FAILED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline|example-pipeline [Stage: Source] \u003e\u003e FAILED\u003e*\n_AWS CodePipeline (123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "ExecID 01234567-0123-0123-0123-0123456789ab is now FAILED at Stage Source"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "codepipeline",
+  "Severity": 5,
+  "Title": "example-pipeline [Stage: Source] \u003e\u003e FAILED",
+  "TitleURL": "https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline",
+  "Subtitle": "AWS CodePipeline (123456789012)",
+  "Summary": "ExecID 01234567-0123-0123-0123-0123456789ab is now FAILED at Stage Source",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "example-pipeline \u003e\u003e FAILED",
+  "Footnotes": null
 }

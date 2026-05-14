@@ -16,7 +16,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -89,25 +89,26 @@ func TestRepository_Match(t *testing.T) {
 	}
 }
 
-func TestPullRequest_TitleAndColor(t *testing.T) {
+func TestPullRequest_TitleAndSeverity(t *testing.T) {
 	cases := []struct {
-		event, status, merged, title, color string
+		event, status, merged, title string
+		severity                     notify.Severity
 	}{
-		{event: "pullRequestCreated", title: "Pull Request #1 was opened", color: "good"},
-		{event: "pullRequestSourceBranchUpdated", title: "Pull Request #1 source branch was updated", color: "warning"},
-		{event: "pullRequestMergeStatusUpdated", status: "Closed", merged: "True", title: "Pull Request #1 was merged", color: "#439FE0"},
-		{event: "pullRequestStatusChanged", status: "Closed", merged: "False", title: "Pull Request #1 was closed", color: "danger"},
-		{event: "commentOnPullRequestCreated", title: "Pull Request #1", color: "#dddddd"},
+		{event: "pullRequestCreated", title: "Pull Request #1 was opened", severity: notify.SeverityNotice},
+		{event: "pullRequestSourceBranchUpdated", title: "Pull Request #1 source branch was updated", severity: notify.SeverityNotice},
+		{event: "pullRequestMergeStatusUpdated", status: "Closed", merged: "True", title: "Pull Request #1 was merged", severity: notify.SeverityNotice},
+		{event: "pullRequestStatusChanged", status: "Closed", merged: "False", title: "Pull Request #1 was closed", severity: notify.SeverityWarning},
+		{event: "commentOnPullRequestCreated", title: "Pull Request #1", severity: notify.SeverityNotice},
 	}
 	for _, tc := range cases {
-		title, color := pullRequestTitleAndColor(pullRequestDetail{
+		title, severity := pullRequestTitleAndSeverity(pullRequestDetail{
 			Event:             tc.event,
 			PullRequestID:     "1",
 			PullRequestStatus: tc.status,
 			IsMerged:          tc.merged,
 		})
-		if title != tc.title || color != tc.color {
-			t.Fatalf("event %s → (%q, %q), want (%q, %q)", tc.event, title, color, tc.title, tc.color)
+		if title != tc.title || severity != tc.severity {
+			t.Fatalf("event %s → (%q, %s), want (%q, %s)", tc.event, title, severity, tc.title, tc.severity)
 		}
 	}
 }
@@ -308,7 +309,7 @@ func TestRepository_SampleGoldens(t *testing.T) {
 // parserSurface is the minimal interface runGoldens needs from each parser.
 type parserSurface interface {
 	Match(*envelope.Event) bool
-	Parse(context.Context, *envelope.Event) (*slack.Message, error)
+	Parse(context.Context, *envelope.Event) (*notify.Notification, error)
 }
 
 // runGoldens drives one parser over every JSON sample in dir, asserting the

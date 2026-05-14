@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 // fakeParser is the test seam that lets us drive the router state machine
@@ -15,14 +15,14 @@ import (
 type fakeParser struct {
 	name    string
 	matches bool
-	msg     *slack.Message
+	msg     *notify.Notification
 	err     error
 	calls   int
 }
 
 func (f *fakeParser) Name() string                 { return f.name }
 func (f *fakeParser) Match(_ *envelope.Event) bool { return f.matches }
-func (f *fakeParser) Parse(_ context.Context, _ *envelope.Event) (*slack.Message, error) {
+func (f *fakeParser) Parse(_ context.Context, _ *envelope.Event) (*notify.Notification, error) {
 	f.calls++
 	return f.msg, f.err
 }
@@ -37,7 +37,7 @@ func newEvent(t *testing.T) *envelope.Event {
 }
 
 func TestRoute_SingleMatchReturnsMessage(t *testing.T) {
-	want := slack.NewMessage(slack.ColorOK, "ok")
+	want := &notify.Notification{Severity: notify.SeverityOK, Title: "ok", Fallback: "ok"}
 	p := &fakeParser{name: "p", matches: true, msg: want}
 	r := New()
 	r.Register(p)
@@ -59,7 +59,7 @@ func TestRoute_SilencedParserIsTerminal(t *testing.T) {
 	// must stop walking; B (a catch-all that would otherwise render) is
 	// never consulted.
 	a := &fakeParser{name: "a", matches: true, msg: nil}
-	b := &fakeParser{name: "b", matches: true, msg: slack.NewMessage(slack.ColorOK, "from-b")}
+	b := &fakeParser{name: "b", matches: true, msg: &notify.Notification{Severity: notify.SeverityOK, Title: "from-b", Fallback: "from-b"}}
 	r := New()
 	r.Register(a)
 	r.Register(b)
@@ -81,7 +81,7 @@ func TestRoute_SilencedParserIsTerminal(t *testing.T) {
 
 func TestRoute_NonMatchingParsersSkipped(t *testing.T) {
 	a := &fakeParser{name: "a", matches: false}
-	b := &fakeParser{name: "b", matches: true, msg: slack.NewMessage(slack.ColorOK, "from-b")}
+	b := &fakeParser{name: "b", matches: true, msg: &notify.Notification{Severity: notify.SeverityOK, Title: "from-b", Fallback: "from-b"}}
 	r := New()
 	r.Register(a)
 	r.Register(b)
@@ -115,7 +115,7 @@ func TestRoute_NoMatchReturnsNilNil(t *testing.T) {
 func TestRoute_ParserErrorRecordedAndWalkContinues(t *testing.T) {
 	wantErr := errors.New("boom")
 	a := &fakeParser{name: "a", matches: true, err: wantErr}
-	b := &fakeParser{name: "b", matches: true, msg: slack.NewMessage(slack.ColorOK, "from-b")}
+	b := &fakeParser{name: "b", matches: true, msg: &notify.Notification{Severity: notify.SeverityOK, Title: "from-b", Fallback: "from-b"}}
 	r := New()
 	r.Register(a)
 	r.Register(b)
@@ -125,7 +125,7 @@ func TestRoute_ParserErrorRecordedAndWalkContinues(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Route: %v", err)
 	}
-	if got == nil || got.Attachments[0].Fallback != "from-b" {
+	if got == nil || got.Fallback != "from-b" {
 		t.Fatalf("walk did not fall through to b: %+v", got)
 	}
 }

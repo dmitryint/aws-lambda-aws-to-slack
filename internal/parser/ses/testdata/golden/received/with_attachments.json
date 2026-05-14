@@ -1,34 +1,25 @@
 {
-  "attachments": [
+  "Source": "ses-received",
+  "Severity": 1,
+  "Title": "Email with attachment",
+  "TitleURL": "",
+  "Subtitle": "Amazon SES",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "#439FE0",
-      "fallback": "New email received from SES",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Email with attachment*\n_Amazon SES_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*From*\nsender@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*To*\nrecipient@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Attachments*\nMessage carries one or more attachments."
-            }
-          ]
-        }
-      ]
+      "Key": "From",
+      "Value": "sender@example.com"
+    },
+    {
+      "Key": "To",
+      "Value": "recipient@example.com"
+    },
+    {
+      "Key": "Attachments",
+      "Value": "Message carries one or more attachments."
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "New email received from SES",
+  "Footnotes": null
 }

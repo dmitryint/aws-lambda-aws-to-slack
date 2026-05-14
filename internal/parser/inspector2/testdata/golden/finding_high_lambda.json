@@ -1,53 +1,37 @@
 {
-  "attachments": [
+  "Source": "inspector2",
+  "Severity": 4,
+  "Title": "CVE-2024-LAMBDA — CVE-2024-LAMBDA - requests",
+  "TitleURL": "https://console.aws.amazon.com/inspector/v2/home?region=us-east-1#/findings?findingArn=arn%3Aaws%3Ainspector2%3Aus-east-1%3A123456789012%3Afinding%2Flmbd1234567890abcdef0123",
+  "Subtitle": "Amazon Inspector",
+  "Summary": "A high-severity vulnerability was found in the requests Python package bundled with the Lambda function.",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "CVE-2024-LAMBDA: A high-severity vulnerability was found in the requests Python package bundled with the Lambda function.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/inspector/v2/home?region=us-east-1#/findings?findingArn=arn%3Aaws%3Ainspector2%3Aus-east-1%3A123456789012%3Afinding%2Flmbd1234567890abcdef0123|CVE-2024-LAMBDA — CVE-2024-LAMBDA - requests\u003e*\n_Amazon Inspector_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "A high-severity vulnerability was found in the requests Python package bundled with the Lambda function."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Severity*\nHIGH"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Score*\n7.5"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Fix available*\nYES"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Exploit available*\nNO"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Resource*\nLambda example-fn"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Account*\n123456789012 (us-east-1)"
-            }
-          ]
-        }
-      ]
+      "Key": "Severity",
+      "Value": "HIGH"
+    },
+    {
+      "Key": "Score",
+      "Value": "7.5"
+    },
+    {
+      "Key": "Fix available",
+      "Value": "YES"
+    },
+    {
+      "Key": "Exploit available",
+      "Value": "NO"
+    },
+    {
+      "Key": "Resource",
+      "Value": "Lambda example-fn"
+    },
+    {
+      "Key": "Account",
+      "Value": "123456789012 (us-east-1)"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "CVE-2024-LAMBDA: A high-severity vulnerability was found in the requests Python package bundled with the Lambda function.",
+  "Footnotes": null
 }

@@ -1,42 +1,33 @@
 {
-  "attachments": [
+  "Source": "awshealth",
+  "Severity": 3,
+  "Title": "AWS Health Event",
+  "TitleURL": "",
+  "Subtitle": "AWS Health (123456789012)",
+  "Summary": "One or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time.",
+  "Fields": [
     {
-      "color": "#439FE0",
-      "fallback": "One or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*AWS Health Event*\nOne or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Account ID*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\nEC2"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Start Time*\nSat, 08 Jun 2024 04:00:00 UTC"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*End Time*\nSat, 08 Jun 2024 05:00:00 UTC"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Affected Entities*\ni-0123456789abcdef0"
-            }
-          ]
-        }
-      ]
+      "Key": "Account ID",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Service",
+      "Value": "EC2"
+    },
+    {
+      "Key": "Start Time",
+      "Value": "Sat, 08 Jun 2024 04:00:00 UTC"
+    },
+    {
+      "Key": "End Time",
+      "Value": "Sat, 08 Jun 2024 05:00:00 UTC"
+    },
+    {
+      "Key": "Affected Entities",
+      "Value": "i-0123456789abcdef0"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "One or more of your Amazon EC2 instances is scheduled for retirement. Please launch a replacement instance or migrate to a new instance type before the scheduled retirement time.",
+  "Footnotes": null
 }

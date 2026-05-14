@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 // name is the stable identifier the router uses for log lines.
@@ -45,12 +45,12 @@ func (Parser) Name() string { return name }
 // Match always returns true — this parser is the catch-all.
 func (Parser) Match(_ *envelope.Event) bool { return true }
 
-// Parse renders a Slack message describing the raw event. Four cases:
+// Parse renders a Notification describing the raw event. Four cases:
 //   - EventBridge envelope (object with `source` / `detail-type`).
 //   - SNS string body (free-form text published via SNS).
 //   - SNS JSON body (parsed object delivered through SNS).
 //   - Non-object message (anything else — render as a string).
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	title := e.Subject()
 	if title == "" {
 		title = defaultTitle
@@ -65,10 +65,19 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 		return nil, fmt.Errorf("decode message: %w", err)
 	}
 
-	var blocks []slack.Block
+	n := &notify.Notification{
+		Source:   name,
+		Severity: notify.SeverityInfo,
+		Fallback: fallback(e),
+	}
+
 	if !asObject {
-		blocks = renderString(title, author, body.text)
-		return slack.NewMessage(slack.ColorNeutral, fallback(e), blocks...), nil
+		n.Title = title
+		n.Subtitle = author
+		if body.text != "" {
+			n.Summary = codeBlock(body.text)
+		}
+		return n, nil
 	}
 
 	// Object path — strip the keys that are hoisted into the header.
@@ -78,8 +87,19 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	}
 	delete(body.object, "time")
 
-	blocks = renderObject(title, headerAuthor, body.object)
-	return slack.NewMessage(slack.ColorNeutral, fallback(e), blocks...), nil
+	n.Title = title
+	n.Subtitle = headerAuthor
+	if len(body.object) > 0 && len(body.object) <= maxFields {
+		if fields := buildFields(body.object); len(fields) > 0 {
+			n.Fields = fields
+			return n, nil
+		}
+	}
+	pretty, err := json.MarshalIndent(body.object, "", "  ")
+	if err == nil {
+		n.Summary = codeBlock(string(pretty))
+	}
+	return n, nil
 }
 
 // decoded carries the outcome of decodeMessage: either a parsed object or
@@ -147,60 +167,23 @@ func extractStringKey(obj map[string]any, key string) string {
 	return s
 }
 
-// renderString produces the Block Kit body for non-object messages.
-func renderString(title, author, text string) []slack.Block {
-	header := slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author))
-	if text == "" {
-		return []slack.Block{header}
-	}
-	return []slack.Block{
-		header,
-		slack.SectionBlock(codeBlock(text)),
-	}
-}
-
-// renderObject produces the Block Kit body for object messages. Two-mode
-// rendering: when the message has 1-8 top-level keys, each becomes a
-// "field" row; otherwise the whole object is pretty-printed inside a
-// code block.
-func renderObject(title, author string, obj map[string]any) []slack.Block {
-	header := slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author))
-	if len(obj) > 0 && len(obj) <= maxFields {
-		if fields := buildFields(obj); len(fields) > 0 {
-			return []slack.Block{header, slack.FieldsSection(fields)}
-		}
-	}
-	pretty, err := json.MarshalIndent(obj, "", "  ")
-	if err != nil {
-		return []slack.Block{header}
-	}
-	return []slack.Block{
-		header,
-		slack.SectionBlock(codeBlock(string(pretty))),
-	}
-}
-
-// buildFields converts the message's top-level keys into Slack fields. The
-// key order is stabilized so golden files are deterministic.
-func buildFields(obj map[string]any) []slack.TextObject {
+// buildFields converts the message's top-level keys into Notification fields.
+// The key order is stabilized so golden files are deterministic.
+func buildFields(obj map[string]any) []notify.Field {
 	keys := make([]string, 0, len(obj))
 	for k := range obj {
 		keys = append(keys, k)
 	}
 	sort.Strings(keys)
 
-	fields := make([]slack.TextObject, 0, len(keys))
+	fields := make([]notify.Field, 0, len(keys))
 	for _, k := range keys {
 		v := obj[k]
 		// "version" key with an empty value: skip.
 		if k == "version" && isEmpty(v) {
 			continue
 		}
-		val := stringifyValue(v)
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: fmt.Sprintf("*%s*\n%s", k, val),
-		})
+		fields = append(fields, notify.Field{Key: k, Value: stringifyValue(v)})
 	}
 	return fields
 }
@@ -250,14 +233,13 @@ func isEmpty(v any) bool {
 	}
 }
 
-// codeBlock wraps text in a Slack triple-backtick mrkdwn fence.
+// codeBlock wraps text in a triple-backtick mrkdwn fence.
 func codeBlock(text string) string {
 	return "```\n" + text + "\n```"
 }
 
-// fallback renders the plain-text fallback the legacy attachment carries
-// for email digests, mobile push, and ancient Slack clients. The entire
-// outer record is pretty-printed.
+// fallback renders the plain-text fallback for email digests, mobile push,
+// and ancient Slack clients. The entire outer record is pretty-printed.
 func fallback(e *envelope.Event) string {
 	pretty, err := json.MarshalIndent(e.Raw(), "", "  ")
 	if err != nil {

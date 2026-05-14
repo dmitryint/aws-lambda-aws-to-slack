@@ -1,20 +1,23 @@
-// Package rds renders Slack messages for Amazon RDS event-subscription SNS
-// notifications. Matches when the inner message contains
-// `"Event Source": "db-instance"`.
+// Package rds renders Amazon RDS event-subscription SNS notifications into
+// the transport-neutral notify.Notification shape. Matches when the inner
+// message contains `"Event Source": "db-instance"`.
 package rds
 
 import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
 	name           = "rds"
 	dbInstanceKind = "db-instance"
+
+	subtitleAmazonRDS = "Amazon RDS"
 )
 
 // Parser handles RDS event-subscription SNS notifications.
@@ -53,21 +56,47 @@ func (Parser) Match(e *envelope.Event) bool {
 	return ok && m.EventSource == dbInstanceKind
 }
 
-// Parse renders the Slack message for an RDS event-subscription notification.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for an RDS event-subscription notification.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	m, ok := decode(e)
 	if !ok {
 		return nil, fmt.Errorf("rds: payload is not a JSON object")
 	}
 
-	title := slack.Link(m.IdentifierLink, m.SourceID)
-	author := "Amazon RDS"
+	return &notify.Notification{
+		Source:   name,
+		Severity: severityFor(m.EventMessage),
+		Title:    m.SourceID,
+		TitleURL: m.IdentifierLink,
+		Subtitle: subtitleAmazonRDS,
+		Summary:  m.EventMessage,
+		Fallback: fmt.Sprintf("%s: %s", m.SourceID, m.EventMessage),
+	}, nil
+}
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.SectionBlock(m.EventMessage),
+// severityFor classifies the RDS event message into a Severity per the
+// spec: failover / fatal → Critical, maintenance → Notice,
+// backup / availability → OK; anything else defaults to Notice.
+func severityFor(msg string) notify.Severity {
+	lower := strings.ToLower(msg)
+	switch {
+	case containsAny(lower, "failover", "fatal", "failed", "error"):
+		return notify.SeverityCritical
+	case containsAny(lower, "maintenance", "patch", "upgrade", "reboot", "applying"):
+		return notify.SeverityNotice
+	case containsAny(lower, "backup", "snapshot", "available", "restored", "created"):
+		return notify.SeverityOK
+	default:
+		return notify.SeverityNotice
 	}
+}
 
-	fallback := fmt.Sprintf("%s: %s", m.SourceID, m.EventMessage)
-	return slack.NewMessage(slack.ColorAccent, fallback, blocks...), nil
+// containsAny reports whether s contains any of the given substrings.
+func containsAny(s string, subs ...string) bool {
+	for _, sub := range subs {
+		if strings.Contains(s, sub) {
+			return true
+		}
+	}
+	return false
 }

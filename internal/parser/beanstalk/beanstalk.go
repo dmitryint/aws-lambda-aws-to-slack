@@ -1,6 +1,6 @@
-// Package beanstalk renders Slack messages for AWS Elastic Beanstalk SNS
-// notifications. Matches when the SNS Subject begins with "AWS Elastic
-// Beanstalk Notification".
+// Package beanstalk renders AWS Elastic Beanstalk SNS notifications into the
+// transport-neutral notify.Notification shape. Matches when the SNS Subject
+// begins with "AWS Elastic Beanstalk Notification".
 package beanstalk
 
 import (
@@ -10,7 +10,7 @@ import (
 	"strings"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -21,6 +21,8 @@ const (
 	keyEnvironment = "Environment"
 	keyTimestamp   = "Timestamp"
 	keyEnvURL      = "Environment URL"
+
+	authorBeanstalk = "AWS Elastic Beanstalk"
 )
 
 // Parser handles Beanstalk SNS notifications.
@@ -37,10 +39,10 @@ func (Parser) Match(e *envelope.Event) bool {
 	return strings.HasPrefix(e.Subject(), subjectPrefix)
 }
 
-// Parse renders the Slack message for a Beanstalk notification. Returns
+// Parse renders the Notification for a Beanstalk SNS notification. Returns
 // (nil, nil) when the body is not parseable into the required key/value
 // pairs.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	body := stringMessage(e.Message())
 	fields := parseKeyValueLines(body)
 	if !hasRequiredFields(fields) {
@@ -52,22 +54,22 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	environment := fields[keyEnvironment]
 	envURL := fields[keyEnvURL]
 
-	color := classify(text)
+	severity := classify(text)
 	titleText := fmt.Sprintf("%s / %s", application, environment)
-	title := slack.Link(envURL, titleText)
-	author := "AWS Elastic Beanstalk"
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.SectionBlock(text),
-		slack.FieldsSection([]slack.TextObject{
-			{Type: slack.TextTypeMrkdwn, Text: "*Application*\n" + application},
-			{Type: slack.TextTypeMrkdwn, Text: "*Environment*\n" + environment},
-		}),
-	}
-
-	fallback := fmt.Sprintf("%s / %s: %s", application, environment, text)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    titleText,
+		TitleURL: envURL,
+		Subtitle: authorBeanstalk,
+		Summary:  text,
+		Fields: []notify.Field{
+			{Key: "Application", Value: application},
+			{Key: "Environment", Value: environment},
+		},
+		Fallback: fmt.Sprintf("%s / %s: %s", application, environment, text),
+	}, nil
 }
 
 // stringMessage extracts the inner SNS message as a plain string. Beanstalk
@@ -111,10 +113,10 @@ func hasRequiredFields(fields map[string]string) bool {
 	return true
 }
 
-// classify maps the Beanstalk Message text to a Slack color. When both the
+// classify maps the Beanstalk Message text to a Severity. When both the
 // critical and warning substring lists match the same message, warning
 // wins because its loop runs after the critical loop.
-func classify(text string) string {
+func classify(text string) notify.Severity {
 	critical := []string{
 		" to RED",
 		" to Severe",
@@ -135,18 +137,18 @@ func classify(text string) string {
 		" aborted operation.",
 		"some instances may have deployed the new application version",
 	}
-	color := slack.ColorOK
+	severity := notify.SeverityInfo
 	for _, substr := range critical {
 		if strings.Contains(text, substr) {
-			color = slack.ColorCritical
+			severity = notify.SeverityCritical
 			break
 		}
 	}
 	for _, substr := range warning {
 		if strings.Contains(text, substr) {
-			color = slack.ColorWarning
+			severity = notify.SeverityWarning
 			break
 		}
 	}
-	return color
+	return severity
 }

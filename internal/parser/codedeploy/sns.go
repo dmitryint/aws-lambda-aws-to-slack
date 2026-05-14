@@ -1,7 +1,7 @@
-// Package codedeploy renders Slack messages for AWS CodeDeploy events. The
-// package owns two parsers — one for the SNS notification trigger
-// (this file) and one for the EventBridge state-change rule
-// (cloudwatch.go).
+// Package codedeploy renders AWS CodeDeploy events into the
+// transport-neutral notify.Notification shape. The package owns two parsers
+// — one for the SNS notification trigger (this file) and one for the
+// EventBridge state-change rule (cloudwatch.go).
 package codedeploy
 
 import (
@@ -10,7 +10,7 @@ import (
 	"fmt"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const snsName = "codedeploy-sns"
@@ -58,21 +58,22 @@ func (SNSParser) Match(e *envelope.Event) bool {
 	return ok
 }
 
-// Parse renders the Slack message for a CodeDeploy SNS notification.
-func (SNSParser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CodeDeploy SNS notification.
+func (SNSParser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	m, ok := decodeSNS(e)
 	if !ok {
 		return nil, fmt.Errorf("codedeploy-sns: payload missing deploymentId or deploymentGroupName")
 	}
 	outcome := snsOutcome(m.Status)
-	return renderMessage(renderInput{
+	return renderNotification(renderInput{
+		source:          snsName,
 		region:          e.Region(),
 		application:     m.ApplicationName,
 		deploymentID:    m.DeploymentID,
 		deploymentGroup: m.DeploymentGroupName,
 		status:          m.Status,
 		titleSuffix:     outcome.titleSuffix,
-		color:           outcome.color,
+		severity:        outcome.severity,
 	}), nil
 }
 

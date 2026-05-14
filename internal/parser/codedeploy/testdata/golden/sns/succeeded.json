@@ -1,30 +1,21 @@
 {
-  "attachments": [
+  "Source": "codedeploy-sns",
+  "Severity": 2,
+  "Title": "CodeDeploy Application example-app has finished",
+  "TitleURL": "https://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123",
+  "Subtitle": "AWS CodeDeploy Notification",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "good",
-      "fallback": "\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e SUCCEEDED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e has finished*\n_AWS CodeDeploy Notification_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nSUCCEEDED"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*DeploymentGroup*\nexample-deployment-group"
-            }
-          ]
-        }
-      ]
+      "Key": "Status",
+      "Value": "SUCCEEDED"
+    },
+    {
+      "Key": "DeploymentGroup",
+      "Value": "example-deployment-group"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "CodeDeploy Application example-app SUCCEEDED",
+  "Footnotes": null
 }

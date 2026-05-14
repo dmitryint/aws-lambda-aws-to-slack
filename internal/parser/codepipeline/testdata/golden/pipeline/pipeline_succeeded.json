@@ -1,24 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "good",
-      "fallback": "example-pipeline \u003e\u003e SUCCEEDED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline|example-pipeline \u003e\u003e SUCCEEDED\u003e*\n_AWS CodePipeline (123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "CodePipeline Pipeline Execution State Change"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "codepipeline",
+  "Severity": 2,
+  "Title": "example-pipeline \u003e\u003e SUCCEEDED",
+  "TitleURL": "https://console.aws.amazon.com/codepipeline/home?region=us-east-1#/view/example-pipeline",
+  "Subtitle": "AWS CodePipeline (123456789012)",
+  "Summary": "CodePipeline Pipeline Execution State Change",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "example-pipeline \u003e\u003e SUCCEEDED",
+  "Footnotes": null
 }

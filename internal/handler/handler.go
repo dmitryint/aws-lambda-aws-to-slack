@@ -31,39 +31,36 @@ import (
 	rdsparser "github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser/rds"
 	sesparser "github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser/ses"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/router"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/transport"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/transport/slack"
 )
 
-// maxInFlight bounds how many Slack POSTs run concurrently when an SNS
-// multi-record event is fanned out. A small fan-out keeps burst rates
-// below Slack's 429 threshold while still completing well within the
-// Lambda deadline.
+// maxInFlight bounds how many notification deliveries run concurrently
+// when an SNS multi-record event is fanned out. A small fan-out keeps
+// burst rates below Slack's 429 threshold while still completing well
+// within the Lambda deadline.
 const maxInFlight = 4
 
-// SlackPoster is the seam tests use to capture posted messages without a
-// real HTTP server. The slack.Client implementation satisfies it.
-type SlackPoster interface {
-	Post(ctx context.Context, m *slack.Message) error
-}
-
-// Handler wires the envelope → router → slack pipeline.
+// Handler wires the envelope → router → transport pipeline.
 //
 // One Handler is constructed once at cold start and reused for the lifetime
 // of the Lambda container. The struct holds no mutable state.
 type Handler struct {
-	cfg    *config.Config
-	awsCfg aws.Config
-	router *router.Router
-	slack  SlackPoster
-	log    *slog.Logger
+	cfg       *config.Config
+	awsCfg    aws.Config
+	router    *router.Router
+	renderers []transport.Renderer
+	log       *slog.Logger
 }
 
 // Option configures the Handler at construction time.
 type Option func(*Handler)
 
-// WithSlackPoster overrides the default slack.Client built from the Config.
-// Tests inject a recording stub.
-func WithSlackPoster(p SlackPoster) Option { return func(h *Handler) { h.slack = p } }
+// WithRenderers replaces the default transport list. Tests inject a
+// recording renderer; production wires the Slack renderer.
+func WithRenderers(renderers ...transport.Renderer) Option {
+	return func(h *Handler) { h.renderers = renderers }
+}
 
 // WithLogger overrides the default slog logger (slog.Default()).
 func WithLogger(l *slog.Logger) Option { return func(h *Handler) { h.log = l } }
@@ -72,16 +69,18 @@ func WithLogger(l *slog.Logger) Option { return func(h *Handler) { h.log = l } }
 // custom parsers without going through the production wiring.
 func WithRouter(r *router.Router) Option { return func(h *Handler) { h.router = r } }
 
-// New returns a Handler with a default router (generic parser registered)
-// and a slack client built from the provided Config. Later waves register
-// the specialized parsers before the generic catch-all.
+// New returns a Handler with the default router (every wave's parsers plus
+// the generic catch-all) and the Slack transport renderer wired from the
+// provided Config.
 func New(cfg *config.Config, awsCfg aws.Config, opts ...Option) *Handler {
 	h := &Handler{
 		cfg:    cfg,
 		awsCfg: awsCfg,
 		router: defaultRouter(cfg, awsCfg),
-		slack:  slack.New(cfg.SlackHookURL),
-		log:    slog.Default(),
+		renderers: []transport.Renderer{
+			slack.NewRenderer(slack.New(cfg.SlackHookURL)),
+		},
+		log: slog.Default(),
 	}
 	for _, o := range opts {
 		o(h)
@@ -194,13 +193,15 @@ func isEmptySNSRecords(raw json.RawMessage) bool {
 	return outer.Records != nil && len(*outer.Records) == 0
 }
 
-// processRecord drives the router and Slack post for a single record.
+// processRecord drives the router and fan-out to every accepting transport
+// renderer for a single record. Per-transport errors are aggregated; the
+// loop continues so one failing transport never silences the others.
 func (h *Handler) processRecord(ctx context.Context, rec *envelope.Event) error {
-	msg, err := h.router.Route(ctx, rec)
+	n, err := h.router.Route(ctx, rec)
 	if err != nil {
 		return fmt.Errorf("route: %w", err)
 	}
-	if msg == nil {
+	if n == nil {
 		h.log.InfoContext(ctx, "record silenced",
 			"source", rec.Source(),
 			"subject", rec.Subject(),
@@ -208,13 +209,26 @@ func (h *Handler) processRecord(ctx context.Context, rec *envelope.Event) error 
 		)
 		return nil
 	}
-	if perr := h.slack.Post(ctx, msg); perr != nil {
-		return fmt.Errorf("slack post: %w", perr)
+
+	var errs []error
+	delivered := 0
+	for _, r := range h.renderers {
+		if !r.Accepts(n.Severity) {
+			continue
+		}
+		if perr := r.Send(ctx, n); perr != nil {
+			errs = append(errs, fmt.Errorf("%s: %w", r.Name(), perr))
+			continue
+		}
+		delivered++
 	}
-	h.log.InfoContext(ctx, "alert posted",
+	if len(errs) > 0 {
+		return errors.Join(errs...)
+	}
+	h.log.InfoContext(ctx, "alert delivered",
 		"source", rec.Source(),
-		"subject", rec.Subject(),
-		"detail_type", rec.DetailType(),
+		"severity", n.Severity.String(),
+		"transports", delivered,
 	)
 	return nil
 }

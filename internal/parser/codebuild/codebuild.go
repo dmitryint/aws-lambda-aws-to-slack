@@ -1,7 +1,8 @@
-// Package codebuild renders Slack messages for AWS CodeBuild EventBridge
-// events. Matches when the EventBridge source is "aws.codebuild". Only
-// "CodeBuild Build State Change" produces a message — the "CodeBuild
-// Build Phase Change" detail-type is silenced.
+// Package codebuild renders AWS CodeBuild EventBridge events into the
+// transport-neutral notify.Notification shape. Matches when the
+// EventBridge source is "aws.codebuild". Only "CodeBuild Build State Change"
+// produces a message — the "CodeBuild Build Phase Change" detail-type is
+// silenced.
 package codebuild
 
 import (
@@ -13,7 +14,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -23,6 +24,11 @@ const (
 	detailBuildPhase = "CodeBuild Build Phase Change"
 	authorBase       = "AWS CodeBuild"
 	logsPath         = "cloudwatch/home"
+
+	statusSucceeded  = "SUCCEEDED"
+	statusFailed     = "FAILED"
+	statusStopped    = "STOPPED"
+	statusInProgress = "IN_PROGRESS"
 )
 
 // Parser handles AWS CodeBuild EventBridge events.
@@ -49,9 +55,9 @@ type detail struct {
 	BuildID     string `json:"build-id"`
 }
 
-// Parse renders the Slack message for a CodeBuild state-change event.
+// Parse renders the Notification for a CodeBuild state-change event.
 // Returns (nil, nil) for the Build Phase Change detail-type.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	if e.DetailType() == detailBuildPhase {
 		return nil, nil //nolint:nilnil // silence — Build Phase Change is intentionally dropped
 	}
@@ -75,33 +81,28 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	logsFragment := fmt.Sprintf("logEventViewer:group=/aws/codebuild/%s;start=PT5M", project)
 	logsURL := console.URLWithFragment(region, logsPath, logsFragment)
 
-	author := authorBase
+	subtitle := authorBase
 	if accountID != "" {
-		author = fmt.Sprintf("%s (%s)", authorBase, accountID)
+		subtitle = fmt.Sprintf("%s (%s)", authorBase, accountID)
 	}
 
-	title := slack.Link(buildURL, project)
-	color := buildColor(d.BuildStatus)
+	severity := buildSeverity(d.BuildStatus)
 
-	fields := make([]slack.TextObject, 0, 2)
+	fields := make([]notify.Field, 0, 2)
 	if d.BuildStatus != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Status*\n" + d.BuildStatus,
-		})
+		fields = append(fields, notify.Field{Key: "Status", Value: d.BuildStatus})
 	}
-	fields = append(fields, slack.TextObject{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Logs*\n" + slack.Link(logsURL, "View Logs"),
-	})
+	fields = append(fields, notify.Field{Key: "Logs", Value: notify.Link(logsURL, "View Logs")})
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.FieldsSection(fields),
-	}
-
-	fallback := fmt.Sprintf("%s %s", project, d.BuildStatus)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    project,
+		TitleURL: buildURL,
+		Subtitle: subtitle,
+		Fields:   fields,
+		Fallback: fmt.Sprintf("%s %s", project, d.BuildStatus),
+	}, nil
 }
 
 // decodeDetail extracts the typed detail block from the inner event message.
@@ -120,17 +121,17 @@ func decodeDetail(e *envelope.Event) (detail, bool) {
 	return d, true
 }
 
-// buildColor maps the CodeBuild build-status to a Slack color.
-func buildColor(status string) string {
+// buildSeverity maps the CodeBuild build-status to a Severity.
+func buildSeverity(status string) notify.Severity {
 	switch status {
-	case "SUCCEEDED":
-		return slack.ColorOK
-	case "STOPPED":
-		return slack.ColorWarning
-	case "FAILED":
-		return slack.ColorCritical
+	case statusSucceeded:
+		return notify.SeverityOK
+	case statusFailed:
+		return notify.SeverityCritical
+	case statusStopped, statusInProgress:
+		return notify.SeverityNotice
 	default:
-		return slack.ColorNeutral
+		return notify.SeverityNotice
 	}
 }
 

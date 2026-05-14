@@ -12,6 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -51,34 +52,36 @@ func TestECS_Match(t *testing.T) {
 	}
 }
 
-func TestECS_TaskColor(t *testing.T) {
+func TestECS_TaskSeverity(t *testing.T) {
 	cases := []struct {
-		last, desired, want string
+		last, desired string
+		want          notify.Severity
 	}{
-		{last: "RUNNING", desired: "RUNNING", want: "good"},
-		{last: "PENDING", desired: "RUNNING", want: "warning"},
-		{last: "STOPPED", desired: "STOPPED", want: "danger"},
-		{last: "RUNNING", desired: "STOPPED", want: "danger"},
+		{last: "RUNNING", desired: "RUNNING", want: notify.SeverityOK},
+		{last: "PENDING", desired: "RUNNING", want: notify.SeverityNotice},
+		{last: "STOPPED", desired: "STOPPED", want: notify.SeverityCritical},
+		{last: "RUNNING", desired: "STOPPED", want: notify.SeverityCritical},
 	}
 	for _, tc := range cases {
-		if got := taskColor(tc.last, tc.desired); got != tc.want {
-			t.Fatalf("taskColor(%q,%q) = %q, want %q", tc.last, tc.desired, got, tc.want)
+		if got := taskSeverity(tc.last, tc.desired); got != tc.want {
+			t.Fatalf("taskSeverity(%q,%q) = %s, want %s", tc.last, tc.desired, got, tc.want)
 		}
 	}
 }
 
-func TestECS_ServiceColor(t *testing.T) {
+func TestECS_ServiceSeverity(t *testing.T) {
 	cases := []struct {
-		eventType, want string
+		eventType string
+		want      notify.Severity
 	}{
-		{eventType: "INFO", want: "good"},
-		{eventType: "WARN", want: "warning"},
-		{eventType: "ERROR", want: "danger"},
-		{eventType: "OTHER", want: "#dddddd"},
+		{eventType: "INFO", want: notify.SeverityOK},
+		{eventType: "WARN", want: notify.SeverityWarning},
+		{eventType: "ERROR", want: notify.SeverityCritical},
+		{eventType: "OTHER", want: notify.SeverityNotice},
 	}
 	for _, tc := range cases {
-		if got := serviceColor(tc.eventType); got != tc.want {
-			t.Fatalf("serviceColor(%q) = %q, want %q", tc.eventType, got, tc.want)
+		if got := serviceSeverity(tc.eventType); got != tc.want {
+			t.Fatalf("serviceSeverity(%q) = %s, want %s", tc.eventType, got, tc.want)
 		}
 	}
 }

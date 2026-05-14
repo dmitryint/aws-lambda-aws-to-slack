@@ -1,38 +1,29 @@
 {
-  "attachments": [
+  "Source": "ecs",
+  "Severity": 4,
+  "Title": "Amazon ECS - ECS Service Action",
+  "TitleURL": "",
+  "Subtitle": "",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "example-cluster - ECS Service Action - SERVICE_TASK_PLACEMENT_FAILURE",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Amazon ECS - ECS Service Action*"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nSERVICE_TASK_PLACEMENT_FAILURE"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service Logs*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Cluster*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
-            }
-          ]
-        }
-      ]
+      "Key": "Service",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
+    },
+    {
+      "Key": "Status",
+      "Value": "SERVICE_TASK_PLACEMENT_FAILURE"
+    },
+    {
+      "Key": "Service Logs",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
+    },
+    {
+      "Key": "Cluster",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-cluster - ECS Service Action - SERVICE_TASK_PLACEMENT_FAILURE",
+  "Footnotes": null
 }

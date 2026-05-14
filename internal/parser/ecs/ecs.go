@@ -1,8 +1,8 @@
-// Package ecs renders Slack messages for Amazon ECS EventBridge events.
-// Matches when the EventBridge source is "aws.ecs". Two detail-types
-// produce specialized messages — "ECS Task State Change" and "ECS Service
-// Action" — and the remaining detail-types fall through to a default
-// attachment carrying only the cluster header.
+// Package ecs renders Amazon ECS EventBridge events into the transport-neutral
+// notify.Notification shape. Matches when the EventBridge source is
+// "aws.ecs". Two detail-types produce specialized messages — "ECS Task
+// State Change" and "ECS Service Action" — and the remaining detail-types
+// fall through to a default attachment carrying only the cluster header.
 package ecs
 
 import (
@@ -13,7 +13,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -29,6 +29,8 @@ const (
 	clusterPrefix      = "cluster/"
 
 	defaultStoppedReason = "Unknown"
+
+	authorPrefix = "Amazon ECS - "
 )
 
 // Parser handles Amazon ECS EventBridge events.
@@ -62,11 +64,11 @@ type serviceDetail struct {
 	EventName  string `json:"eventName"`
 }
 
-// Parse renders the Slack message for the given ECS EventBridge event. The
-// two specialized detail-types build full attachment payloads; everything
-// else (Deployment State Change, Container Instance State Change, …) falls
-// through to a default attachment carrying just the cluster header.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for the given ECS EventBridge event. The
+// two specialized detail-types build full payloads; everything else
+// (Deployment State Change, Container Instance State Change, …) falls
+// through to a default Notification carrying just the cluster header.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	detailType := e.DetailType()
 	switch detailType {
 	case detailTaskStateChange:
@@ -79,7 +81,7 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 }
 
 // parseTaskStateChange renders the body for an ECS Task State Change event.
-func parseTaskStateChange(e *envelope.Event) (*slack.Message, error) {
+func parseTaskStateChange(e *envelope.Event) (*notify.Notification, error) {
 	var d taskDetail
 	if err := unmarshalDetail(e, &d); err != nil {
 		return nil, fmt.Errorf("ecs: decode task detail: %w", err)
@@ -97,30 +99,35 @@ func parseTaskStateChange(e *envelope.Event) (*slack.Message, error) {
 	taskURL := console.URLWithFragment(region, "ecs/home", "/clusters/"+cluster+"/tasks/"+task+"/details")
 	logsURL := console.URLWithFragment(region, "ecs/home", "/clusters/"+cluster+"/services/"+service+"/logs")
 
-	color := taskColor(d.LastStatus, d.DesiredStatus)
+	severity := taskSeverity(d.LastStatus, d.DesiredStatus)
 	stoppedReason := defaultStoppedReason
 	if d.DesiredStatus == "STOPPED" && d.StoppedReason != "" {
 		stoppedReason = d.StoppedReason
 	}
 
-	author := "Amazon ECS - " + detailTaskStateChange
-	header := slack.SectionBlock("*" + author + "*")
-	fields := slack.FieldsSection([]slack.TextObject{
-		{Type: slack.TextTypeMrkdwn, Text: "*Task*\n" + slack.Link(taskURL, task)},
-		{Type: slack.TextTypeMrkdwn, Text: "*Status*\n" + d.LastStatus},
-		{Type: slack.TextTypeMrkdwn, Text: "*Desired Status*\n" + d.DesiredStatus},
-		{Type: slack.TextTypeMrkdwn, Text: "*Reason*\n" + stoppedReason},
-		{Type: slack.TextTypeMrkdwn, Text: "*Service Logs*\n" + slack.Link(logsURL, "View Logs")},
-		{Type: slack.TextTypeMrkdwn, Text: "*Service*\n" + slack.Link(serviceURL, service)},
-		{Type: slack.TextTypeMrkdwn, Text: "*Cluster*\n" + slack.Link(clusterURL, cluster)},
-	})
+	subtitle := authorPrefix + detailTaskStateChange
+	fields := []notify.Field{
+		{Key: "Task", Value: notify.Link(taskURL, task)},
+		{Key: "Status", Value: d.LastStatus},
+		{Key: "Desired Status", Value: d.DesiredStatus},
+		{Key: "Reason", Value: stoppedReason},
+		{Key: "Service Logs", Value: notify.Link(logsURL, "View Logs")},
+		{Key: "Service", Value: notify.Link(serviceURL, service)},
+		{Key: "Cluster", Value: notify.Link(clusterURL, cluster)},
+	}
 
 	fallback := fmt.Sprintf("%s - %s - %s", cluster, detailTaskStateChange, d.LastStatus)
-	return slack.NewMessage(color, fallback, header, fields), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    subtitle,
+		Fields:   fields,
+		Fallback: fallback,
+	}, nil
 }
 
 // parseServiceAction renders the body for an ECS Service Action event.
-func parseServiceAction(e *envelope.Event) (*slack.Message, error) {
+func parseServiceAction(e *envelope.Event) (*notify.Notification, error) {
 	var d serviceDetail
 	if err := unmarshalDetail(e, &d); err != nil {
 		return nil, fmt.Errorf("ecs: decode service detail: %w", err)
@@ -136,35 +143,42 @@ func parseServiceAction(e *envelope.Event) (*slack.Message, error) {
 	serviceURL := console.URLWithFragment(region, "ecs/home", "/clusters/"+cluster+"/services/"+service+"/details")
 	logsURL := console.URLWithFragment(region, "ecs/home", "/clusters/"+cluster+"/services/"+service+"/logs")
 
-	color := serviceColor(d.EventType)
-	author := "Amazon ECS - " + detailServiceAction
-	header := slack.SectionBlock("*" + author + "*")
-	fields := slack.FieldsSection([]slack.TextObject{
-		{Type: slack.TextTypeMrkdwn, Text: "*Service*\n" + slack.Link(serviceURL, service)},
-		{Type: slack.TextTypeMrkdwn, Text: "*Status*\n" + d.EventName},
-		{Type: slack.TextTypeMrkdwn, Text: "*Service Logs*\n" + slack.Link(logsURL, "View Logs")},
-		{Type: slack.TextTypeMrkdwn, Text: "*Cluster*\n" + slack.Link(clusterURL, cluster)},
-	})
+	severity := serviceSeverity(d.EventType)
+	subtitle := authorPrefix + detailServiceAction
+	fields := []notify.Field{
+		{Key: "Service", Value: notify.Link(serviceURL, service)},
+		{Key: "Status", Value: d.EventName},
+		{Key: "Service Logs", Value: notify.Link(logsURL, "View Logs")},
+		{Key: "Cluster", Value: notify.Link(clusterURL, cluster)},
+	}
 
 	fallback := fmt.Sprintf("%s - %s - %s", cluster, detailServiceAction, d.EventName)
-	return slack.NewMessage(color, fallback, header, fields), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    subtitle,
+		Fields:   fields,
+		Fallback: fallback,
+	}, nil
 }
 
 // parseDefault renders the fall-through shape for ECS detail-types that
 // have no specialized renderer (Deployment State Change, Container Instance
-// State Change). The output is an attachment carrying just the source and
-// detail-type header.
-func parseDefault(e *envelope.Event, detailType string) *slack.Message {
+// State Change). The output carries just the source and detail-type header.
+func parseDefault(e *envelope.Event, detailType string) *notify.Notification {
 	cluster, _ := clusterAndRegion(detailClusterARN(e))
 	title := fmt.Sprintf("%s - %s", cluster, detailType)
 	if cluster == "" {
 		title = detailType
 	}
-	author := "Amazon ECS - " + detailType
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
+	subtitle := authorPrefix + detailType
+	return &notify.Notification{
+		Source:   name,
+		Severity: notify.SeverityNotice,
+		Title:    title,
+		Subtitle: subtitle,
+		Fallback: title,
 	}
-	return slack.NewMessage(slack.ColorNeutral, title, blocks...)
 }
 
 // unmarshalDetail decodes the inner EventBridge detail block into the
@@ -231,31 +245,31 @@ func serviceFromResources(e *envelope.Event, cluster string) string {
 	return strings.TrimPrefix(res, cluster+"/")
 }
 
-// taskColor maps the lastStatus / desiredStatus pair to a Slack color:
-// both RUNNING is ok, desiredStatus STOPPED is critical, anything else
-// renders as a warning.
-func taskColor(lastStatus, desiredStatus string) string {
+// taskSeverity maps the lastStatus / desiredStatus pair to a Severity. Both
+// RUNNING is OK; desiredStatus STOPPED is Critical; anything else is Notice.
+func taskSeverity(lastStatus, desiredStatus string) notify.Severity {
 	switch {
 	case lastStatus == "RUNNING" && desiredStatus == "RUNNING":
-		return slack.ColorOK
+		return notify.SeverityOK
 	case desiredStatus == "STOPPED":
-		return slack.ColorCritical
+		return notify.SeverityCritical
 	default:
-		return slack.ColorWarning
+		return notify.SeverityNotice
 	}
 }
 
-// serviceColor maps the Service Action eventType to a Slack color so
-// INFO renders ok, WARN yellow, and ERROR red.
-func serviceColor(eventType string) string {
+// serviceSeverity maps the Service Action eventType to a Severity. INFO is
+// OK (announcement of normal service activity), WARN → Warning,
+// ERROR → Critical.
+func serviceSeverity(eventType string) notify.Severity {
 	switch eventType {
 	case "INFO":
-		return slack.ColorOK
+		return notify.SeverityOK
 	case "WARN":
-		return slack.ColorWarning
+		return notify.SeverityWarning
 	case "ERROR":
-		return slack.ColorCritical
+		return notify.SeverityCritical
 	default:
-		return slack.ColorNeutral
+		return notify.SeverityNotice
 	}
 }

@@ -1,53 +1,37 @@
 {
-  "attachments": [
+  "Source": "inspector2",
+  "Severity": 4,
+  "Title": "CVE-2024-EC2 — CVE-2024-EC2 - kernel",
+  "TitleURL": "https://console.aws.amazon.com/inspector/v2/home?region=us-east-1#/findings?findingArn=arn%3Aaws%3Ainspector2%3Aus-east-1%3A123456789012%3Afinding%2Fec21234567890abcdef0123",
+  "Subtitle": "Amazon Inspector",
+  "Summary": "A high-severity vulnerability was found in the kernel package on an EC2 instance.",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "CVE-2024-EC2: A high-severity vulnerability was found in the kernel package on an EC2 instance.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/inspector/v2/home?region=us-east-1#/findings?findingArn=arn%3Aaws%3Ainspector2%3Aus-east-1%3A123456789012%3Afinding%2Fec21234567890abcdef0123|CVE-2024-EC2 — CVE-2024-EC2 - kernel\u003e*\n_Amazon Inspector_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "A high-severity vulnerability was found in the kernel package on an EC2 instance."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Severity*\nHIGH"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Score*\n7.8"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Fix available*\nYES"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Exploit available*\nNO"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Resource*\nEC2 i-0123456789abcdef0 (AMI ami-0123456789abcdef0)"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Account*\n123456789012 (us-east-1)"
-            }
-          ]
-        }
-      ]
+      "Key": "Severity",
+      "Value": "HIGH"
+    },
+    {
+      "Key": "Score",
+      "Value": "7.8"
+    },
+    {
+      "Key": "Fix available",
+      "Value": "YES"
+    },
+    {
+      "Key": "Exploit available",
+      "Value": "NO"
+    },
+    {
+      "Key": "Resource",
+      "Value": "EC2 i-0123456789abcdef0 (AMI ami-0123456789abcdef0)"
+    },
+    {
+      "Key": "Account",
+      "Value": "123456789012 (us-east-1)"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "CVE-2024-EC2: A high-severity vulnerability was found in the kernel package on an EC2 instance.",
+  "Footnotes": null
 }

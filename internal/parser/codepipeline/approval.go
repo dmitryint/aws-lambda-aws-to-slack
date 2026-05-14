@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -82,8 +82,8 @@ func (ApprovalParser) Match(e *envelope.Event) bool {
 	return ok
 }
 
-// Parse renders the Slack message for a CodePipeline approval request.
-func (ApprovalParser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CodePipeline approval request.
+func (ApprovalParser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	m, ok := decodeApproval(e)
 	if !ok {
 		return nil, fmt.Errorf("codepipeline-approval: payload missing consoleLink or approval.pipelineName")
@@ -97,28 +97,29 @@ func (ApprovalParser) Parse(_ context.Context, e *envelope.Event) (*slack.Messag
 	numHours := approvalNumHours(m.Approval.Expires, e.Time())
 	hrs := renderHours(numHours)
 
-	text := fmt.Sprintf("Approval required %s for %s / %s", hrs, stage, action)
+	summary := fmt.Sprintf("Approval required %s for %s / %s", hrs, stage, action)
 	if customMsg != "" {
-		text += "\n" + customMsg
+		summary += "\n" + customMsg
 	}
 
-	author := authorBase
+	subtitle := authorBase
 	if accountID := e.AccountID(); accountID != "" {
-		author = fmt.Sprintf("%s (%s)", authorBase, accountID)
+		subtitle = fmt.Sprintf("%s (%s)", authorBase, accountID)
 	}
 
-	title := slack.Link(m.ConsoleLink, pipeline)
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.SectionBlock(text),
-		slack.FieldsSection([]slack.TextObject{
-			{Type: slack.TextTypeMrkdwn, Text: "*Review URL*\n" + m.Approval.ExternalEntityLink},
-			{Type: slack.TextTypeMrkdwn, Text: "*Approval URL*\n" + m.Approval.ApprovalReviewLink},
-		}),
-	}
-
-	fallback := fmt.Sprintf("%s >> APPROVAL REQUIRED", pipeline)
-	return slack.NewMessage(slack.ColorWarning, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   approvalName,
+		Severity: notify.SeverityWarning,
+		Title:    pipeline,
+		TitleURL: m.ConsoleLink,
+		Subtitle: subtitle,
+		Summary:  summary,
+		Fields: []notify.Field{
+			{Key: "Review URL", Value: m.Approval.ExternalEntityLink},
+			{Key: "Approval URL", Value: m.Approval.ApprovalReviewLink},
+		},
+		Fallback: fmt.Sprintf("%s >> APPROVAL REQUIRED", pipeline),
+	}, nil
 }
 
 // approvalNumHours computes the remaining time to expiry in hours. Returns 0
@@ -133,7 +134,7 @@ func approvalNumHours(expires string, now time.Time) float64 {
 	return deltaMs / msPerHour
 }
 
-// renderHours maps the remaining-time-to-expiry to its Slack-rendered phrase.
+// renderHours maps the remaining-time-to-expiry to its rendered phrase.
 func renderHours(numHours float64) string {
 	switch {
 	case numHours < expiredThreshold:

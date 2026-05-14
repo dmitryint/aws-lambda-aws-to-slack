@@ -1,37 +1,21 @@
 {
-  "attachments": [
+  "Source": "inspector",
+  "Severity": 3,
+  "Title": "Assessment run summary",
+  "TitleURL": "",
+  "Subtitle": "Amazon Inspector",
+  "Summary": "*\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/finding?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|Findings\u003e*\nCommon Vulnerabilities and Exposures: 12\nSecurity Best Practices: 3",
+  "Fields": [
     {
-      "color": "good",
-      "fallback": "*\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/finding?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|Findings\u003e*\nCommon Vulnerabilities and Exposures: 12\nSecurity Best Practices: 3",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Assessment run summary*\n_Amazon Inspector_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/finding?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|Findings\u003e*\nCommon Vulnerabilities and Exposures: 12\nSecurity Best Practices: 3"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Target*\narn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Run*\n\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/run?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|arn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE/template/0-EXAMPLE/run/0-EXAMPLE\u003e\n"
-            }
-          ]
-        }
-      ]
+      "Key": "Target",
+      "Value": "arn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE"
+    },
+    {
+      "Key": "Run",
+      "Value": "\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/run?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|arn:aws:inspector:us-east-1:123456789012:target/0-EXAMPLE/template/0-EXAMPLE/run/0-EXAMPLE\u003e\n"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "*\u003chttps://console.aws.amazon.com/inspector/home?region=us-east-1#/finding?filter=%7B%22assessmentRunArns%22%3A%5B%22arn%3Aaws%3Ainspector%3Aus-east-1%3A123456789012%3Atarget%2F0-EXAMPLE%2Ftemplate%2F0-EXAMPLE%2Frun%2F0-EXAMPLE%22%5D%7D|Findings\u003e*\nCommon Vulnerabilities and Exposures: 12\nSecurity Best Practices: 3",
+  "Footnotes": null
 }

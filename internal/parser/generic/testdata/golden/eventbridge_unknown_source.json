@@ -1,38 +1,29 @@
 {
-  "attachments": [
+  "Source": "generic",
+  "Severity": 1,
+  "Title": "Some Custom Event",
+  "TitleURL": "",
+  "Subtitle": "com.example.custom (us-east-1 - 123456789012)",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "#dddddd",
-      "fallback": "{\n  \"version\": \"0\",\n  \"id\": \"01234567-EXAMPLE\",\n  \"detail-type\": \"Some Custom Event\",\n  \"source\": \"com.example.custom\",\n  \"account\": \"123456789012\",\n  \"time\": \"2024-06-01T12:00:00Z\",\n  \"region\": \"us-east-1\",\n  \"resources\": [],\n  \"detail\": {\n    \"message\": \"This is a custom application event that no specific parser handles.\",\n    \"customField\": \"value\",\n    \"level\": \"info\"\n  }\n}",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Some Custom Event*\n_com.example.custom (us-east-1 - 123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*detail*\n{\"customField\":\"value\",\"level\":\"info\",\"message\":\"This is a custom application event that no specific parser handles.\"}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*id*\n01234567-EXAMPLE"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*resources*\n[]"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*version*\n0"
-            }
-          ]
-        }
-      ]
+      "Key": "detail",
+      "Value": "{\"customField\":\"value\",\"level\":\"info\",\"message\":\"This is a custom application event that no specific parser handles.\"}"
+    },
+    {
+      "Key": "id",
+      "Value": "01234567-EXAMPLE"
+    },
+    {
+      "Key": "resources",
+      "Value": "[]"
+    },
+    {
+      "Key": "version",
+      "Value": "0"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "{\n  \"version\": \"0\",\n  \"id\": \"01234567-EXAMPLE\",\n  \"detail-type\": \"Some Custom Event\",\n  \"source\": \"com.example.custom\",\n  \"account\": \"123456789012\",\n  \"time\": \"2024-06-01T12:00:00Z\",\n  \"region\": \"us-east-1\",\n  \"resources\": [],\n  \"detail\": {\n    \"message\": \"This is a custom application event that no specific parser handles.\",\n    \"customField\": \"value\",\n    \"level\": \"info\"\n  }\n}",
+  "Footnotes": null
 }

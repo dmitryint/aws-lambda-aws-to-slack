@@ -79,7 +79,7 @@ func TestAWSHealth_Parse_FallsBackToFirstDescription(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
 	}
-	if msg == nil || msg.Attachments[0].Fallback != "hello" {
+	if msg == nil || msg.Fallback != "hello" {
 		t.Fatalf("expected fallback 'hello', got %+v", msg)
 	}
 }
@@ -99,7 +99,7 @@ func TestAWSHealth_Parse_FallbackUsesDetailTypeWhenNoDescription(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Parse: %v", err)
 	}
-	if got := msg.Attachments[0].Fallback; got != "AWS Health Event" {
+	if got := msg.Fallback; got != "AWS Health Event" {
 		t.Fatalf("fallback = %q, want %q", got, "AWS Health Event")
 	}
 }

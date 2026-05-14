@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -15,6 +15,8 @@ const (
 
 	mimeMultipart = "multipart/"
 	attachmentHdr = "Content-Disposition: attachment"
+
+	subtitleAmazonSES = "Amazon SES"
 )
 
 // ReceivedParser handles SES inbound-receipt SNS notifications. Matches
@@ -57,49 +59,41 @@ type mailHeader struct {
 	Value string `json:"value"`
 }
 
-// Parse renders the Slack message for an SES inbound-receipt notification.
+// Parse renders the Notification for an SES inbound-receipt notification.
 //
-// For privacy reasons the raw RFC 5322 message body is never sent to
-// Slack — only the From / To / Subject metadata is rendered, plus a
+// For privacy reasons the raw RFC 5322 message body is never sent to the
+// transport — only the From / To / Subject metadata is rendered, plus a
 // "has attachments" hint when the message is multipart.
-func (ReceivedParser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+func (ReceivedParser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	p, ok := decodeReceived(e)
 	if !ok {
 		return nil, fmt.Errorf("ses-received: payload missing or not an object")
 	}
 
 	subject := p.Mail.CommonHeaders.Subject
-	author := "Amazon SES"
 
-	fields := make([]slack.TextObject, 0, 3)
+	fields := make([]notify.Field, 0, 3)
 	if p.Mail.Source != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*From*\n" + p.Mail.Source,
-		})
+		fields = append(fields, notify.Field{Key: "From", Value: p.Mail.Source})
 	}
 	if len(p.Mail.Destination) > 0 {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*To*\n" + strings.Join(p.Mail.Destination, ",\n"),
-		})
+		fields = append(fields, notify.Field{Key: "To", Value: strings.Join(p.Mail.Destination, ",\n")})
 	}
 	if hasAttachments(p.Mail.Headers, p.Content) {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Attachments*\nMessage carries one or more attachments.",
+		fields = append(fields, notify.Field{
+			Key:   "Attachments",
+			Value: "Message carries one or more attachments.",
 		})
 	}
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", subject, author)),
-	}
-	if len(fields) > 0 {
-		blocks = append(blocks, slack.FieldsSection(fields))
-	}
-
-	fallback := "New email received from SES"
-	return slack.NewMessage(slack.ColorAccent, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   receivedName,
+		Severity: notify.SeverityInfo,
+		Title:    subject,
+		Subtitle: subtitleAmazonSES,
+		Fields:   fields,
+		Fallback: "New email received from SES",
+	}, nil
 }
 
 // decodeReceived decodes the typed received payload from the inner SNS

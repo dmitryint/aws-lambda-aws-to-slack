@@ -1,6 +1,6 @@
-// Package autoscaling renders Slack messages for AWS Auto Scaling SNS
-// notifications. Matches when the inner message carries an
-// "AutoScalingGroupARN" field.
+// Package autoscaling renders AWS Auto Scaling SNS notifications into the
+// transport-neutral notify.Notification shape. Matches when the inner
+// message carries an "AutoScalingGroupARN" field.
 package autoscaling
 
 import (
@@ -11,10 +11,14 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
-const name = "autoscaling"
+const (
+	name = "autoscaling"
+
+	eventTerminateError = "autoscaling:EC2_INSTANCE_TERMINATE_ERROR"
+)
 
 // Parser handles SNS notifications published by AWS Auto Scaling groups.
 type Parser struct{}
@@ -57,8 +61,8 @@ func (Parser) Match(e *envelope.Event) bool {
 	return ok
 }
 
-// Parse renders the Slack message for an Auto Scaling notification.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for an Auto Scaling SNS event.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	m, ok := decode(e)
 	if !ok {
 		return nil, fmt.Errorf("autoscaling: payload missing AutoScalingGroupARN")
@@ -69,21 +73,31 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	consoleURL := console.URLWithFragment(region, "ec2/autoscaling/home", "AutoScalingGroups:id="+m.AutoScalingGroupName)
 
 	titleText := fmt.Sprintf("%s - %s", m.AutoScalingGroupName, m.Event)
-	title := slack.Link(consoleURL, titleText)
-	author := slack.Link(signInURL, fmt.Sprintf("AWS AutoScaling (%s - %s)", region, m.AccountID))
-	bodyText := fmt.Sprintf("Auto Scaling triggered %s for service %s.", m.Event, m.Service)
+	subtitle := notify.Link(signInURL, fmt.Sprintf("AWS AutoScaling (%s - %s)", region, m.AccountID))
+	summary := fmt.Sprintf("Auto Scaling triggered %s for service %s.", m.Event, m.Service)
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-		slack.SectionBlock(bodyText),
-		slack.FieldsSection([]slack.TextObject{
-			{Type: slack.TextTypeMrkdwn, Text: "*Service*\n" + m.Service},
-			{Type: slack.TextTypeMrkdwn, Text: "*Event*\n" + m.Event},
-		}),
+	return &notify.Notification{
+		Source:   name,
+		Severity: severityFor(m.Event),
+		Title:    titleText,
+		TitleURL: consoleURL,
+		Subtitle: subtitle,
+		Summary:  summary,
+		Fields: []notify.Field{
+			{Key: "Service", Value: m.Service},
+			{Key: "Event", Value: m.Event},
+		},
+		Fallback: summary,
+	}, nil
+}
+
+// severityFor maps the AutoScaling event keyword to a Severity. Termination
+// errors are operational alerts; every other lifecycle event is informational.
+func severityFor(event string) notify.Severity {
+	if event == eventTerminateError {
+		return notify.SeverityCritical
 	}
-
-	fallback := bodyText
-	return slack.NewMessage(slack.ColorNeutral, fallback, blocks...), nil
+	return notify.SeverityNotice
 }
 
 // regionFromARN returns the region segment of an Auto Scaling ARN.

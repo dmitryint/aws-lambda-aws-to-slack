@@ -1,13 +1,13 @@
-// Package inspector2 renders Slack messages for Amazon Inspector v2 EventBridge
-// findings. Matches when the EventBridge source is "aws.inspector2" or the
-// detail-type equals "Inspector2 Finding".
+// Package inspector2 renders Amazon Inspector v2 EventBridge findings into the
+// transport-neutral notify.Notification shape. Matches when the EventBridge
+// source is "aws.inspector2" or the detail-type equals "Inspector2 Finding".
 //
 // Only HIGH / CRITICAL findings claim the event — lower severities fail
 // Match so the generic parser renders them as raw-event dumps.
-// HIGH renders as a warning attachment; CRITICAL as a danger attachment.
-// The parser ties into the dedup package to suppress repeat alerts for the
-// same (vulnerabilityId, resourceType, resourceFamily) triple within the
-// TTL window.
+// HIGH renders as Warning; CRITICAL renders as Critical. The parser ties
+// into the dedup package to suppress repeat alerts for the same
+// (vulnerabilityId, resourceType, resourceFamily) triple within the TTL
+// window.
 package inspector2
 
 import (
@@ -26,7 +26,7 @@ import (
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/dedup"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -62,7 +62,7 @@ const (
 // ARN.
 var inspector2ArnRegionRE = regexp.MustCompile(`^arn:[^:]+:inspector2:([^:]+):`)
 
-// Parser renders Slack messages for Inspector2 findings.
+// Parser renders Notifications for Inspector2 findings.
 type Parser struct {
 	dedup dedup.Deduplicator
 	log   *slog.Logger
@@ -182,12 +182,12 @@ type ec2Instance struct {
 	ImageID string `json:"imageId"`
 }
 
-// Parse renders the Slack message for an Inspector2 finding.
+// Parse renders the Notification for an Inspector2 finding.
 //
-// Severities outside {HIGH, CRITICAL} are silenced. Repeated findings within
-// the dedup TTL window are silenced. SDK errors from the dedup store fail
-// open — the alert is rendered anyway.
-func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, error) {
+// Severities outside {HIGH, CRITICAL} are silenced at Match. Repeated
+// findings within the dedup TTL window are silenced here. SDK errors from
+// the dedup store fail open — the alert is rendered anyway.
+func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notification, error) {
 	f, ok := decode(e)
 	if !ok {
 		return nil, fmt.Errorf("inspector2: detail block missing or malformed")
@@ -215,7 +215,7 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, 
 				"resource_type", res.Type,
 				"region", region,
 			)
-			return nil, nil
+			return nil, nil //nolint:nilnil // silence — duplicate finding inside TTL window
 		}
 		p.logger().InfoContext(ctx, "inspector2 alert reserved",
 			"dedup_key", dedupKey,
@@ -226,9 +226,9 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, 
 		)
 	}
 
-	color := slack.ColorWarning
+	severity := notify.SeverityWarning
 	if f.Severity == severityCritical {
-		color = slack.ColorCritical
+		severity = notify.SeverityCritical
 	}
 
 	vulnID := pickVulnID(f)
@@ -238,17 +238,17 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, 
 	}
 	consoleURL := findingConsoleURL(region, f.FindingArn)
 
-	header := fmt.Sprintf("*%s*\n_%s_", slack.Link(consoleURL, titleText), authorName)
-	body := truncate(f.Description, descriptionTruncate)
-
-	blocks := []slack.Block{slack.SectionBlock(header)}
-	if body != "" {
-		blocks = append(blocks, slack.SectionBlock(body))
-	}
-	blocks = append(blocks, slack.FieldsSection(buildFields(f, res, region)))
-
 	fallback := vulnID + ": " + truncate(f.Description, fallbackTruncate)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    titleText,
+		TitleURL: consoleURL,
+		Subtitle: authorName,
+		Summary:  truncate(f.Description, descriptionTruncate),
+		Fields:   buildFields(f, res, region),
+		Fallback: fallback,
+	}, nil
 }
 
 // decode extracts the typed detail block from the inner event message.
@@ -389,18 +389,18 @@ func resourceLabel(res resource) string {
 }
 
 // buildFields constructs the field rows shown in the rendered alert.
-func buildFields(f finding, res resource, region string) []slack.TextObject {
+func buildFields(f finding, res resource, region string) []notify.Field {
 	score := "n/a"
 	if f.InspectorScore != nil {
 		score = strconv.FormatFloat(*f.InspectorScore, 'f', -1, 64)
 	}
-	return []slack.TextObject{
-		{Type: slack.TextTypeMrkdwn, Text: "*Severity*\n" + f.Severity},
-		{Type: slack.TextTypeMrkdwn, Text: "*Score*\n" + score},
-		{Type: slack.TextTypeMrkdwn, Text: "*Fix available*\n" + valueOrDefault(f.FixAvailable, defaultFixAvailable)},
-		{Type: slack.TextTypeMrkdwn, Text: "*Exploit available*\n" + valueOrDefault(f.ExploitAvailable, defaultExploitAvailable)},
-		{Type: slack.TextTypeMrkdwn, Text: "*Resource*\n" + resourceLabel(res)},
-		{Type: slack.TextTypeMrkdwn, Text: "*Account*\n" + fmt.Sprintf("%s (%s)", f.AwsAccountID, region)},
+	return []notify.Field{
+		{Key: "Severity", Value: f.Severity},
+		{Key: "Score", Value: score},
+		{Key: "Fix available", Value: valueOrDefault(f.FixAvailable, defaultFixAvailable)},
+		{Key: "Exploit available", Value: valueOrDefault(f.ExploitAvailable, defaultExploitAvailable)},
+		{Key: "Resource", Value: resourceLabel(res)},
+		{Key: "Account", Value: fmt.Sprintf("%s (%s)", f.AwsAccountID, region)},
 	}
 }
 

@@ -11,6 +11,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -71,8 +72,8 @@ func TestCloudWatch_Parse_UnknownStateFallsBackToNeutral(t *testing.T) {
 	if msg == nil {
 		t.Fatal("expected message")
 	}
-	if msg.Attachments[0].Color != "#dddddd" {
-		t.Fatalf("color = %q, want neutral", msg.Attachments[0].Color)
+	if msg.Severity != notify.SeverityNotice {
+		t.Fatalf("severity = %s, want %s", msg.Severity, notify.SeverityNotice)
 	}
 }
 

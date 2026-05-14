@@ -1,30 +1,21 @@
 {
-  "attachments": [
+  "Source": "codedeploy-sns",
+  "Severity": 3,
+  "Title": "CodeDeploy Application example-app was stopped",
+  "TitleURL": "https://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123",
+  "Subtitle": "AWS CodeDeploy Notification",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e STOPPED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e was stopped*\n_AWS CodeDeploy Notification_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nSTOPPED"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*DeploymentGroup*\nexample-deployment-group"
-            }
-          ]
-        }
-      ]
+      "Key": "Status",
+      "Value": "STOPPED"
+    },
+    {
+      "Key": "DeploymentGroup",
+      "Value": "example-deployment-group"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "CodeDeploy Application example-app STOPPED",
+  "Footnotes": null
 }

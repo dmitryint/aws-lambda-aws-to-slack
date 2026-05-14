@@ -12,7 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -72,24 +72,24 @@ func TestBatch_Parse_ErrorOnMissingJobName(t *testing.T) {
 	}
 }
 
-func TestBatch_TitleAndColor(t *testing.T) {
+func TestBatch_SeverityAndTitle(t *testing.T) {
 	cases := []struct {
-		status    string
-		wantColor string
+		status string
+		want   notify.Severity
 	}{
-		{"SUBMITTED", slack.ColorNeutral},
-		{"RUNNABLE", slack.ColorNeutral},
-		{"STARTING", slack.ColorNeutral},
-		{"RUNNING", slack.ColorNeutral},
-		{"SUCCEEDED", slack.ColorOK},
-		{"FAILED", slack.ColorCritical},
-		{"WEIRD", slack.ColorNeutral},
+		{"SUBMITTED", notify.SeverityNotice},
+		{"RUNNABLE", notify.SeverityNotice},
+		{"STARTING", notify.SeverityNotice},
+		{"RUNNING", notify.SeverityNotice},
+		{"SUCCEEDED", notify.SeverityOK},
+		{"FAILED", notify.SeverityCritical},
+		{"WEIRD", notify.SeverityNotice},
 	}
 	for _, tc := range cases {
 		t.Run(tc.status, func(t *testing.T) {
-			color, _ := titleAndColor("job", tc.status)
-			if color != tc.wantColor {
-				t.Fatalf("color = %q, want %q", color, tc.wantColor)
+			got, _ := severityAndTitle("job", tc.status)
+			if got != tc.want {
+				t.Fatalf("severity = %s, want %s", got, tc.want)
 			}
 		})
 	}

@@ -1,24 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "#439FE0",
-      "fallback": "example-db: Restored DB instance from snapshot",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/rds/home?region=us-east-1#dbinstance:id=example-db|example-db\u003e*\n_Amazon RDS_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "Restored DB instance from snapshot"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "rds",
+  "Severity": 2,
+  "Title": "example-db",
+  "TitleURL": "https://console.aws.amazon.com/rds/home?region=us-east-1#dbinstance:id=example-db",
+  "Subtitle": "Amazon RDS",
+  "Summary": "Restored DB instance from snapshot",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "example-db: Restored DB instance from snapshot",
+  "Footnotes": null
 }

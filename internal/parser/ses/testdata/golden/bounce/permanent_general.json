@@ -1,45 +1,29 @@
 {
-  "attachments": [
+  "Source": "ses-bounce",
+  "Severity": 4,
+  "Title": "Example bounce",
+  "TitleURL": "",
+  "Subtitle": "Amazon SES - Bounce: Permanent - General",
+  "Summary": "recipient@example.com — failed; 5.1.1; smtp; 550 5.1.1 user unknown",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "Bounce: Permanent - General",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Example bounce*\n_Amazon SES - Bounce: Permanent - General_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "recipient@example.com — failed; 5.1.1; smtp; 550 5.1.1 user unknown"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*From*\nsender@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*To*\nrecipient@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*BounceType*\nPermanent"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*BounceSubType*\nGeneral"
-            }
-          ]
-        }
-      ]
+      "Key": "From",
+      "Value": "sender@example.com"
+    },
+    {
+      "Key": "To",
+      "Value": "recipient@example.com"
+    },
+    {
+      "Key": "BounceType",
+      "Value": "Permanent"
+    },
+    {
+      "Key": "BounceSubType",
+      "Value": "General"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Bounce: Permanent - General",
+  "Footnotes": null
 }

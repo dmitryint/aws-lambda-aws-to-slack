@@ -7,7 +7,7 @@ import (
 	"strings"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -54,35 +54,36 @@ type bouncedRecipient struct {
 	DiagnosticCode string `json:"diagnosticCode"`
 }
 
-// Parse renders the Slack message for an SES Bounce notification.
-func (BounceParser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for an SES Bounce notification.
+func (BounceParser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	p, ok := decodeBounce(e)
 	if !ok {
 		return nil, fmt.Errorf("ses-bounce: payload missing or not an object")
 	}
 
-	color := bounceColor(p.Bounce.BounceType)
-	author := fmt.Sprintf("Amazon SES - Bounce: %s - %s",
+	severity := bounceSeverity(p.Bounce.BounceType)
+	subtitle := fmt.Sprintf("Amazon SES - Bounce: %s - %s",
 		p.Bounce.BounceType, p.Bounce.BounceSubType)
 	title := p.Mail.CommonHeaders.Subject
 
 	fields := buildMailFields(p.Mail)
 	fields = append(fields,
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*BounceType*\n" + p.Bounce.BounceType},
-		slack.TextObject{Type: slack.TextTypeMrkdwn, Text: "*BounceSubType*\n" + p.Bounce.BounceSubType},
+		notify.Field{Key: "BounceType", Value: p.Bounce.BounceType},
+		notify.Field{Key: "BounceSubType", Value: p.Bounce.BounceSubType},
 	)
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", title, author)),
-	}
-	if body := renderBouncedRecipients(p.Bounce.BouncedRecipients); body != "" {
-		blocks = append(blocks, slack.SectionBlock(body))
-	}
-	blocks = append(blocks, slack.FieldsSection(fields))
+	summary := renderBouncedRecipients(p.Bounce.BouncedRecipients)
+	fallback := fmt.Sprintf("Bounce: %s - %s", p.Bounce.BounceType, p.Bounce.BounceSubType)
 
-	fallback := fmt.Sprintf("Bounce: %s - %s",
-		p.Bounce.BounceType, p.Bounce.BounceSubType)
-	return slack.NewMessage(color, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   bounceName,
+		Severity: severity,
+		Title:    title,
+		Subtitle: subtitle,
+		Summary:  summary,
+		Fields:   fields,
+		Fallback: fallback,
+	}, nil
 }
 
 // decodeBounce decodes the typed bounce payload from the inner SNS message.
@@ -98,42 +99,37 @@ func decodeBounce(e *envelope.Event) (bouncePayload, bool) {
 	return p, true
 }
 
-// bounceColor maps the bounceType to a Slack color: Transient → accent,
-// Permanent → critical, anything else → neutral.
-func bounceColor(bounceType string) string {
+// bounceSeverity maps the bounceType to a Severity. Permanent (hard) bounce
+// is Warning per the spec; Transient (soft) bounce is Notice; anything else
+// degrades to Notice.
+func bounceSeverity(bounceType string) notify.Severity {
 	switch bounceType {
-	case bounceTypeTransient:
-		return slack.ColorAccent
 	case bounceTypePermanent:
-		return slack.ColorCritical
+		return notify.SeverityWarning
+	case bounceTypeTransient:
+		return notify.SeverityNotice
 	default:
-		return slack.ColorNeutral
+		return notify.SeverityNotice
 	}
 }
 
 // buildMailFields constructs the shared From / To rows the SES bounce and
 // complaint parsers both emit. The Received parser uses a different format
 // so does not call this helper.
-func buildMailFields(m commonMail) []slack.TextObject {
-	fields := make([]slack.TextObject, 0, 4)
+func buildMailFields(m commonMail) []notify.Field {
+	fields := make([]notify.Field, 0, 4)
 	if m.Source != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*From*\n" + m.Source,
-		})
+		fields = append(fields, notify.Field{Key: "From", Value: m.Source})
 	}
 	if len(m.Destination) > 0 {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*To*\n" + strings.Join(m.Destination, ",\n"),
-		})
+		fields = append(fields, notify.Field{Key: "To", Value: strings.Join(m.Destination, ",\n")})
 	}
 	return fields
 }
 
 // renderBouncedRecipients lists one human-readable line per bouncedRecipient
 // — email plus action/status/diagnosticCode when present. An empty slice
-// yields an empty string so the caller can skip the body section.
+// yields an empty string so the caller can omit the body section.
 func renderBouncedRecipients(recipients []bouncedRecipient) string {
 	if len(recipients) == 0 {
 		return ""

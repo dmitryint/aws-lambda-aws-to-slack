@@ -1,30 +1,21 @@
 {
-  "attachments": [
+  "Source": "codedeploy-cloudwatch",
+  "Severity": 5,
+  "Title": "CodeDeploy Application example-app has failed",
+  "TitleURL": "https://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123",
+  "Subtitle": "AWS CodeDeploy Notification",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e FAILURE",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/codedeploy/home?region=us-east-1#/deployments/d-EXAMPLE123|CodeDeploy Application example-app\u003e has failed*\n_AWS CodeDeploy Notification_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nFAILURE"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*DeploymentGroup*\nexample-deployment-group"
-            }
-          ]
-        }
-      ]
+      "Key": "Status",
+      "Value": "FAILURE"
+    },
+    {
+      "Key": "DeploymentGroup",
+      "Value": "example-deployment-group"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "CodeDeploy Application example-app FAILURE",
+  "Footnotes": null
 }

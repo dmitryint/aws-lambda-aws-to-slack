@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -55,20 +56,20 @@ func TestSESBounce_Parse_ErrorOnNonObject(t *testing.T) {
 	}
 }
 
-func TestSESBounce_BounceColor(t *testing.T) {
+func TestSESBounce_BounceSeverity(t *testing.T) {
 	cases := []struct {
 		in   string
-		want string
+		want notify.Severity
 	}{
-		{"Permanent", "danger"},
-		{"Transient", "#439FE0"},
-		{"Undetermined", "#dddddd"},
-		{"", "#dddddd"},
+		{"Permanent", notify.SeverityWarning},
+		{"Transient", notify.SeverityNotice},
+		{"Undetermined", notify.SeverityNotice},
+		{"", notify.SeverityNotice},
 	}
 	for _, tc := range cases {
 		t.Run(tc.in, func(t *testing.T) {
-			if got := bounceColor(tc.in); got != tc.want {
-				t.Fatalf("bounceColor(%q) = %q, want %q", tc.in, got, tc.want)
+			if got := bounceSeverity(tc.in); got != tc.want {
+				t.Fatalf("bounceSeverity(%q) = %s, want %s", tc.in, got, tc.want)
 			}
 		})
 	}

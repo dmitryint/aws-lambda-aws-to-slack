@@ -1,6 +1,7 @@
-// Package inspector renders Slack messages for the classic Amazon Inspector
-// SNS notification feed. Matches when the inner SNS message has a `template`
-// field whose value starts with "arn:aws:inspector".
+// Package inspector renders the classic Amazon Inspector SNS notification feed
+// into the transport-neutral notify.Notification shape. Matches when the inner
+// SNS message has a `template` field whose value starts with
+// "arn:aws:inspector".
 //
 // Inspector classic emits five event flavors over SNS — ASSESSMENT_RUN_STARTED,
 // ASSESSMENT_RUN_COMPLETED, ASSESSMENT_RUN_STATE_CHANGED, FINDING_REPORTED,
@@ -18,7 +19,7 @@ import (
 	"strings"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -30,6 +31,8 @@ const (
 	eventAssessmentRunStateChanged = "ASSESSMENT_RUN_STATE_CHANGED"
 	eventFindingReported           = "FINDING_REPORTED"
 	eventEnableNotifications       = "ENABLE_ASSESSMENT_NOTIFICATIONS"
+
+	subtitleAmazonInspector = "Amazon Inspector"
 )
 
 // arnRegionRE captures the region segment from an Inspector ARN.
@@ -142,48 +145,49 @@ func (Parser) Match(e *envelope.Event) bool {
 	return strings.HasPrefix(m.Template, templatePrefix)
 }
 
-// Parse renders the Slack message for an Inspector classic notification.
-// Returns (nil, nil) for ENABLE_ASSESSMENT_NOTIFICATIONS, which is
-// silenced as a superfluous setup event.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for an Inspector classic notification.
+// Returns (nil, nil) for ENABLE_ASSESSMENT_NOTIFICATIONS, which is silenced
+// as a superfluous setup event.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	m, ok := decode(e)
 	if !ok {
 		return nil, fmt.Errorf("inspector: payload is not a JSON object")
 	}
 	if m.Event == eventEnableNotifications {
-		return nil, nil
+		return nil, nil //nolint:nilnil // silence — setup notifications are intentionally dropped
 	}
 
-	title, text, color := renderEvent(m)
+	title, summary := renderEvent(m)
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_Amazon Inspector_", title)),
-	}
-	if text != "" {
-		blocks = append(blocks, slack.SectionBlock(text))
-	}
-	blocks = append(blocks, slack.FieldsSection(buildFields(m)))
-
-	fallback := text
+	fallback := summary
 	if fallback == "" {
 		fallback = title
 	}
-	return slack.NewMessage(color, fallback, blocks...), nil
+
+	return &notify.Notification{
+		Source:   name,
+		Severity: notify.SeverityNotice,
+		Title:    title,
+		Subtitle: subtitleAmazonInspector,
+		Summary:  summary,
+		Fields:   buildFields(m),
+		Fallback: fallback,
+	}, nil
 }
 
-// renderEvent maps the event type to (title, body text, color).
-func renderEvent(m message) (title, text, color string) {
+// renderEvent maps the event type to (title, body text).
+func renderEvent(m message) (title, text string) {
 	switch m.Event {
 	case eventAssessmentRunStarted:
-		return "Assessment run started", "", slack.ColorOK
+		return "Assessment run started", ""
 	case eventAssessmentRunCompleted:
-		return "Assessment run summary", renderCompletedText(m), slack.ColorOK
+		return "Assessment run summary", renderCompletedText(m)
 	case eventFindingReported:
-		return "Finding reported", m.Finding, slack.ColorWarning
+		return "Finding reported", m.Finding
 	case eventAssessmentRunStateChanged:
-		return "Assessment run", renderStateChange(m.NewState), slack.ColorNeutral
+		return "Assessment run", renderStateChange(m.NewState)
 	default:
-		return "", "", slack.ColorNeutral
+		return "", ""
 	}
 }
 
@@ -193,7 +197,7 @@ func renderEvent(m message) (title, text, color string) {
 func renderCompletedText(m message) string {
 	var b strings.Builder
 	b.WriteString("*")
-	b.WriteString(slack.Link(runURL("finding", m.Run), "Findings"))
+	b.WriteString(notify.Link(runURL("finding", m.Run), "Findings"))
 	b.WriteString("*\n")
 
 	for i, entry := range parseFindingsCount(m.FindingsCount) {
@@ -255,16 +259,10 @@ func lookupRuleName(arn string) string {
 
 // buildFields returns the Target + Run rows. The Run row is omitted when
 // the run ARN is empty.
-func buildFields(m message) []slack.TextObject {
-	fields := []slack.TextObject{{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Target*\n" + m.Target,
-	}}
+func buildFields(m message) []notify.Field {
+	fields := []notify.Field{{Key: "Target", Value: m.Target}}
 	if m.Run != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Run*\n" + slack.Link(runURL("run", m.Run), m.Run) + "\n",
-		})
+		fields = append(fields, notify.Field{Key: "Run", Value: notify.Link(runURL("run", m.Run), m.Run) + "\n"})
 	}
 	return fields
 }

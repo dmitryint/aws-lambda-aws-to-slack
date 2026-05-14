@@ -1,83 +1,69 @@
 {
-  "attachments": [
+  "Source": "guardduty",
+  "Severity": 5,
+  "Title": "EC2 instance is communicating with a known command-and-control server.",
+  "TitleURL": "",
+  "Subtitle": "Amazon GuardDuty",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "EC2 instance is communicating with a known command-and-control server. EC2 instance is querying a domain associated with a known command and control server.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*EC2 instance is communicating with a known command-and-control server.*\n_Amazon GuardDuty_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Description*\nEC2 instance is querying a domain associated with a known command and control server."
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Account*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nus-east-1"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Type*\nBackdoor:EC2/C\u0026CActivity.B!DNS"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Severity*\n8"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Command and Control Domain*\nProofPoint"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Unknown Action Type (${actionType})*\n{\n  \"actionType\": \"DNS_REQUEST\",\n  \"dnsRequestAction\": {\n    \"blocked\": false,\n    \"domain\": \"malicious-domain.example.com\",\n    \"protocol\": \"UDP\"\n  }\n}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*First Event Time*\n2024-06-01T11:55:00.000Z"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Last Event Time*\n2024-06-01T12:00:00.000Z"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Event count*\n3"
-            }
-          ]
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Resource Type*\nInstance"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Instance ID*\ni-0123456789abcdef0"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Instance Type*\nt2.micro"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Name*\nexample-instance"
-            }
-          ]
-        }
-      ]
+      "Key": "Description",
+      "Value": "EC2 instance is querying a domain associated with a known command and control server."
+    },
+    {
+      "Key": "Account",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Region",
+      "Value": "us-east-1"
+    },
+    {
+      "Key": "Type",
+      "Value": "Backdoor:EC2/C\u0026CActivity.B!DNS"
+    },
+    {
+      "Key": "Severity",
+      "Value": "8"
+    },
+    {
+      "Key": "Command and Control Domain",
+      "Value": "ProofPoint"
+    },
+    {
+      "Key": "Unknown Action Type (${actionType})",
+      "Value": "{\n  \"actionType\": \"DNS_REQUEST\",\n  \"dnsRequestAction\": {\n    \"blocked\": false,\n    \"domain\": \"malicious-domain.example.com\",\n    \"protocol\": \"UDP\"\n  }\n}"
+    },
+    {
+      "Key": "First Event Time",
+      "Value": "2024-06-01T11:55:00.000Z"
+    },
+    {
+      "Key": "Last Event Time",
+      "Value": "2024-06-01T12:00:00.000Z"
+    },
+    {
+      "Key": "Event count",
+      "Value": "3"
+    },
+    {
+      "Key": "Resource Type",
+      "Value": "Instance"
+    },
+    {
+      "Key": "Instance ID",
+      "Value": "i-0123456789abcdef0"
+    },
+    {
+      "Key": "Instance Type",
+      "Value": "t2.micro"
+    },
+    {
+      "Key": "Name",
+      "Value": "example-instance"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "EC2 instance is communicating with a known command-and-control server. EC2 instance is querying a domain associated with a known command and control server.",
+  "Footnotes": null
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/codecommit"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -25,12 +25,12 @@ const (
 	refTypeTag    = "tag"
 )
 
-// RepositoryParser renders Slack messages for CodeCommit Repository State
+// RepositoryParser renders Notifications for CodeCommit Repository State
 // Change EventBridge events.
 //
 // The parser calls CodeCommit GetBranch/GetCommit through an injected Client
 // to enrich the message with the commit subject line. SDK errors are logged
-// and swallowed — the Slack message renders without the commit subject.
+// and swallowed — the message renders without the commit subject.
 type RepositoryParser struct {
 	client Client
 	log    *slog.Logger
@@ -73,8 +73,8 @@ func (RepositoryParser) Match(e *envelope.Event) bool {
 	return matchesSource(e) && e.DetailType() == detailTypeRepository
 }
 
-// Parse renders the Slack message for a CodeCommit repository event.
-func (p *RepositoryParser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CodeCommit repository event.
+func (p *RepositoryParser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notification, error) {
 	d, ok := decodeRepository(e)
 	if !ok {
 		return nil, fmt.Errorf("codecommit-repository: detail block missing or malformed")
@@ -84,22 +84,20 @@ func (p *RepositoryParser) Parse(ctx context.Context, e *envelope.Event) (*slack
 	repoURL := repoConsoleURL(region, d.RepositoryName)
 	title := repositoryTitle(d)
 
-	header := fmt.Sprintf("*%s*\n_%s_", slack.Link(repoURL, title), authorBase)
-	blocks := []slack.Block{slack.SectionBlock(header)}
-
 	fields := buildRepositoryFields(d)
 	if commitMsg := p.fetchCommitMessage(ctx, d); commitMsg != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + fieldCommitMsg + "*\n" + commitMsg,
-		})
-	}
-	if len(fields) > 0 {
-		blocks = append(blocks, slack.FieldsSection(fields))
+		fields = append(fields, notify.Field{Key: fieldCommitMsg, Value: commitMsg})
 	}
 
-	fallback := fmt.Sprintf("%s: %s", d.RepositoryName, title)
-	return slack.NewMessage(slack.ColorNeutral, fallback, blocks...), nil
+	return &notify.Notification{
+		Source:   repositoryName,
+		Severity: repositorySeverity(d),
+		Title:    title,
+		TitleURL: repoURL,
+		Subtitle: authorBase,
+		Fields:   fields,
+		Fallback: fmt.Sprintf("%s: %s", d.RepositoryName, title),
+	}, nil
 }
 
 // decodeRepository extracts the typed detail block from the inner event.
@@ -115,8 +113,18 @@ func decodeRepository(e *envelope.Event) (repositoryDetail, bool) {
 	return d, true
 }
 
-// repositoryTitle maps (event, referenceType, repositoryName) to the Slack
-// title. Unknown combinations fall back to the bare repository name.
+// repositorySeverity maps the (event, referenceType) pair to a Severity.
+// Destructive operations on a branch — referenceDeleted — read as Warning;
+// every other normal commit/branch/tag activity is Notice.
+func repositorySeverity(d repositoryDetail) notify.Severity {
+	if d.Event == repoEventReferenceDeleted && d.ReferenceType == refTypeBranch {
+		return notify.SeverityWarning
+	}
+	return notify.SeverityNotice
+}
+
+// repositoryTitle maps (event, referenceType, repositoryName) to the title.
+// Unknown combinations fall back to the bare repository name.
 func repositoryTitle(d repositoryDetail) string {
 	repo := d.RepositoryName
 	switch {
@@ -139,26 +147,17 @@ func repositoryTitle(d repositoryDetail) string {
 
 // buildRepositoryFields returns the conditional Repository / Type / Caller
 // ARN field rows.
-func buildRepositoryFields(d repositoryDetail) []slack.TextObject {
-	fields := make([]slack.TextObject, 0, 3)
+func buildRepositoryFields(d repositoryDetail) []notify.Field {
+	fields := make([]notify.Field, 0, 3)
 	if d.RepositoryName != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + fieldRepository + "*\n" + d.RepositoryName,
-		})
+		fields = append(fields, notify.Field{Key: fieldRepository, Value: d.RepositoryName})
 	}
 	if d.ReferenceType != "" {
 		label := capitalizeFirst(d.ReferenceType)
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + label + "*\n" + d.ReferenceName,
-		})
+		fields = append(fields, notify.Field{Key: label, Value: d.ReferenceName})
 	}
 	if d.CallerUserArn != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*" + fieldCallerARN + "*\n" + d.CallerUserArn,
-		})
+		fields = append(fields, notify.Field{Key: fieldCallerARN, Value: d.CallerUserArn})
 	}
 	return fields
 }

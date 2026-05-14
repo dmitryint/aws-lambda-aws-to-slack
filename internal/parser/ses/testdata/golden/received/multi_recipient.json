@@ -1,30 +1,21 @@
 {
-  "attachments": [
+  "Source": "ses-received",
+  "Severity": 1,
+  "Title": "Multi-recipient email",
+  "TitleURL": "",
+  "Subtitle": "Amazon SES",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "#439FE0",
-      "fallback": "New email received from SES",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Multi-recipient email*\n_Amazon SES_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*From*\nsender@example.com"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*To*\nrecipient@example.com,\nrecipient2@example.com,\nrecipient3@example.com"
-            }
-          ]
-        }
-      ]
+      "Key": "From",
+      "Value": "sender@example.com"
+    },
+    {
+      "Key": "To",
+      "Value": "recipient@example.com,\nrecipient2@example.com,\nrecipient3@example.com"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "New email received from SES",
+  "Footnotes": null
 }

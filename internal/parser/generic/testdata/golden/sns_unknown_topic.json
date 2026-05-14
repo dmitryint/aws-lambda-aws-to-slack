@@ -1,24 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "#dddddd",
-      "fallback": "{\n  \"Records\": [\n    {\n      \"EventVersion\": \"1.0\",\n      \"EventSubscriptionArn\": \"arn:aws:sns:us-east-1:123456789012:misc-topic:21be56ed-a058-49f5-8c98-aedd2564c486\",\n      \"EventSource\": \"aws:sns\",\n      \"Sns\": {\n        \"SignatureVersion\": \"1\",\n        \"Timestamp\": \"2024-06-01T12:00:00.000Z\",\n        \"Signature\": \"tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==\",\n        \"SigningCertUrl\": \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem\",\n        \"MessageId\": \"95df01b4-ee98-5cb9-9903-4c221d41eb5e\",\n        \"Message\": \"This is an arbitrary message published to an SNS topic that no specific parser recognizes.\",\n        \"MessageAttributes\": {},\n        \"Type\": \"Notification\",\n        \"UnsubscribeUrl\": \"https://sns.us-east-1.amazonaws.com/unsubscribe\",\n        \"TopicArn\": \"arn:aws:sns:us-east-1:123456789012:misc-topic\",\n        \"Subject\": \"Custom Notification\"\n      }\n    }\n  ]\n}",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Custom Notification*\n_sns_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "```\nThis is an arbitrary message published to an SNS topic that no specific parser recognizes.\n```"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "generic",
+  "Severity": 1,
+  "Title": "Custom Notification",
+  "TitleURL": "",
+  "Subtitle": "sns",
+  "Summary": "```\nThis is an arbitrary message published to an SNS topic that no specific parser recognizes.\n```",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "{\n  \"Records\": [\n    {\n      \"EventVersion\": \"1.0\",\n      \"EventSubscriptionArn\": \"arn:aws:sns:us-east-1:123456789012:misc-topic:21be56ed-a058-49f5-8c98-aedd2564c486\",\n      \"EventSource\": \"aws:sns\",\n      \"Sns\": {\n        \"SignatureVersion\": \"1\",\n        \"Timestamp\": \"2024-06-01T12:00:00.000Z\",\n        \"Signature\": \"tcc6faL2yUC6dgZdmrwh1Y4cGa/ebXEkAi6RibDsvpi+tE/1+82j...65r==\",\n        \"SigningCertUrl\": \"https://sns.us-east-1.amazonaws.com/SimpleNotificationService.pem\",\n        \"MessageId\": \"95df01b4-ee98-5cb9-9903-4c221d41eb5e\",\n        \"Message\": \"This is an arbitrary message published to an SNS topic that no specific parser recognizes.\",\n        \"MessageAttributes\": {},\n        \"Type\": \"Notification\",\n        \"UnsubscribeUrl\": \"https://sns.us-east-1.amazonaws.com/unsubscribe\",\n        \"TopicArn\": \"arn:aws:sns:us-east-1:123456789012:misc-topic\",\n        \"Subject\": \"Custom Notification\"\n      }\n    }\n  ]\n}",
+  "Footnotes": null
 }

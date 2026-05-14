@@ -1,44 +1,21 @@
 {
-  "attachments": [
+  "Source": "cloudwatch",
+  "Severity": 5,
+  "Title": "composite-alarm",
+  "TitleURL": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#alarm:name=composite-alarm",
+  "Subtitle": "AWS CloudWatch Alarm (123456789012)",
+  "Summary": "*Description*\nComposite alarm of ALARM(child-a) AND ALARM(child-b)\n\narn:aws:cloudwatch:us-east-1:123456789012:alarm:child-a transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC AND arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-b transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "composite-alarm state is now ALARM:\narn:aws:cloudwatch:us-east-1:123456789012:alarm:child-a transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC AND arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-b transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#alarm:name=composite-alarm|composite-alarm\u003e*\n_AWS CloudWatch Alarm (123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Description*\nComposite alarm of ALARM(child-a) AND ALARM(child-b)"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-a transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC AND arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-b transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*State Change*\nOK → ALARM"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nUS East (N. Virginia)"
-            }
-          ]
-        }
-      ]
+      "Key": "State Change",
+      "Value": "OK → ALARM"
+    },
+    {
+      "Key": "Region",
+      "Value": "US East (N. Virginia)"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "composite-alarm state is now ALARM:\narn:aws:cloudwatch:us-east-1:123456789012:alarm:child-a transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC AND arn:aws:cloudwatch:us-east-1:123456789012:alarm:child-b transitioned to ALARM at Saturday 01 June, 2024 12:00:00 UTC",
+  "Footnotes": null
 }

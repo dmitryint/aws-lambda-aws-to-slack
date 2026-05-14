@@ -1,50 +1,41 @@
 {
-  "attachments": [
+  "Source": "ecs",
+  "Severity": 3,
+  "Title": "Amazon ECS - ECS Task State Change",
+  "TitleURL": "",
+  "Subtitle": "",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "example-cluster - ECS Task State Change - PROVISIONING",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Amazon ECS - ECS Task State Change*"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Task*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/tasks/0123456789abcdef0/details|0123456789abcdef0\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nPROVISIONING"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Desired Status*\nRUNNING"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Reason*\nUnknown"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service Logs*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Cluster*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
-            }
-          ]
-        }
-      ]
+      "Key": "Task",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/tasks/0123456789abcdef0/details|0123456789abcdef0\u003e"
+    },
+    {
+      "Key": "Status",
+      "Value": "PROVISIONING"
+    },
+    {
+      "Key": "Desired Status",
+      "Value": "RUNNING"
+    },
+    {
+      "Key": "Reason",
+      "Value": "Unknown"
+    },
+    {
+      "Key": "Service Logs",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
+    },
+    {
+      "Key": "Service",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
+    },
+    {
+      "Key": "Cluster",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-cluster - ECS Task State Change - PROVISIONING",
+  "Footnotes": null
 }

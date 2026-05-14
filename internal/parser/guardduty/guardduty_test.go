@@ -12,7 +12,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 var updateGoldens = flag.Bool("update", false, "rewrite golden files instead of comparing")
@@ -75,21 +75,21 @@ func TestGuardDuty_Parse_ErrorOnMalformedDetail(t *testing.T) {
 	}
 }
 
-func TestGuardDuty_SeverityColor(t *testing.T) {
+func TestGuardDuty_SeverityFor(t *testing.T) {
 	cases := []struct {
 		severity float64
-		want     string
+		want     notify.Severity
 	}{
-		{severity: 0, want: slack.ColorNeutral},
-		{severity: 4, want: slack.ColorNeutral},
-		{severity: 4.1, want: slack.ColorWarning},
-		{severity: 7, want: slack.ColorWarning},
-		{severity: 7.5, want: slack.ColorCritical},
-		{severity: 9, want: slack.ColorCritical},
+		{severity: 0, want: notify.SeverityNotice},
+		{severity: 4, want: notify.SeverityNotice},
+		{severity: 4.1, want: notify.SeverityWarning},
+		{severity: 7, want: notify.SeverityWarning},
+		{severity: 7.5, want: notify.SeverityCritical},
+		{severity: 9, want: notify.SeverityCritical},
 	}
 	for _, tc := range cases {
-		if got := severityColor(tc.severity); got != tc.want {
-			t.Fatalf("severityColor(%g) = %q, want %q", tc.severity, got, tc.want)
+		if got := severityFor(tc.severity); got != tc.want {
+			t.Fatalf("severityFor(%g) = %s, want %s", tc.severity, got, tc.want)
 		}
 	}
 }

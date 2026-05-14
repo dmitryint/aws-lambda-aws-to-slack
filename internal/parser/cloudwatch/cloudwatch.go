@@ -1,6 +1,6 @@
-// Package cloudwatch renders Slack messages for CloudWatch alarm SNS
-// notifications. Matches when the inner SNS message carries both `AlarmName`
-// and `AlarmDescription`.
+// Package cloudwatch renders CloudWatch alarm SNS notifications into the
+// transport-neutral notify.Notification shape. Matches when the inner SNS
+// message carries both `AlarmName` and `AlarmDescription`.
 //
 // Behavior contract:
 //
@@ -13,8 +13,8 @@
 //  4. The widget JSON is built end-to-end from the alarm payload and
 //     validated by unit tests against samples/cloudwatch/*.json.
 //
-// The chart image goes inside a Block Kit `image` block while the severity
-// color stays on the legacy attachment envelope.
+// The chart image goes into Notification.ImageURL; the Slack renderer wraps
+// it in a Block Kit image block.
 package cloudwatch
 
 import (
@@ -30,7 +30,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -39,9 +39,11 @@ const (
 	stateOK               = "OK"
 	stateAlarm            = "ALARM"
 	stateInsufficientData = "INSUFFICIENT_DATA"
+
+	subtitlePrefix = "AWS CloudWatch Alarm"
 )
 
-// Parser renders Slack messages for CloudWatch alarm SNS payloads.
+// Parser renders Notifications for CloudWatch alarm SNS payloads.
 type Parser struct {
 	pipeline *ChartRenderingPipeline
 	log      *slog.Logger
@@ -166,41 +168,53 @@ func (Parser) Match(e *envelope.Event) bool {
 	return probe.AlarmName != nil && probe.AlarmDescription != nil
 }
 
-// Parse renders the Slack message for a CloudWatch alarm SNS payload.
-func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CloudWatch alarm SNS payload.
+func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notification, error) {
 	m, ok := decodeAlarm(e)
 	if !ok {
 		return nil, fmt.Errorf("cloudwatch: payload is not a JSON object")
 	}
 
 	region := resolveRegion(m.Region, e.Region())
-	color := stateColor(m.NewStateValue)
+	severity := stateSeverity(m.NewStateValue)
 
-	header := fmt.Sprintf("*%s*\n_AWS CloudWatch Alarm (%s)_",
-		slack.Link(alarmConsoleURL(region, m.AlarmName), m.AlarmName),
-		m.AWSAccountID,
-	)
-	text := buildReasonText(m, e.Time(), region)
+	subtitle := subtitlePrefix
+	if m.AWSAccountID != "" {
+		subtitle = fmt.Sprintf("%s (%s)", subtitlePrefix, m.AWSAccountID)
+	}
 
-	blocks := []slack.Block{slack.SectionBlock(header)}
+	summary := buildReasonText(m, e.Time(), region)
 	if m.AlarmDescription != "" {
-		blocks = append(blocks, slack.SectionBlock("*Description*\n"+m.AlarmDescription))
+		desc := "*Description*\n" + m.AlarmDescription
+		if summary != "" {
+			summary = desc + "\n\n" + summary
+		} else {
+			summary = desc
+		}
 	}
-	if text != "" {
-		blocks = append(blocks, slack.SectionBlock(text))
-	}
-	blocks = append(blocks, slack.FieldsSection([]slack.TextObject{
-		{Type: slack.TextTypeMrkdwn, Text: "*State Change*\n" + m.OldStateValue + " → " + m.NewStateValue},
-		{Type: slack.TextTypeMrkdwn, Text: "*Region*\n" + m.Region},
-	}))
 
-	if imgURL := p.pipeline.renderAlarmChart(ctx, m); imgURL != "" {
-		blocks = append(blocks, slack.ImageBlock(imgURL, m.AlarmName+" chart"))
+	fields := []notify.Field{
+		{Key: "State Change", Value: m.OldStateValue + " → " + m.NewStateValue},
+		{Key: "Region", Value: m.Region},
 	}
 
 	fallback := fmt.Sprintf("%s state is now %s:\n%s",
 		m.AlarmName, m.NewStateValue, m.NewStateReason)
-	return slack.NewMessage(color, fallback, blocks...), nil
+
+	n := &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    m.AlarmName,
+		TitleURL: alarmConsoleURL(region, m.AlarmName),
+		Subtitle: subtitle,
+		Summary:  summary,
+		Fields:   fields,
+		Fallback: fallback,
+	}
+	if imgURL := p.pipeline.renderAlarmChart(ctx, m); imgURL != "" {
+		n.ImageURL = imgURL
+	}
+	return n, nil
 }
 
 // decodeAlarm extracts the typed alarm message from the inner SNS payload.
@@ -219,18 +233,19 @@ func decodeAlarm(e *envelope.Event) (alarmMessage, bool) {
 	return m, true
 }
 
-// stateColor maps a CloudWatch alarm state to a Slack color, defaulting to
-// neutral when the state is composite or unknown.
-func stateColor(state string) string {
+// stateSeverity maps a CloudWatch alarm state to a Severity. OK → OK,
+// ALARM → Critical, INSUFFICIENT_DATA → Warning; anything else degrades to
+// Notice (composite alarms, custom states).
+func stateSeverity(state string) notify.Severity {
 	switch state {
 	case stateOK:
-		return slack.ColorOK
+		return notify.SeverityOK
 	case stateAlarm:
-		return slack.ColorCritical
+		return notify.SeverityCritical
 	case stateInsufficientData:
-		return slack.ColorWarning
+		return notify.SeverityWarning
 	default:
-		return slack.ColorNeutral
+		return notify.SeverityNotice
 	}
 }
 
@@ -241,7 +256,7 @@ func buildReasonText(m alarmMessage, ts time.Time, region string) string {
 	if logsURL == "" {
 		return reason
 	}
-	link := slack.Link(logsURL, "See recent logs")
+	link := notify.Link(logsURL, "See recent logs")
 	if link == "" {
 		return reason
 	}

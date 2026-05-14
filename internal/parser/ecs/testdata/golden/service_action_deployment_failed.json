@@ -1,38 +1,29 @@
 {
-  "attachments": [
+  "Source": "ecs",
+  "Severity": 5,
+  "Title": "Amazon ECS - ECS Service Action",
+  "TitleURL": "",
+  "Subtitle": "",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "example-cluster - ECS Service Action - SERVICE_DEPLOYMENT_FAILED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Amazon ECS - ECS Service Action*"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nSERVICE_DEPLOYMENT_FAILED"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service Logs*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Cluster*\n\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
-            }
-          ]
-        }
-      ]
+      "Key": "Service",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/details|example-service\u003e"
+    },
+    {
+      "Key": "Status",
+      "Value": "SERVICE_DEPLOYMENT_FAILED"
+    },
+    {
+      "Key": "Service Logs",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services/example-service/logs|View Logs\u003e"
+    },
+    {
+      "Key": "Cluster",
+      "Value": "\u003chttps://console.aws.amazon.com/ecs/home?region=us-east-1#/clusters/example-cluster/services|example-cluster\u003e"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-cluster - ECS Service Action - SERVICE_DEPLOYMENT_FAILED",
+  "Footnotes": null
 }

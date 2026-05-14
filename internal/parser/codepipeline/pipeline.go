@@ -1,7 +1,8 @@
-// Package codepipeline renders Slack messages for AWS CodePipeline events.
-// The package owns two parsers — one for pipeline/stage/action state-change
-// EventBridge events (pipeline.go) and one for SNS-delivered manual
-// approval notifications (approval.go).
+// Package codepipeline renders AWS CodePipeline events into the
+// transport-neutral notify.Notification shape. The package owns two parsers
+// — one for pipeline/stage/action state-change EventBridge events
+// (pipeline.go) and one for SNS-delivered manual approval notifications
+// (approval.go).
 package codepipeline
 
 import (
@@ -12,7 +13,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
@@ -25,6 +26,11 @@ const (
 
 	executionStage  = "Stage"
 	executionAction = "Action"
+
+	stateStarted   = "STARTED"
+	stateSucceeded = "SUCCEEDED"
+	stateFailed    = "FAILED"
+	stateCanceled  = "CANCELED"
 )
 
 // detailTypeRE captures the execution scope (Pipeline / Stage / Action) from
@@ -80,8 +86,8 @@ func (Parser) Match(e *envelope.Event) bool {
 	return a.PipelineName == ""
 }
 
-// Parse renders the Slack message for a CodePipeline state-change event.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for a CodePipeline state-change event.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	d := decodePipelineDetail(e)
 	pipeline := d.Pipeline
 	if pipeline == "" {
@@ -97,24 +103,27 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error
 	region := e.Region()
 	consoleURL := console.URLWithFragment(region, "codepipeline/home", "/view/"+pipeline)
 
-	author := authorBase
+	subtitle := authorBase
 	if accountID := e.AccountID(); accountID != "" {
-		author = fmt.Sprintf("%s (%s)", authorBase, accountID)
+		subtitle = fmt.Sprintf("%s (%s)", authorBase, accountID)
 	}
 
 	detailType := e.DetailType()
 	scope := executionScope(detailType)
-	title, text := renderTitleAndText(scope, pipeline, d, detailType)
-	headerLink := slack.Link(consoleURL, title)
+	title, summary := renderTitleAndText(scope, pipeline, d, detailType)
 
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n_%s_", headerLink, author)),
-		slack.SectionBlock(text),
-	}
-
-	color := pipelineColor(d.State)
+	severity := pipelineSeverity(d.State)
 	fallback := fmt.Sprintf("%s >> %s", pipeline, d.State)
-	return slack.NewMessage(color, fallback, blocks...), nil
+
+	return &notify.Notification{
+		Source:   pipelineName,
+		Severity: severity,
+		Title:    title,
+		TitleURL: consoleURL,
+		Subtitle: subtitle,
+		Summary:  summary,
+		Fallback: fallback,
+	}, nil
 }
 
 // decodePipelineDetail extracts the typed detail block. Missing fields
@@ -163,18 +172,17 @@ func renderTitleAndText(scope, pipeline string, d pipelineDetail, detailType str
 	return title, text
 }
 
-// pipelineColor maps the pipeline state to a Slack color.
-func pipelineColor(state string) string {
+// pipelineSeverity maps the pipeline state to a Severity. FAILED → Critical,
+// SUCCEEDED → OK; every other state (STARTED, CANCELED, etc.) is Notice.
+func pipelineSeverity(state string) notify.Severity {
 	switch state {
-	case "STARTED":
-		return slack.ColorAccent
-	case "SUCCEEDED":
-		return slack.ColorOK
-	case "FAILED":
-		return slack.ColorCritical
-	case "CANCELED":
-		return slack.ColorWarning
+	case stateSucceeded:
+		return notify.SeverityOK
+	case stateFailed:
+		return notify.SeverityCritical
+	case stateStarted, stateCanceled:
+		return notify.SeverityNotice
 	default:
-		return slack.ColorNeutral
+		return notify.SeverityNotice
 	}
 }

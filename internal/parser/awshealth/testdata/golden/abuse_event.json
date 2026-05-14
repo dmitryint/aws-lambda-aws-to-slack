@@ -1,38 +1,29 @@
 {
-  "attachments": [
+  "Source": "awshealth",
+  "Severity": 5,
+  "Title": "AWS Health Abuse Event",
+  "TitleURL": "",
+  "Subtitle": "AWS Health (123456789012)",
+  "Summary": "We have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources.",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "We have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*AWS Health Abuse Event*\nWe have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Account ID*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\nABUSE"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Start Time*\nSat, 01 Jun 2024 11:30:00 UTC"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Affected Entities*\ni-0123456789abcdef0"
-            }
-          ]
-        }
-      ]
+      "Key": "Account ID",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Service",
+      "Value": "ABUSE"
+    },
+    {
+      "Key": "Start Time",
+      "Value": "Sat, 01 Jun 2024 11:30:00 UTC"
+    },
+    {
+      "Key": "Affected Entities",
+      "Value": "i-0123456789abcdef0"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "We have received a denial-of-service abuse report involving one or more of your AWS resources. Please investigate the affected resources.",
+  "Footnotes": null
 }

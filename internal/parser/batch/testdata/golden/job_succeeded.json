@@ -1,34 +1,25 @@
 {
-  "attachments": [
+  "Source": "batch",
+  "Severity": 2,
+  "Title": "example-job succeeded",
+  "TitleURL": "",
+  "Subtitle": "AWS Batch Notification",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "good",
-      "fallback": "Batch Job Event example-job SUCCEEDED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*example-job succeeded*\n_AWS Batch Notification_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nSUCCEEDED"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Reason*\nEssential container in task exited"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Logs*\n\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/aws/batch/job;stream=example-job/default/abcd1234;|View Logs\u003e"
-            }
-          ]
-        }
-      ]
+      "Key": "Status",
+      "Value": "SUCCEEDED"
+    },
+    {
+      "Key": "Reason",
+      "Value": "Essential container in task exited"
+    },
+    {
+      "Key": "Logs",
+      "Value": "\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#logEventViewer:group=/aws/batch/job;stream=example-job/default/abcd1234;|View Logs\u003e"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Batch Job Event example-job SUCCEEDED",
+  "Footnotes": null
 }

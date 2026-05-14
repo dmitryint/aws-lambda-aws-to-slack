@@ -4,14 +4,14 @@ import (
 	"context"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 // Parser is the contract every per-source parser implements.
 //
-// Match is a cheap predicate (no network, no allocation beyond what the
-// envelope already holds); the router walks the registered parsers in
-// order and dispatches the first one that returns true.
+// Parsers emit transport-neutral notify.Notification values — they must
+// not import any internal/transport/* package. Visual mapping (color,
+// emoji, layout) lives in the transports.
 type Parser interface {
 	// Name returns a stable identifier used in logs and the router test
 	// that asserts ordering invariants.
@@ -24,9 +24,9 @@ type Parser interface {
 	// not Parse.
 	Match(e *envelope.Event) bool
 
-	// Parse renders the Slack message for the given event. The result is
-	// terminal: a nil message with a nil error means the parser
-	// deliberately silenced the event (matched but no alert is posted),
-	// and the router will not fall through to another parser.
-	Parse(ctx context.Context, e *envelope.Event) (*slack.Message, error)
+	// Parse builds the transport-neutral Notification for the given event.
+	// The result is terminal: a nil Notification with a nil error means
+	// the parser deliberately silenced the event (matched but no alert is
+	// emitted), and the router will not fall through to another parser.
+	Parse(ctx context.Context, e *envelope.Event) (*notify.Notification, error)
 }

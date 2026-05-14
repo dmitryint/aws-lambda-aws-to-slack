@@ -1,24 +1,12 @@
 {
-  "attachments": [
-    {
-      "color": "#439FE0",
-      "fallback": "example-db: The free storage capacity for DB Instance is low",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/rds/home?region=us-east-1#dbinstance:id=example-db|example-db\u003e*\n_Amazon RDS_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "The free storage capacity for DB Instance is low"
-          }
-        }
-      ]
-    }
-  ]
+  "Source": "rds",
+  "Severity": 3,
+  "Title": "example-db",
+  "TitleURL": "https://console.aws.amazon.com/rds/home?region=us-east-1#dbinstance:id=example-db",
+  "Subtitle": "Amazon RDS",
+  "Summary": "The free storage capacity for DB Instance is low",
+  "Fields": null,
+  "ImageURL": "",
+  "Fallback": "example-db: The free storage capacity for DB Instance is low",
+  "Footnotes": null
 }

@@ -1,83 +1,69 @@
 {
-  "attachments": [
+  "Source": "guardduty",
+  "Severity": 4,
+  "Title": "API ListBuckets was invoked from a known malicious IP address.",
+  "TitleURL": "",
+  "Subtitle": "Amazon GuardDuty",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "API ListBuckets was invoked from a known malicious IP address. An API commonly used to discover S3 buckets was invoked from a known malicious source IP.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*API ListBuckets was invoked from a known malicious IP address.*\n_Amazon GuardDuty_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Description*\nAn API commonly used to discover S3 buckets was invoked from a known malicious source IP."
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Account*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nus-east-1"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Type*\nRecon:IAMUser/MaliciousIPCaller"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Severity*\n5"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Generic*\nProofPoint"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\ns3.amazonaws.com - ListBuckets"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*API origin*\n203.0.113.30\nExample ISP - Example Org"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Location*\nRussia - Moscow"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Resource Type*\nAccessKey"
-            }
-          ]
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*AccessKeyId*\nAKIAIOSFODNN7EXAMPLE"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*PrincipalId*\nAROAJTAAAAAAAAAAAAAAA:example-session"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*User Type*\nAssumedRole"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*User Name*\nexample-role"
-            }
-          ]
-        }
-      ]
+      "Key": "Description",
+      "Value": "An API commonly used to discover S3 buckets was invoked from a known malicious source IP."
+    },
+    {
+      "Key": "Account",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Region",
+      "Value": "us-east-1"
+    },
+    {
+      "Key": "Type",
+      "Value": "Recon:IAMUser/MaliciousIPCaller"
+    },
+    {
+      "Key": "Severity",
+      "Value": "5"
+    },
+    {
+      "Key": "Generic",
+      "Value": "ProofPoint"
+    },
+    {
+      "Key": "Service",
+      "Value": "s3.amazonaws.com - ListBuckets"
+    },
+    {
+      "Key": "API origin",
+      "Value": "203.0.113.30\nExample ISP - Example Org"
+    },
+    {
+      "Key": "Location",
+      "Value": "Russia - Moscow"
+    },
+    {
+      "Key": "Resource Type",
+      "Value": "AccessKey"
+    },
+    {
+      "Key": "AccessKeyId",
+      "Value": "AKIAIOSFODNN7EXAMPLE"
+    },
+    {
+      "Key": "PrincipalId",
+      "Value": "AROAJTAAAAAAAAAAAAAAA:example-session"
+    },
+    {
+      "Key": "User Type",
+      "Value": "AssumedRole"
+    },
+    {
+      "Key": "User Name",
+      "Value": "example-role"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "API ListBuckets was invoked from a known malicious IP address. An API commonly used to discover S3 buckets was invoked from a known malicious source IP.",
+  "Footnotes": null
 }

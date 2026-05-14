@@ -1,34 +1,25 @@
 {
-  "attachments": [
+  "Source": "awshealth",
+  "Severity": 1,
+  "Title": "AWS Health Event",
+  "TitleURL": "",
+  "Subtitle": "AWS Health (123456789012)",
+  "Summary": "Your AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible.",
+  "Fields": [
     {
-      "color": "#439FE0",
-      "fallback": "Your AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*AWS Health Event*\nYour AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Account ID*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\nIAM"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Start Time*\nSat, 01 Jun 2024 11:30:00 UTC"
-            }
-          ]
-        }
-      ]
+      "Key": "Account ID",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Service",
+      "Value": "IAM"
+    },
+    {
+      "Key": "Start Time",
+      "Value": "Sat, 01 Jun 2024 11:30:00 UTC"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Your AWS account has an IAM policy that grants broad permissions. We recommend you review the policy and reduce the permissions if possible.",
+  "Footnotes": null
 }

@@ -1,37 +1,21 @@
 {
-  "attachments": [
+  "Source": "autoscaling",
+  "Severity": 3,
+  "Title": "example-asg - autoscaling:TEST_NOTIFICATION",
+  "TitleURL": "https://console.aws.amazon.com/ec2/autoscaling/home?region=us-east-1#AutoScalingGroups:id=example-asg",
+  "Subtitle": "\u003chttps://123456789012.signin.aws.amazon.com/console/ec2?region=us-east-1|AWS AutoScaling (us-east-1 - 123456789012)\u003e",
+  "Summary": "Auto Scaling triggered autoscaling:TEST_NOTIFICATION for service AWS Auto Scaling.",
+  "Fields": [
     {
-      "color": "#dddddd",
-      "fallback": "Auto Scaling triggered autoscaling:TEST_NOTIFICATION for service AWS Auto Scaling.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/ec2/autoscaling/home?region=us-east-1#AutoScalingGroups:id=example-asg|example-asg - autoscaling:TEST_NOTIFICATION\u003e*\n_\u003chttps://123456789012.signin.aws.amazon.com/console/ec2?region=us-east-1|AWS AutoScaling (us-east-1 - 123456789012)\u003e_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "Auto Scaling triggered autoscaling:TEST_NOTIFICATION for service AWS Auto Scaling."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Service*\nAWS Auto Scaling"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Event*\nautoscaling:TEST_NOTIFICATION"
-            }
-          ]
-        }
-      ]
+      "Key": "Service",
+      "Value": "AWS Auto Scaling"
+    },
+    {
+      "Key": "Event",
+      "Value": "autoscaling:TEST_NOTIFICATION"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Auto Scaling triggered autoscaling:TEST_NOTIFICATION for service AWS Auto Scaling.",
+  "Footnotes": null
 }

@@ -1,5 +1,6 @@
-// Package awshealth renders Slack messages for AWS Health Dashboard
-// EventBridge events. Matches when the EventBridge source is "aws.health".
+// Package awshealth renders AWS Health Dashboard EventBridge events into the
+// transport-neutral notify.Notification shape. Matches when the EventBridge
+// source is "aws.health".
 //
 // Two detail-types reach this parser: "AWS Health Event" (regional service
 // status notifications, account notifications, scheduled changes) and "AWS
@@ -16,17 +17,21 @@ import (
 	"time"
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
 
 const (
 	name         = "awshealth"
 	sourceHealth = "health"
 
-	categoryIssue   = "issue"
-	preferredLang   = "en_US"
-	timeRenderForm  = "Mon, 02 Jan 2006 15:04:05 MST"
-	descriptionLen2 = 3
+	categoryIssue               = "issue"
+	categoryScheduledChange     = "scheduledChange"
+	categoryAccountNotification = "accountNotification"
+	preferredLang               = "en_US"
+	timeRenderForm              = "Mon, 02 Jan 2006 15:04:05 MST"
+	descriptionLen2             = 3
+	authorAWSHealth             = "AWS Health"
+	subtitlePrefix              = "AWS Health"
 )
 
 // Parser handles AWS Health Dashboard EventBridge events.
@@ -66,36 +71,38 @@ type affectedEntity struct {
 	EntityValue string `json:"entityValue"`
 }
 
-// Parse renders the Slack message for an AWS Health event.
-func (Parser) Parse(_ context.Context, e *envelope.Event) (*slack.Message, error) {
+// Parse renders the Notification for an AWS Health event.
+func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification, error) {
 	d, ok := decodeDetail(e)
 	if !ok {
 		return nil, fmt.Errorf("awshealth: detail block missing or malformed")
 	}
 
 	description := pickDescription(d.EventDescription)
-	color := slack.ColorAccent
-	if d.EventTypeCategory == categoryIssue {
-		color = slack.ColorWarning
-	}
+	severity := severityFor(d.EventTypeCategory)
 
 	detailType := e.DetailType()
 	accountID := e.AccountID()
 
-	fields := buildFields(accountID, d)
-
-	blocks := []slack.Block{
-		slack.SectionBlock(fmt.Sprintf("*%s*\n%s", detailType, formatMrkdwn(description))),
-	}
-	if len(fields) > 0 {
-		blocks = append(blocks, slack.FieldsSection(fields))
+	subtitle := subtitlePrefix
+	if accountID != "" {
+		subtitle = fmt.Sprintf("%s (%s)", subtitlePrefix, accountID)
 	}
 
 	fallback := description
 	if fallback == "" {
 		fallback = detailType
 	}
-	return slack.NewMessage(color, fallback, blocks...), nil
+
+	return &notify.Notification{
+		Source:   name,
+		Severity: severity,
+		Title:    detailType,
+		Subtitle: subtitle,
+		Summary:  formatMrkdwn(description),
+		Fields:   buildFields(accountID, d),
+		Fallback: fallback,
+	}, nil
 }
 
 // decodeDetail extracts the typed detail block from the inner event message.
@@ -109,6 +116,22 @@ func decodeDetail(e *envelope.Event) (detail, bool) {
 		return detail{}, false
 	}
 	return d, true
+}
+
+// severityFor maps the AWS Health eventTypeCategory to a Severity. `issue`
+// events are service-impacting (Critical); scheduledChange is operational
+// notice; accountNotification is informational.
+func severityFor(category string) notify.Severity {
+	switch category {
+	case categoryIssue:
+		return notify.SeverityCritical
+	case categoryScheduledChange:
+		return notify.SeverityNotice
+	case categoryAccountNotification:
+		return notify.SeverityInfo
+	default:
+		return notify.SeverityNotice
+	}
 }
 
 // pickDescription returns the en_US latestDescription when present,
@@ -128,35 +151,20 @@ func pickDescription(entries []descriptionEntry) string {
 // buildFields constructs the field rows shown in the rendered alert. The
 // Account ID field is always present; Service / Start Time / End Time /
 // Affected Entities are conditional.
-func buildFields(accountID string, d detail) []slack.TextObject {
-	fields := make([]slack.TextObject, 0, 5)
-	fields = append(fields, slack.TextObject{
-		Type: slack.TextTypeMrkdwn,
-		Text: "*Account ID*\n" + accountID,
-	})
+func buildFields(accountID string, d detail) []notify.Field {
+	fields := make([]notify.Field, 0, 5)
+	fields = append(fields, notify.Field{Key: "Account ID", Value: accountID})
 	if d.Service != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Service*\n" + d.Service,
-		})
+		fields = append(fields, notify.Field{Key: "Service", Value: d.Service})
 	}
 	if d.StartTime != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Start Time*\n" + formatHealthTime(d.StartTime),
-		})
+		fields = append(fields, notify.Field{Key: "Start Time", Value: formatHealthTime(d.StartTime)})
 	}
 	if d.EndTime != "" {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*End Time*\n" + formatHealthTime(d.EndTime),
-		})
+		fields = append(fields, notify.Field{Key: "End Time", Value: formatHealthTime(d.EndTime)})
 	}
 	if len(d.AffectedEntities) > 0 {
-		fields = append(fields, slack.TextObject{
-			Type: slack.TextTypeMrkdwn,
-			Text: "*Affected Entities*\n" + joinEntities(d.AffectedEntities),
-		})
+		fields = append(fields, notify.Field{Key: "Affected Entities", Value: joinEntities(d.AffectedEntities)})
 	}
 	return fields
 }

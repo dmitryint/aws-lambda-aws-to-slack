@@ -1,26 +1,17 @@
 {
-  "attachments": [
+  "Source": "batch",
+  "Severity": 3,
+  "Title": "Batch Job Event example-job",
+  "TitleURL": "",
+  "Subtitle": "AWS Batch Notification",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "#dddddd",
-      "fallback": "Batch Job Event example-job SUBMITTED",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Batch Job Event example-job*\n_AWS Batch Notification_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Status*\nSUBMITTED"
-            }
-          ]
-        }
-      ]
+      "Key": "Status",
+      "Value": "SUBMITTED"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Batch Job Event example-job SUBMITTED",
+  "Footnotes": null
 }

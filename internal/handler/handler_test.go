@@ -20,27 +20,37 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/config"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser"
 	genericparser "github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser/generic"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/router"
-	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/slack"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/transport"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/transport/slack"
 )
 
-// recordingPoster captures every Post call. The optional errFunc returns
-// an error for the call at the given (1-based) index so partial-failure
-// tests can target a specific record.
-type recordingPoster struct {
+// recordingRenderer captures every Notification handed to Send. The optional
+// errFunc returns an error for the call at the given (1-based) index so
+// partial-failure tests can target a specific record.
+type recordingRenderer struct {
 	mu       sync.Mutex
-	posted   []*slack.Message
+	posted   []*notify.Notification
 	inFlight atomic.Int32
 	maxSeen  atomic.Int32
 	delay    time.Duration
 	errFunc  func(callIndex int) error
 }
 
-func (r *recordingPoster) Post(ctx context.Context, m *slack.Message) error {
+// Name identifies the recording renderer in handler logs.
+func (*recordingRenderer) Name() string { return "recording" }
+
+// Accepts always returns true — the recording renderer captures every
+// notification regardless of severity.
+func (*recordingRenderer) Accepts(notify.Severity) bool { return true }
+
+// Send records the Notification and exercises the bounded-concurrency seam.
+func (r *recordingRenderer) Send(ctx context.Context, n *notify.Notification) error {
 	r.mu.Lock()
-	r.posted = append(r.posted, m)
+	r.posted = append(r.posted, n)
 	idx := len(r.posted)
 	r.mu.Unlock()
 
@@ -71,6 +81,9 @@ func (r *recordingPoster) Post(ctx context.Context, m *slack.Message) error {
 	return nil
 }
 
+// ensure recordingRenderer satisfies the transport.Renderer interface.
+var _ transport.Renderer = (*recordingRenderer)(nil)
+
 func readSample(t *testing.T, name string) []byte {
 	t.Helper()
 	path := filepath.Join("..", "..", "samples", "sns_envelope", name)
@@ -82,37 +95,37 @@ func readSample(t *testing.T, name string) []byte {
 }
 
 // testRouter returns a router with only the generic parser, so every
-// record produces a non-nil message — exactly what we need to count
-// Slack posts.
+// record produces a non-nil notification — exactly what we need to count
+// deliveries.
 func testRouter() *router.Router {
 	r := router.New()
 	r.Register(genericparser.New())
 	return r
 }
 
-func newTestHandler(t *testing.T, poster SlackPoster) *Handler {
+func newTestHandler(t *testing.T, rec *recordingRenderer) *Handler {
 	t.Helper()
 	cfg := &config.Config{SlackHookURL: "http://invalid.example/never-called"}
-	return New(cfg, aws.Config{}, WithRouter(testRouter()), WithSlackPoster(poster))
+	return New(cfg, aws.Config{}, WithRouter(testRouter()), WithRenderers(rec))
 }
 
 func TestHandle_MultiRecordFanOut(t *testing.T) {
 	raw := readSample(t, "multi_record.json")
-	poster := &recordingPoster{}
-	h := newTestHandler(t, poster)
+	rec := &recordingRenderer{}
+	h := newTestHandler(t, rec)
 
 	if err := h.Handle(t.Context(), raw); err != nil {
 		t.Fatalf("Handle: %v", err)
 	}
-	if len(poster.posted) != 2 {
-		t.Fatalf("posted %d messages, want 2", len(poster.posted))
+	if len(rec.posted) != 2 {
+		t.Fatalf("posted %d notifications, want 2", len(rec.posted))
 	}
 }
 
 func TestHandle_PartialFailure_StillPostsOthers(t *testing.T) {
 	raw := readSample(t, "multi_record.json")
 	postErr := errors.New("slack outage")
-	poster := &recordingPoster{
+	rec := &recordingRenderer{
 		errFunc: func(i int) error {
 			if i == 2 {
 				return postErr
@@ -120,14 +133,14 @@ func TestHandle_PartialFailure_StillPostsOthers(t *testing.T) {
 			return nil
 		},
 	}
-	h := newTestHandler(t, poster)
+	h := newTestHandler(t, rec)
 
 	err := h.Handle(t.Context(), raw)
 	if err == nil {
 		t.Fatal("expected handler error from partial failure")
 	}
-	if len(poster.posted) != 2 {
-		t.Fatalf("posted %d messages, want 2 (partial failure must still attempt all)", len(poster.posted))
+	if len(rec.posted) != 2 {
+		t.Fatalf("posted %d notifications, want 2 (partial failure must still attempt all)", len(rec.posted))
 	}
 	if !errors.Is(err, postErr) {
 		t.Fatalf("error chain missing post error: %v", err)
@@ -137,44 +150,44 @@ func TestHandle_PartialFailure_StillPostsOthers(t *testing.T) {
 func TestHandle_BoundedConcurrency(t *testing.T) {
 	const totalRecords = 10
 	raw := buildSyntheticSNSEnvelope(t, totalRecords)
-	poster := &recordingPoster{delay: 20 * time.Millisecond}
-	h := newTestHandler(t, poster)
+	rec := &recordingRenderer{delay: 20 * time.Millisecond}
+	h := newTestHandler(t, rec)
 
 	if err := h.Handle(t.Context(), raw); err != nil {
 		t.Fatalf("Handle: %v", err)
 	}
-	if got := poster.maxSeen.Load(); got > int32(maxInFlight) {
-		t.Fatalf("max concurrent Posts = %d, exceeds bound %d", got, maxInFlight)
+	if got := rec.maxSeen.Load(); got > int32(maxInFlight) {
+		t.Fatalf("max concurrent sends = %d, exceeds bound %d", got, maxInFlight)
 	}
-	if got := poster.maxSeen.Load(); got < 2 {
+	if got := rec.maxSeen.Load(); got < 2 {
 		// On a single-CPU runner this could legitimately serialize to 1;
 		// still useful as a sanity check the goroutines actually overlap.
 		if runtime.NumCPU() > 1 {
-			t.Fatalf("max concurrent Posts = %d, expected fan-out to overlap on a multi-CPU host", got)
+			t.Fatalf("max concurrent sends = %d, expected fan-out to overlap on a multi-CPU host", got)
 		}
 	}
-	if len(poster.posted) != totalRecords {
-		t.Fatalf("posted %d messages, want %d", len(poster.posted), totalRecords)
+	if len(rec.posted) != totalRecords {
+		t.Fatalf("posted %d notifications, want %d", len(rec.posted), totalRecords)
 	}
 }
 
 func TestHandle_EmptyRecords(t *testing.T) {
 	raw := json.RawMessage(`{"Records":[]}`)
-	poster := &recordingPoster{}
-	h := newTestHandler(t, poster)
+	rec := &recordingRenderer{}
+	h := newTestHandler(t, rec)
 
 	if err := h.Handle(t.Context(), raw); err != nil {
 		t.Fatalf("Handle: %v", err)
 	}
-	if len(poster.posted) != 0 {
-		t.Fatalf("posted %d messages on empty envelope", len(poster.posted))
+	if len(rec.posted) != 0 {
+		t.Fatalf("posted %d notifications on empty envelope", len(rec.posted))
 	}
 }
 
 func TestHandle_InvalidJSON(t *testing.T) {
 	raw := json.RawMessage(`{"not closed":`)
-	poster := &recordingPoster{}
-	h := newTestHandler(t, poster)
+	rec := &recordingRenderer{}
+	h := newTestHandler(t, rec)
 
 	err := h.Handle(t.Context(), raw)
 	if err == nil {
@@ -183,13 +196,13 @@ func TestHandle_InvalidJSON(t *testing.T) {
 	if !strings.Contains(err.Error(), "envelope") {
 		t.Fatalf("error %q should mention envelope parsing", err)
 	}
-	if len(poster.posted) != 0 {
-		t.Fatalf("posted on invalid JSON: %d", len(poster.posted))
+	if len(rec.posted) != 0 {
+		t.Fatalf("posted on invalid JSON: %d", len(rec.posted))
 	}
 }
 
-// TestHandle_Slack429ThenSuccess wires the real slack.Client with a
-// server that 429s once then succeeds, exercising the retry contract.
+// TestHandle_Slack429ThenSuccess wires the real slack.Renderer with a server
+// that 429s once then succeeds, exercising the retry contract end-to-end.
 func TestHandle_Slack429ThenSuccess(t *testing.T) {
 	var calls atomic.Int32
 	srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
@@ -207,8 +220,9 @@ func TestHandle_Slack429ThenSuccess(t *testing.T) {
 		slack.WithBaseBackoff(time.Millisecond),
 		slack.WithSleep(func(time.Duration) {}),
 	)
+	renderer := slack.NewRenderer(client)
 	cfg := &config.Config{SlackHookURL: srv.URL}
-	h := New(cfg, aws.Config{}, WithRouter(testRouter()), WithSlackPoster(client))
+	h := New(cfg, aws.Config{}, WithRouter(testRouter()), WithRenderers(renderer))
 
 	raw := readSample(t, "single_record.json")
 	if err := h.Handle(t.Context(), raw); err != nil {
@@ -223,14 +237,14 @@ func TestHandle_Slack429ThenSuccess(t *testing.T) {
 // (non-SNS) shape: no Records[] wrapper, one event in the slice.
 func TestHandle_DirectInvocationPayload(t *testing.T) {
 	raw := json.RawMessage(`{"detail-type":"direct","source":"unit-test","detail":{"hello":"world"}}`)
-	poster := &recordingPoster{}
-	h := newTestHandler(t, poster)
+	rec := &recordingRenderer{}
+	h := newTestHandler(t, rec)
 
 	if err := h.Handle(t.Context(), raw); err != nil {
 		t.Fatalf("Handle: %v", err)
 	}
-	if len(poster.posted) != 1 {
-		t.Fatalf("posted %d, want 1 for direct payload", len(poster.posted))
+	if len(rec.posted) != 1 {
+		t.Fatalf("posted %d, want 1 for direct payload", len(rec.posted))
 	}
 }
 
@@ -241,8 +255,8 @@ func TestHandle_RouterError_PropagatesAsHandlerError(t *testing.T) {
 	r := router.New()
 	r.Register(errParser)
 	cfg := &config.Config{SlackHookURL: "http://invalid.example"}
-	poster := &recordingPoster{}
-	h := New(cfg, aws.Config{}, WithRouter(r), WithSlackPoster(poster))
+	rec := &recordingRenderer{}
+	h := New(cfg, aws.Config{}, WithRouter(r), WithRenderers(rec))
 
 	raw := readSample(t, "single_record.json")
 	err := h.Handle(t.Context(), raw)
@@ -252,22 +266,22 @@ func TestHandle_RouterError_PropagatesAsHandlerError(t *testing.T) {
 	if !errors.Is(err, errParser.err) {
 		t.Fatalf("error chain missing parser error: %v", err)
 	}
-	if len(poster.posted) != 0 {
-		t.Fatalf("posted on router error: %d", len(poster.posted))
+	if len(rec.posted) != 0 {
+		t.Fatalf("posted on router error: %d", len(rec.posted))
 	}
 }
 
 // TestNew_DefaultsCarryThrough confirms the production constructor wires
-// a non-nil router and a slack client. We don't invoke Handle in this
-// test — that would attempt a real HTTP POST to the configured URL.
+// a non-nil router and the default Slack renderer. We don't invoke Handle
+// in this test — that would attempt a real HTTP POST to the configured URL.
 func TestNew_DefaultsCarryThrough(t *testing.T) {
 	cfg := &config.Config{SlackHookURL: "http://invalid.example"}
 	h := New(cfg, aws.Config{})
 	if h.router == nil {
 		t.Fatal("router is nil")
 	}
-	if h.slack == nil {
-		t.Fatal("slack is nil")
+	if len(h.renderers) == 0 {
+		t.Fatal("renderers is empty")
 	}
 	if h.log == nil {
 		t.Fatal("logger is nil")
@@ -283,7 +297,7 @@ type erroringParser struct{ err error }
 
 func (erroringParser) Name() string               { return "erroring" }
 func (erroringParser) Match(*envelope.Event) bool { return true }
-func (p erroringParser) Parse(context.Context, *envelope.Event) (*slack.Message, error) {
+func (p erroringParser) Parse(context.Context, *envelope.Event) (*notify.Notification, error) {
 	return nil, p.err
 }
 
@@ -325,3 +339,7 @@ func buildSyntheticSNSEnvelope(t *testing.T, n int) json.RawMessage {
 	}
 	return raw
 }
+
+// pointer assertion used to compile-time verify that erroringParser pointer
+// receivers also satisfy the parser.Parser interface.
+var _ parser.Parser = (*erroringParser)(nil)

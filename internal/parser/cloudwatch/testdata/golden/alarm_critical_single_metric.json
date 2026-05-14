@@ -1,44 +1,21 @@
 {
-  "attachments": [
+  "Source": "cloudwatch",
+  "Severity": 5,
+  "Title": "example-alarm",
+  "TitleURL": "https://console.aws.amazon.com/cloudwatch/home?region=us-east-1#alarm:name=example-alarm",
+  "Subtitle": "AWS CloudWatch Alarm (123456789012)",
+  "Summary": "*Description*\nExample alarm description\n\nThreshold Crossed: 1 datapoint [99.5 (01/06/24 11:59:00)] was greater than the threshold (90.0).",
+  "Fields": [
     {
-      "color": "danger",
-      "fallback": "example-alarm state is now ALARM:\nThreshold Crossed: 1 datapoint [99.5 (01/06/24 11:59:00)] was greater than the threshold (90.0).",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*\u003chttps://console.aws.amazon.com/cloudwatch/home?region=us-east-1#alarm:name=example-alarm|example-alarm\u003e*\n_AWS CloudWatch Alarm (123456789012)_"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Description*\nExample alarm description"
-          }
-        },
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "Threshold Crossed: 1 datapoint [99.5 (01/06/24 11:59:00)] was greater than the threshold (90.0)."
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*State Change*\nOK → ALARM"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nUS East (N. Virginia)"
-            }
-          ]
-        }
-      ]
+      "Key": "State Change",
+      "Value": "OK → ALARM"
+    },
+    {
+      "Key": "Region",
+      "Value": "US East (N. Virginia)"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "example-alarm state is now ALARM:\nThreshold Crossed: 1 datapoint [99.5 (01/06/24 11:59:00)] was greater than the threshold (90.0).",
+  "Footnotes": null
 }

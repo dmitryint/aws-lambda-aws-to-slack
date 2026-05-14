@@ -1,62 +1,53 @@
 {
-  "attachments": [
+  "Source": "guardduty",
+  "Severity": 4,
+  "Title": "Outbound network connection to a known malicious IP address.",
+  "TitleURL": "",
+  "Subtitle": "Amazon GuardDuty",
+  "Summary": "",
+  "Fields": [
     {
-      "color": "warning",
-      "fallback": "Outbound network connection to a known malicious IP address. EC2 instance is communicating with an IP address on a custom threat list.",
-      "blocks": [
-        {
-          "type": "section",
-          "text": {
-            "type": "mrkdwn",
-            "text": "*Outbound network connection to a known malicious IP address.*\n_Amazon GuardDuty_"
-          }
-        },
-        {
-          "type": "section",
-          "fields": [
-            {
-              "type": "mrkdwn",
-              "text": "*Description*\nEC2 instance is communicating with an IP address on a custom threat list."
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Account*\n123456789012"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Region*\nus-east-1"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Type*\nUnauthorizedAccess:EC2/MaliciousIPCaller.Custom"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Severity*\n5"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Generic*\nCustomList"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Unknown Action Type (${actionType})*\n{\n  \"actionType\": \"NETWORK_CONNECTION\",\n  \"networkConnectionAction\": {\n    \"blocked\": false,\n    \"connectionDirection\": \"OUTBOUND\",\n    \"localPortDetails\": {\n      \"port\": 52345,\n      \"portName\": \"Unknown\"\n    },\n    \"protocol\": \"TCP\",\n    \"remoteIpDetails\": {\n      \"city\": {\n        \"cityName\": \"Beijing\"\n      },\n      \"country\": {\n        \"countryName\": \"China\"\n      },\n      \"geoLocation\": {\n        \"lat\": 39.9042,\n        \"lon\": 116.4074\n      },\n      \"ipAddressV4\": \"203.0.113.40\",\n      \"organization\": {\n        \"asn\": \"65001\",\n        \"asnOrg\": \"Example ISP\",\n        \"isp\": \"Example ISP\",\n        \"org\": \"Example Org\"\n      }\n    },\n    \"remotePortDetails\": {\n      \"port\": 443,\n      \"portName\": \"HTTPS\"\n    }\n  }\n}"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Resource Type*\nInstance"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Instance ID*\ni-0123456789abcdef0"
-            },
-            {
-              "type": "mrkdwn",
-              "text": "*Instance Type*\nt2.micro"
-            }
-          ]
-        }
-      ]
+      "Key": "Description",
+      "Value": "EC2 instance is communicating with an IP address on a custom threat list."
+    },
+    {
+      "Key": "Account",
+      "Value": "123456789012"
+    },
+    {
+      "Key": "Region",
+      "Value": "us-east-1"
+    },
+    {
+      "Key": "Type",
+      "Value": "UnauthorizedAccess:EC2/MaliciousIPCaller.Custom"
+    },
+    {
+      "Key": "Severity",
+      "Value": "5"
+    },
+    {
+      "Key": "Generic",
+      "Value": "CustomList"
+    },
+    {
+      "Key": "Unknown Action Type (${actionType})",
+      "Value": "{\n  \"actionType\": \"NETWORK_CONNECTION\",\n  \"networkConnectionAction\": {\n    \"blocked\": false,\n    \"connectionDirection\": \"OUTBOUND\",\n    \"localPortDetails\": {\n      \"port\": 52345,\n      \"portName\": \"Unknown\"\n    },\n    \"protocol\": \"TCP\",\n    \"remoteIpDetails\": {\n      \"city\": {\n        \"cityName\": \"Beijing\"\n      },\n      \"country\": {\n        \"countryName\": \"China\"\n      },\n      \"geoLocation\": {\n        \"lat\": 39.9042,\n        \"lon\": 116.4074\n      },\n      \"ipAddressV4\": \"203.0.113.40\",\n      \"organization\": {\n        \"asn\": \"65001\",\n        \"asnOrg\": \"Example ISP\",\n        \"isp\": \"Example ISP\",\n        \"org\": \"Example Org\"\n      }\n    },\n    \"remotePortDetails\": {\n      \"port\": 443,\n      \"portName\": \"HTTPS\"\n    }\n  }\n}"
+    },
+    {
+      "Key": "Resource Type",
+      "Value": "Instance"
+    },
+    {
+      "Key": "Instance ID",
+      "Value": "i-0123456789abcdef0"
+    },
+    {
+      "Key": "Instance Type",
+      "Value": "t2.micro"
     }
-  ]
+  ],
+  "ImageURL": "",
+  "Fallback": "Outbound network connection to a known malicious IP address. EC2 instance is communicating with an IP address on a custom threat list.",
+  "Footnotes": null
 }
