@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"log/slog"
 	"sync"
+	"time"
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"golang.org/x/sync/errgroup"
@@ -99,6 +100,8 @@ func defaultRouter(cfg *config.Config, awsCfg aws.Config) *router.Router {
 		BucketName:     cfg.ChartBucketName,
 		BucketRegion:   cfg.ChartBucketRegion,
 		FallbackRegion: cfg.Region,
+		URLTTL:         time.Duration(cfg.ChartURLTTLDays) * 24 * time.Hour,
+		SSEAlgorithm:   cfg.ChartBucketSSE,
 	}
 	r := router.New()
 	r.Register(autoscalingparser.New())

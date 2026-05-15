@@ -196,6 +196,84 @@ func TestLoad_PlumbsPlaintextFields(t *testing.T) {
 	}
 }
 
+func TestLoad_ChartURLTTLDays(t *testing.T) {
+	cases := []struct {
+		name    string
+		envVal  string
+		wantTTL int
+		wantErr string
+	}{
+		{"default_when_unset", "", 7, ""},
+		{"explicit_1", "1", 1, ""},
+		{"explicit_7", "7", 7, ""},
+		{"not_integer", "abc", 0, "CHART_URL_TTL_DAYS must be an integer"},
+		{"zero_rejected", "0", 0, "CHART_URL_TTL_DAYS must be 1..7"},
+		{"above_cap_rejected", "8", 0, "CHART_URL_TTL_DAYS must be 1..7"},
+		{"negative_rejected", "-1", 0, "CHART_URL_TTL_DAYS must be 1..7"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv(envSlackHookURL, "https://hooks.slack.com/services/T1/B1/abcd")
+			t.Setenv(envSlackChannel, "")
+			t.Setenv("CHART_URL_TTL_DAYS", tc.envVal)
+
+			cfg, err := Load(t.Context(), &stubDecrypter{})
+			if tc.wantErr != "" {
+				if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+					t.Fatalf("expected error containing %q, got %v", tc.wantErr, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("Load: %v", err)
+			}
+			if cfg.ChartURLTTLDays != tc.wantTTL {
+				t.Fatalf("ChartURLTTLDays = %d, want %d", cfg.ChartURLTTLDays, tc.wantTTL)
+			}
+		})
+	}
+}
+
+func TestLoad_ChartBucketSSE(t *testing.T) {
+	cases := []struct {
+		name    string
+		set     bool
+		envVal  string
+		wantSSE string
+		wantErr string
+	}{
+		{"default_when_unset", false, "", ChartBucketSSEKMS, ""},
+		{"explicit_kms", true, "aws:kms", ChartBucketSSEKMS, ""},
+		{"explicit_aes256", true, "AES256", ChartBucketSSEAES256, ""},
+		{"explicit_off", true, "", ChartBucketSSEOff, ""},
+		{"unknown_rejected", true, "aes-256-gcm", "", "CHART_BUCKET_SSE must be"},
+		{"lowercase_aes_rejected", true, "aes256", "", "CHART_BUCKET_SSE must be"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			t.Setenv(envSlackHookURL, "https://hooks.slack.com/services/T1/B1/abcd")
+			t.Setenv(envSlackChannel, "")
+			if tc.set {
+				t.Setenv("CHART_BUCKET_SSE", tc.envVal)
+			}
+
+			cfg, err := Load(t.Context(), &stubDecrypter{})
+			if tc.wantErr != "" {
+				if err == nil || !strings.Contains(err.Error(), tc.wantErr) {
+					t.Fatalf("expected error containing %q, got %v", tc.wantErr, err)
+				}
+				return
+			}
+			if err != nil {
+				t.Fatalf("Load: %v", err)
+			}
+			if cfg.ChartBucketSSE != tc.wantSSE {
+				t.Fatalf("ChartBucketSSE = %q, want %q", cfg.ChartBucketSSE, tc.wantSSE)
+			}
+		})
+	}
+}
+
 func TestLoad_DedupTTLDays_NotInteger(t *testing.T) {
 	t.Setenv(envSlackHookURL, "https://hooks.slack.com/services/T1/B1/abcd")
 	t.Setenv(envSlackChannel, "")

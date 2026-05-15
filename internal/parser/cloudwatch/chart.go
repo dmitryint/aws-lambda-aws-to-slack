@@ -15,10 +15,11 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
+	s3types "github.com/aws/aws-sdk-go-v2/service/s3/types"
 )
 
 const (
-	chartURLTTLSeconds = 15 * 60
+	defaultChartURLTTL = 7 * 24 * time.Hour
 	chartWidgetWidth   = 600
 	chartWidgetHeight  = 300
 	chartWidgetStart   = "-PT3H"
@@ -105,6 +106,14 @@ type ChartConfig struct {
 	// FallbackRegion is used when the alarm's Region field cannot be mapped
 	// to a canonical region id via regionNameToID.
 	FallbackRegion string
+	// URLTTL is the presigned-URL Expires value passed to s3.PresignGetObject.
+	// Zero falls back to defaultChartURLTTL.
+	URLTTL time.Duration
+	// SSEAlgorithm is the value sent as x-amz-server-side-encryption on the
+	// chart upload. Operators set CHART_BUCKET_SSE to "aws:kms" (default),
+	// "AES256", or an empty string to omit the header entirely. The latter
+	// only works when the bucket policy does not require encrypted uploads.
+	SSEAlgorithm string
 }
 
 // ChartRenderingPipeline bundles the three SDK seams required to render and
@@ -162,12 +171,16 @@ func (p *ChartRenderingPipeline) renderAlarmChart(ctx context.Context, m alarmMe
 		return ""
 	}
 
-	if _, err := p.Uploader.PutObject(ctx, &s3.PutObjectInput{
+	putIn := &s3.PutObjectInput{
 		Bucket:      aws.String(p.Config.BucketName),
 		Key:         aws.String(key),
 		Body:        bytes.NewReader(img.MetricWidgetImage),
 		ContentType: aws.String(chartContentType),
-	}); err != nil {
+	}
+	if p.Config.SSEAlgorithm != "" {
+		putIn.ServerSideEncryption = s3types.ServerSideEncryption(p.Config.SSEAlgorithm)
+	}
+	if _, err := p.Uploader.PutObject(ctx, putIn); err != nil {
 		p.logger().Error("cloudwatch chart PutObject failed",
 			"err", err,
 			"alarm", m.AlarmName,
@@ -176,11 +189,15 @@ func (p *ChartRenderingPipeline) renderAlarmChart(ctx context.Context, m alarmMe
 		return ""
 	}
 
+	ttl := p.Config.URLTTL
+	if ttl <= 0 {
+		ttl = defaultChartURLTTL
+	}
 	signed, err := p.Presigner.PresignGetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(p.Config.BucketName),
 		Key:    aws.String(key),
 	}, func(o *s3.PresignOptions) {
-		o.Expires = chartURLTTLSeconds * time.Second
+		o.Expires = ttl
 	})
 	if err != nil {
 		p.logger().Error("cloudwatch chart PresignGetObject failed",
