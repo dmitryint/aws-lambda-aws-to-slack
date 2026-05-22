@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 200" role="img" aria-label="aws-lambda-aws-to-slack">
+  <title>aws-lambda-aws-to-slack</title>
+
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="22">
+    <!-- lambda -->
+    <g stroke="#FF9900">
+      <path d="M 120 50 L 180 170"/>
+      <path d="M 150 110 L 70 170"/>
+    </g>
+
+    <!-- arrow -->
+    <g stroke="#5A6677">
+      <path d="M 230 110 L 330 110"/>
+      <path d="M 315 92 L 332 110 L 315 128"/>
+    </g>
+
+    <!-- chat bubble -->
+    <g stroke="#4A154B">
+      <path d="M 410 60 H 510 a 20 20 0 0 1 20 20 v 50 a 20 20 0 0 1 -20 20 H 470 L 440 178 L 450 150 H 410 a 20 20 0 0 1 -20 -20 v -50 a 20 20 0 0 1 20 -20 Z"/>
+    </g>
+  </g>
+</svg>
