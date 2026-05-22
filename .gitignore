@@ -5,6 +5,7 @@ package/
 cover.out
 *.coverprofile
 .idea/
+.claude/
 
 # OpenTofu / Terraform artifacts (examples/lambda is validated only)
 .terraform/
