@@ -121,7 +121,7 @@ func firstLogStream(attempts []attempt) string {
 // job state machine is SUBMITTED → PENDING → RUNNABLE → STARTING → RUNNING →
 // {SUCCEEDED | FAILED}; only the terminal states alter the title — every
 // other transition renders the generic title at Notice severity.
-func severityAndTitle(jobName, status string) (notify.Severity, string) {
+func severityAndTitle(jobName, status string) (sev notify.Severity, title string) {
 	base := "Batch Job Event " + jobName
 	switch status {
 	case statusSucceeded:

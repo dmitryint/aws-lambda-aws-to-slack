@@ -35,8 +35,8 @@ func NewRenderer(client Poster) *Renderer {
 // WithMinSeverity drops Notifications whose Severity is strictly less than
 // the configured floor. Default behavior (when unset) is to accept every
 // severity, including SeverityUnknown.
-func (r *Renderer) WithMinSeverity(min notify.Severity) *Renderer {
-	r.minSeverity = min
+func (r *Renderer) WithMinSeverity(minSev notify.Severity) *Renderer {
+	r.minSeverity = minSev
 	return r
 }
 
@@ -209,19 +209,19 @@ func stripMrkdwnLinks(s string) string {
 			b.WriteString(s)
 			return b.String()
 		}
-		close := strings.IndexByte(s[open:], '>')
-		if close == -1 {
+		closeIdx := strings.IndexByte(s[open:], '>')
+		if closeIdx == -1 {
 			b.WriteString(s)
 			return b.String()
 		}
-		close += open
+		closeIdx += open
 		b.WriteString(s[:open])
-		segment := s[open+1 : close]
+		segment := s[open+1 : closeIdx]
 		if pipe := strings.IndexByte(segment, '|'); pipe != -1 {
 			b.WriteString(segment[pipe+1:])
 		} else {
 			b.WriteString(segment)
 		}
-		s = s[close+1:]
+		s = s[closeIdx+1:]
 	}
 }
