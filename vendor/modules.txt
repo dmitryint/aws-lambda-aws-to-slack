@@ -53,10 +53,10 @@ github.com/aws/aws-sdk-go-v2/credentials/stscreds
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds/internal/config
-# github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.24
+# github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.28
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/internal/configsources
-# github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.24
+# github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.28
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2
 # github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.24
@@ -69,7 +69,7 @@ github.com/aws/aws-sdk-go-v2/internal/v4a/internal/v4
 github.com/aws/aws-sdk-go-v2/service/cloudwatch
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/types
-# github.com/aws/aws-sdk-go-v2/service/codecommit v1.33.15
+# github.com/aws/aws-sdk-go-v2/service/codecommit v1.34.3
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/codecommit
 github.com/aws/aws-sdk-go-v2/service/codecommit/internal/endpoints
@@ -144,6 +144,7 @@ github.com/aws/smithy-go/encoding/httpbinding
 github.com/aws/smithy-go/encoding/json
 github.com/aws/smithy-go/encoding/xml
 github.com/aws/smithy-go/endpoints
+github.com/aws/smithy-go/endpoints/private/bdd
 github.com/aws/smithy-go/endpoints/private/rulesfn
 github.com/aws/smithy-go/eventstream
 github.com/aws/smithy-go/internal/sync/singleflight
