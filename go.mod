@@ -6,7 +6,7 @@ require (
 	github.com/aws/aws-lambda-go v1.54.0
 	github.com/aws/aws-sdk-go-v2 v1.42.0
 	github.com/aws/aws-sdk-go-v2/config v1.32.17
-	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.57.0
+	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.59.0
 	github.com/aws/aws-sdk-go-v2/service/codecommit v1.33.15
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.3
 	github.com/aws/aws-sdk-go-v2/service/kms v1.52.1
