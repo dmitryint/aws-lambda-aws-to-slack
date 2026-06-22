@@ -74,7 +74,7 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatch/types
 github.com/aws/aws-sdk-go-v2/service/codecommit
 github.com/aws/aws-sdk-go-v2/service/codecommit/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/codecommit/types
-# github.com/aws/aws-sdk-go-v2/service/dynamodb v1.57.3
+# github.com/aws/aws-sdk-go-v2/service/dynamodb v1.59.0
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/dynamodb
 github.com/aws/aws-sdk-go-v2/service/dynamodb/internal/customizations
@@ -86,7 +86,7 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding
 # github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.22
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/checksum
-# github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.11.23
+# github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.6
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery
 # github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.29
