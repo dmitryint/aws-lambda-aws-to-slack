@@ -10,7 +10,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/codecommit v1.34.6
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.60.1
 	github.com/aws/aws-sdk-go-v2/service/kms v1.54.0
-	github.com/aws/aws-sdk-go-v2/service/s3 v1.104.2
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.105.1
 	github.com/google/go-cmp v0.7.0
 	golang.org/x/sync v0.22.0
 )
