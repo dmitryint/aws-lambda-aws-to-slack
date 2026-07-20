@@ -123,6 +123,13 @@ type AlarmPromQLCriteria struct {
 // monitoring account, the metric can be in the same account or a source account.
 type AnomalyDetector struct {
 
+	// The unique identifier of the anomaly detector.
+	//
+	// The identifier does not restrict access to a specific anomaly detector in an
+	// IAM policy. Permissions for anomaly detector operations apply to all anomaly
+	// detectors in the account.
+	AnomalyDetectorId *string
+
 	// The configuration specifies details about how the anomaly detection model is to
 	// be trained, including time ranges to exclude from use for training the model,
 	// and the time zone to use for the metric.

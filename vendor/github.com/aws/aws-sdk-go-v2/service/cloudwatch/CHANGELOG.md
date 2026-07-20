@@ -1,3 +1,11 @@
+# v1.63.1 (2026-07-13)
+
+* No change notes available for this release.
+
+# v1.63.0 (2026-07-10)
+
+* **Feature**: CloudWatch now assigns a unique identifier to each anomaly detector. PutAnomalyDetector and DescribeAnomalyDetectors return this AnomalyDetectorId, which you can use to describe or delete a specific anomaly detector directly.
+
 # v1.62.0 (2026-07-06)
 
 * **Feature**: Add request serialization snapshot tests.
