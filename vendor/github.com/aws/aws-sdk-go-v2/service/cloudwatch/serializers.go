@@ -2670,6 +2670,19 @@ func serializeCBOR_AnomalyDetectorExcludedTimeRanges(v []types.Range) (smithycbo
 	return vl, nil
 }
 
+func serializeCBOR_AnomalyDetectorIds(v []string) (smithycbor.Value, error) {
+	vl := smithycbor.List{}
+	for i := range v {
+
+		ser, err := serializeCBOR_String(v[i])
+		if err != nil {
+			return nil, err
+		}
+		vl = append(vl, ser)
+	}
+	return vl, nil
+}
+
 func serializeCBOR_AnomalyDetectorType(v types.AnomalyDetectorType) (smithycbor.Value, error) {
 	return smithycbor.String(string(v)), nil
 }
@@ -3806,6 +3819,13 @@ func serializeCBOR_DeleteAlarmsInput(v *DeleteAlarmsInput) (smithycbor.Value, er
 
 func serializeCBOR_DeleteAnomalyDetectorInput(v *DeleteAnomalyDetectorInput) (smithycbor.Value, error) {
 	vm := smithycbor.Map{}
+	if v.AnomalyDetectorId != nil {
+		ser, err := serializeCBOR_String(*v.AnomalyDetectorId)
+		if err != nil {
+			return nil, err
+		}
+		vm["AnomalyDetectorId"] = ser
+	}
 	if v.Namespace != nil {
 		ser, err := serializeCBOR_String(*v.Namespace)
 		if err != nil {
@@ -4098,6 +4118,13 @@ func serializeCBOR_DescribeAlarmsInput(v *DescribeAlarmsInput) (smithycbor.Value
 
 func serializeCBOR_DescribeAnomalyDetectorsInput(v *DescribeAnomalyDetectorsInput) (smithycbor.Value, error) {
 	vm := smithycbor.Map{}
+	if v.AnomalyDetectorIds != nil {
+		ser, err := serializeCBOR_AnomalyDetectorIds(v.AnomalyDetectorIds)
+		if err != nil {
+			return nil, err
+		}
+		vm["AnomalyDetectorIds"] = ser
+	}
 	if v.NextToken != nil {
 		ser, err := serializeCBOR_String(*v.NextToken)
 		if err != nil {

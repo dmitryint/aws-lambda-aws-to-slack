@@ -123,6 +123,13 @@ type AlarmPromQLCriteria struct {
 // monitoring account, the metric can be in the same account or a source account.
 type AnomalyDetector struct {
 
+	// The unique identifier of the anomaly detector.
+	//
+	// The identifier does not restrict access to a specific anomaly detector in an
+	// IAM policy. Permissions for anomaly detector operations apply to all anomaly
+	// detectors in the account.
+	AnomalyDetectorId *string
+
 	// The configuration specifies details about how the anomaly detection model is to
 	// be trained, including time ranges to exclude from use for training the model,
 	// and the time zone to use for the metric.
@@ -1591,14 +1598,16 @@ type ScheduleConfiguration struct {
 	ScheduleExpression *string
 
 	// The offset, in seconds, before the scheduled execution time at which the query
+	// time range begins. For example, an offset of 360 (6 minutes) on a query running
+	// at 12:05:00 starts the query time range at 11:59:00.
+	//
+	// This member is required.
+	StartTimeOffset *int64
+
+	// The offset, in seconds, before the scheduled execution time at which the query
 	// time range ends. Must be non-negative and less than StartTimeOffset . The
 	// default is 0.
 	EndTimeOffset *int64
-
-	// The offset, in seconds, before the scheduled execution time at which the query
-	// time range begins. For example, an offset of 360 (6 minutes) on a query running
-	// at 12:05:00 starts the query time range at 11:59:00.
-	StartTimeOffset *int64
 
 	noSmithyDocumentSerde
 }

@@ -2107,11 +2107,27 @@ func (m *smithyRpcv2cbor_deserializeOpPutAnomalyDetector) HandleDeserialize(ctx 
 		return out, metadata, rpc2_deserializeOpErrorPutAnomalyDetector(resp)
 	}
 
-	if _, err = io.Copy(io.Discard, resp.Body); err != nil {
-		return out, metadata, fmt.Errorf("discard response body: %w", err)
+	payload, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return out, metadata, err
 	}
 
-	out.Result = &PutAnomalyDetectorOutput{}
+	if len(payload) == 0 {
+		out.Result = &PutAnomalyDetectorOutput{}
+		return out, metadata, nil
+	}
+
+	cv, err := smithycbor.Decode(payload)
+	if err != nil {
+		return out, metadata, err
+	}
+
+	output, err := deserializeCBOR_PutAnomalyDetectorOutput(cv)
+	if err != nil {
+		return out, metadata, err
+	}
+
+	out.Result = output
 
 	return out, metadata, nil
 }
@@ -3239,6 +3255,17 @@ func deserializeCBOR_AnomalyDetector(v smithycbor.Value) (*types.AnomalyDetector
 	ds := &types.AnomalyDetector{}
 	for key, sv := range av {
 		_, _ = key, sv
+		if key == "AnomalyDetectorId" {
+			if _, ok := sv.(*smithycbor.Nil); ok {
+				continue
+			}
+			dv, err := deserializeCBOR_String(sv)
+			if err != nil {
+				return nil, err
+			}
+			ds.AnomalyDetectorId = ptr.String(dv)
+		}
+
 		if key == "Namespace" {
 			if _, ok := sv.(*smithycbor.Nil); ok {
 				continue
@@ -7918,6 +7945,28 @@ func deserializeCBOR_ListTagsForResourceOutput(v smithycbor.Value) (*ListTagsFor
 				return nil, err
 			}
 			ds.Tags = dv
+		}
+	}
+	return ds, nil
+}
+
+func deserializeCBOR_PutAnomalyDetectorOutput(v smithycbor.Value) (*PutAnomalyDetectorOutput, error) {
+	av, ok := v.(smithycbor.Map)
+	if !ok {
+		return nil, fmt.Errorf("unexpected value type %T", v)
+	}
+	ds := &PutAnomalyDetectorOutput{}
+	for key, sv := range av {
+		_, _ = key, sv
+		if key == "AnomalyDetectorId" {
+			if _, ok := sv.(*smithycbor.Nil); ok {
+				continue
+			}
+			dv, err := deserializeCBOR_String(sv)
+			if err != nil {
+				return nil, err
+			}
+			ds.AnomalyDetectorId = ptr.String(dv)
 		}
 	}
 	return ds, nil
