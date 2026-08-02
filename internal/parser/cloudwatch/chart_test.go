@@ -328,17 +328,80 @@ func TestMetricsLogsURL_BuildsLambdaConsoleLink(t *testing.T) {
 	}
 }
 
-func TestUpperFirstLowerRest(t *testing.T) {
+func TestCanonicalStatistic(t *testing.T) {
 	cases := map[string]string{
-		"":        "",
-		"AVERAGE": "Average",
-		"sum":     "Sum",
-		"MaXiMuM": "Maximum",
+		"":              "",
+		"   ":           "",
+		"AVERAGE":       "Average",
+		"sum":           "Sum",
+		"MaXiMuM":       "Maximum",
+		"MINIMUM":       "Minimum",
+		"SAMPLECOUNT":   "SampleCount",
+		"SampleCount":   "SampleCount",
+		"samplecount":   "SampleCount",
+		" SAMPLECOUNT ": "SampleCount",
+		"iqm":           "IQM",
+		"IQM":           "IQM",
+		"P99":           "p99",
+		"p99":           "p99",
+		"P99.9":         "p99.9",
+		"TM(10%:90%)":   "TM(10%:90%)",
+		"PR(:300)":      "PR(:300)",
 	}
 	for in, want := range cases {
-		if got := upperFirstLowerRest(in); got != want {
-			t.Fatalf("upperFirstLowerRest(%q) = %q, want %q", in, got, want)
+		if got := canonicalStatistic(in); got != want {
+			t.Fatalf("canonicalStatistic(%q) = %q, want %q", in, got, want)
 		}
+	}
+}
+
+func TestChart_BuildWidgetJSON_SampleCountStatistic(t *testing.T) {
+	m := alarmFromSample(t, "alarm_ecs_task_stuck.json")
+	if m.Trigger.Statistic != "SAMPLECOUNT" {
+		t.Fatalf("sample Trigger.Statistic = %q, want SAMPLECOUNT", m.Trigger.Statistic)
+	}
+	raw, err := buildWidgetJSON(m, "us-east-1")
+	if err != nil {
+		t.Fatalf("buildWidgetJSON: %v", err)
+	}
+	if !bytes.Contains(raw, []byte(`"stat":"SampleCount"`)) {
+		t.Fatalf("expected canonical SampleCount stat in widget: %s", raw)
+	}
+}
+
+func TestChart_BuildWidgetJSON_EmptyStatisticOmitsStat(t *testing.T) {
+	m := alarmMessage{
+		AlarmName: "no-statistic",
+		Trigger: trigger{
+			MetricName: "CpuReserved",
+			Namespace:  "ECS/ContainerInsights",
+			Period:     60,
+		},
+	}
+	raw, err := buildWidgetJSON(m, "us-east-1")
+	if err != nil {
+		t.Fatalf("buildWidgetJSON: %v", err)
+	}
+	if bytes.Contains(raw, []byte(`"stat"`)) {
+		t.Fatalf("expected no stat key in widget: %s", raw)
+	}
+}
+
+func TestChart_BuildMetricEntry_NormalizesMetricStatStat(t *testing.T) {
+	entry := buildMetricEntry(metricEntry{
+		ID: "m1",
+		MetricStat: &metricStat{
+			Metric: metric{Namespace: "ECS/ContainerInsights", MetricName: "CpuReserved"},
+			Period: 60,
+			Stat:   "SAMPLECOUNT",
+		},
+	})
+	opts, ok := entry[len(entry)-1].(map[string]any)
+	if !ok {
+		t.Fatalf("last element is not an options object: %#v", entry)
+	}
+	if opts["stat"] != "SampleCount" {
+		t.Fatalf("stat = %v, want SampleCount", opts["stat"])
 	}
 }
 
