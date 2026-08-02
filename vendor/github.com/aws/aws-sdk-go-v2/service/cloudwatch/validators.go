@@ -1493,6 +1493,9 @@ func validateScheduleConfiguration(v *types.ScheduleConfiguration) error {
 	if v.ScheduleExpression == nil {
 		invalidParams.Add(smithy.NewErrParamRequired("ScheduleExpression"))
 	}
+	if v.StartTimeOffset == nil {
+		invalidParams.Add(smithy.NewErrParamRequired("StartTimeOffset"))
+	}
 	if invalidParams.Len() > 0 {
 		return invalidParams
 	} else {
