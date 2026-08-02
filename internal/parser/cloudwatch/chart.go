@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/url"
+	"regexp"
 	"strings"
 	"time"
 
@@ -299,9 +300,11 @@ func buildMetricEntry(metric metricEntry) widgetMetricEntry {
 		}
 		opts := map[string]any{
 			"id":      metric.ID,
-			"stat":    metric.MetricStat.Stat,
 			"period":  metric.MetricStat.Period,
 			"visible": metric.ReturnData == nil || *metric.ReturnData,
+		}
+		if stat := canonicalStatistic(metric.MetricStat.Stat); stat != "" {
+			opts["stat"] = stat
 		}
 		out = append(out, opts)
 		return out
@@ -331,20 +334,37 @@ func buildSimpleMetricEntry(tr trigger) widgetMetricEntry {
 	for _, d := range tr.Dimensions {
 		out = append(out, d.Name, d.Value)
 	}
-	out = append(out, map[string]any{
-		"stat":   upperFirstLowerRest(tr.Statistic),
-		"period": tr.Period,
-	})
+	opts := map[string]any{"period": tr.Period}
+	if stat := canonicalStatistic(tr.Statistic); stat != "" {
+		opts["stat"] = stat
+	}
+	out = append(out, opts)
 	return out
 }
 
-// upperFirstLowerRest mirrors lodash's `_.upperFirst(_.toLower(str))`.
-func upperFirstLowerRest(s string) string {
-	if s == "" {
-		return s
+var canonicalStatistics = map[string]string{
+	"samplecount": "SampleCount",
+	"average":     "Average",
+	"sum":         "Sum",
+	"minimum":     "Minimum",
+	"maximum":     "Maximum",
+	"iqm":         "IQM",
+}
+
+var percentileStatistic = regexp.MustCompile(`^[pP]\d+(\.\d+)?$`)
+
+func canonicalStatistic(s string) string {
+	trimmed := strings.TrimSpace(s)
+	if trimmed == "" {
+		return ""
 	}
-	lower := strings.ToLower(s)
-	return strings.ToUpper(lower[:1]) + lower[1:]
+	if canonical, ok := canonicalStatistics[strings.ToLower(trimmed)]; ok {
+		return canonical
+	}
+	if percentileStatistic.MatchString(trimmed) {
+		return "p" + trimmed[1:]
+	}
+	return trimmed
 }
 
 // buildChartKey returns the S3 object key for a new chart upload — a

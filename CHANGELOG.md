@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Fixed
+
+- CloudWatch alarm charts for alarms whose statistic is not a single word. Alarm SNS payloads publish named statistics upper-cased (`SAMPLECOUNT`), which was rendered as `Samplecount` and rejected by `GetMetricWidgetImage` with a `ValidationError`, dropping the chart from the alert. Statistics are now normalized case-insensitively to the spelling the metric widget schema accepts, percentiles are lower-cased (`P99` → `p99`), and an empty statistic omits `stat` instead of sending an empty string.
+
 ## [0.1.0] - 2026-05-22
 
 ### Added
