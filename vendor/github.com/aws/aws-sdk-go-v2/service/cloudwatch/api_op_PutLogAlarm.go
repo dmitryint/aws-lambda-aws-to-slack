@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Creates or updates a log alarm. A log alarm evaluates the results of a
@@ -190,6 +189,16 @@ type PutLogAlarmInput struct {
 	// default behavior of missing is used.
 	TreatMissingData *string
 
+	// The warm-up configuration for the alarm. A warm-up period delays alarm
+	// evaluation after you create or update the alarm. The warm-up period reduces
+	// alarm noise from missing data while a new resource or service starts publishing
+	// data.
+	//
+	// For more information, see [Alarm warm-up periods] in the Amazon CloudWatch User Guide.
+	//
+	// [Alarm warm-up periods]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-warm-up.html
+	WarmUpConfiguration *types.WarmUpConfiguration
+
 	noSmithyDocumentSerde
 }
 
@@ -239,6 +248,11 @@ func (v *PutLogAlarmInput) SerializeMembers(s smithy.ShapeSerializer) {
 	if v.TreatMissingData != nil {
 		s.WriteString(schemas.PutLogAlarmInput_TreatMissingData, *v.TreatMissingData)
 	}
+	if v.WarmUpConfiguration != nil {
+		s.WriteStruct(schemas.PutLogAlarmInput_WarmUpConfiguration)
+		v.WarmUpConfiguration.SerializeMembers(s)
+		s.CloseStruct()
+	}
 }
 
 type PutLogAlarmOutput struct {
@@ -271,9 +285,6 @@ func (c *Client) addOperationPutLogAlarmMiddlewares(stack *middleware.Stack, opt
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
 	if err = addComputeContentLength(stack); err != nil {
 		return err
 	}
@@ -286,12 +297,6 @@ func (c *Client) addOperationPutLogAlarmMiddlewares(stack *middleware.Stack, opt
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addUserAgentFeatureProtocolRPCV2CBOR(stack, options); err != nil {
 		return err
 	}
@@ -299,9 +304,6 @@ func (c *Client) addOperationPutLogAlarmMiddlewares(stack *middleware.Stack, opt
 		return err
 	}
 	if err = addOpPutLogAlarmValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "PutLogAlarm"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
