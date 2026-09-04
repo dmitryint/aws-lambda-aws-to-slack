@@ -16,6 +16,9 @@ type Codec struct {
 	Deserializer func([]byte) smithy.ShapeDeserializer
 	ContentType  string
 
+	// Protocol-specific hook to retrieve error information from some payload.
+	ErrorInfo func(payload []byte) (code, message string, err error)
+
 	encoder    *eventstream.Encoder
 	decoder    *eventstream.Decoder
 	payloadBuf []byte
@@ -44,8 +47,10 @@ func (c *Codec) SerializeEventMessage(schema, variant *smithy.Schema, v smithy.S
 
 	v.Serialize(ss)
 
-	msg.Headers.Set(eventstream.MessageTypeHeader, eventstream.StringValue(eventstream.EventMessageType))
+	// header order matches the legacy per-operation serializers: the event type
+	// is written before the message type
 	msg.Headers.Set(eventstream.EventTypeHeader, eventstream.StringValue(variant.MemberName()))
+	msg.Headers.Set(eventstream.MessageTypeHeader, eventstream.StringValue(eventstream.EventMessageType))
 
 	if ct := ss.ContentType(); ct != "" {
 		msg.Headers.Set(eventstream.ContentTypeHeader, eventstream.StringValue(ct))
@@ -146,9 +151,26 @@ func (c *Codec) deserializeException(schema *smithy.Schema, types *smithy.TypeRe
 
 	perr, ok := types.DeserializableError(id)
 	if !ok {
+		code := exType.String()
+		message := "UnknownError"
+		if c.ErrorInfo != nil {
+			bodyCode, bodyMessage, err := c.ErrorInfo(msg.Payload)
+			if err != nil {
+				return &smithy.DeserializationError{
+					Err:      fmt.Errorf("get error info: %w", err),
+					Snapshot: msg.Payload,
+				}
+			}
+			if len(code) == 0 && len(bodyCode) != 0 {
+				code = bodyCode
+			}
+			if len(bodyMessage) != 0 {
+				message = bodyMessage
+			}
+		}
 		return &smithy.GenericAPIError{
-			Code:    exType.String(),
-			Message: "unknown exception",
+			Code:    code,
+			Message: message,
 		}
 	}
 
