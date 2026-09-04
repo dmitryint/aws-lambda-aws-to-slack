@@ -49,6 +49,7 @@ func NewCBOR(service *smithy.ServiceSchema, opts ...func(*ProtocolOptions)) *Pro
 			Serializer:   func() smithy.ShapeSerializer { return internalcbor.NewShapeSerializer() },
 			Deserializer: func(p []byte) smithy.ShapeDeserializer { return internalcbor.NewShapeDeserializer(p) },
 			ContentType:  "application/cbor",
+			ErrorInfo:    internalcbor.GetProtocolErrorInfo,
 		},
 		bufs: internalsync.NewBufferPool(),
 	}

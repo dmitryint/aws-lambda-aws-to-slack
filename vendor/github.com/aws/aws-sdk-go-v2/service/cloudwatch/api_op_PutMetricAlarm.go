@@ -8,7 +8,6 @@ import (
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/types"
 	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Creates or updates an alarm and associates it with the specified metric, metric
@@ -487,6 +486,16 @@ type PutMetricAlarmInput struct {
 	// stuck in the INSUFFICIENT DATA state.
 	Unit types.StandardUnit
 
+	// The warm-up configuration for the alarm. A warm-up period delays alarm
+	// evaluation after you create or update the alarm. The warm-up period reduces
+	// alarm noise from missing data while a new resource or service starts publishing
+	// metrics.
+	//
+	// For more information, see [Alarm warm-up periods] in the Amazon CloudWatch User Guide.
+	//
+	// [Alarm warm-up periods]: https://docs.aws.amazon.com/AmazonCloudWatch/latest/monitoring/alarm-warm-up.html
+	WarmUpConfiguration *types.WarmUpConfiguration
+
 	noSmithyDocumentSerde
 }
 
@@ -556,6 +565,11 @@ func (v *PutMetricAlarmInput) SerializeMembers(s smithy.ShapeSerializer) {
 	if v.Unit != "" {
 		s.WriteString(schemas.PutMetricAlarmInput_Unit, string(v.Unit))
 	}
+	if v.WarmUpConfiguration != nil {
+		s.WriteStruct(schemas.PutMetricAlarmInput_WarmUpConfiguration)
+		v.WarmUpConfiguration.SerializeMembers(s)
+		s.CloseStruct()
+	}
 }
 
 type PutMetricAlarmOutput struct {
@@ -588,12 +602,6 @@ func (c *Client) addOperationPutMetricAlarmMiddlewares(stack *middleware.Stack, 
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -603,12 +611,6 @@ func (c *Client) addOperationPutMetricAlarmMiddlewares(stack *middleware.Stack, 
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addUserAgentFeatureProtocolRPCV2CBOR(stack, options); err != nil {
 		return err
 	}
@@ -616,9 +618,6 @@ func (c *Client) addOperationPutMetricAlarmMiddlewares(stack *middleware.Stack, 
 		return err
 	}
 	if err = addOpPutMetricAlarmValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "PutMetricAlarm"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

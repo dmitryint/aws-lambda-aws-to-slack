@@ -15,6 +15,7 @@ import (
 	internalauth "github.com/aws/aws-sdk-go-v2/internal/auth"
 	internalauthsmithy "github.com/aws/aws-sdk-go-v2/internal/auth/smithy"
 	internalConfig "github.com/aws/aws-sdk-go-v2/internal/configsources"
+	"github.com/aws/aws-sdk-go-v2/internal/timeouts"
 	"github.com/aws/aws-sdk-go-v2/service/cloudwatch/schemas"
 	smithy "github.com/aws/smithy-go"
 	smithydocument "github.com/aws/smithy-go/document"
@@ -263,6 +264,10 @@ func (c *Client) invokeOperation(
 
 	finalizeClientEndpointResolverOptions(&options)
 
+	ctx = setLoggerContext(ctx, options, opID)
+
+	ctx = resolveServiceMetadata(ctx, options, opID)
+
 	if err := c.addCommonMiddlewares(stack, options, opID); err != nil {
 		return nil, metadata, err
 	}
@@ -379,9 +384,6 @@ func (c *Client) addCommonMiddlewares(stack *middleware.Stack, options Options, 
 	if err := addProtocolFinalizerMiddlewares(stack, options, operation); err != nil {
 		return fmt.Errorf("add protocol finalizers: %v", err)
 	}
-	if err := addSetLoggerMiddleware(stack, options); err != nil {
-		return err
-	}
 	if err := addClientRequestID(stack); err != nil {
 		return err
 	}
@@ -496,6 +498,14 @@ func (m *deserializeResponseMiddleware) HandleDeserialize(
 		return out, md, &smithy.DeserializationError{Err: fmt.Errorf("unknown transport type %T", out.RawResponse)}
 	}
 
+	// Event streams close their own body in the event stream deserializer.
+	if !m.operationSchema.IsInputEventStream() && !m.operationSchema.IsOutputEventStream() {
+		_, isStreamingPayload := m.output.(smithy.StreamingOutput)
+		defer func() {
+			smithyhttp.CloseResponseBody(ctx, resp, isStreamingPayload, err)
+		}()
+	}
+
 	_, span := tracing.StartSpan(ctx, "OperationDeserializer")
 	endTimer := startMetricTimer(ctx, "client.call.deserialization_duration")
 
@@ -510,30 +520,6 @@ func (m *deserializeResponseMiddleware) HandleDeserialize(
 
 type noSmithyDocumentSerde = smithydocument.NoSerde
 
-type legacyEndpointContextSetter struct {
-	LegacyResolver EndpointResolver
-}
-
-func (*legacyEndpointContextSetter) ID() string {
-	return "legacyEndpointContextSetter"
-}
-
-func (m *legacyEndpointContextSetter) HandleInitialize(ctx context.Context, in middleware.InitializeInput, next middleware.InitializeHandler) (
-	out middleware.InitializeOutput, metadata middleware.Metadata, err error,
-) {
-	if m.LegacyResolver != nil {
-		ctx = awsmiddleware.SetRequiresLegacyEndpoints(ctx, true)
-	}
-
-	return next.HandleInitialize(ctx, in)
-
-}
-func addlegacyEndpointContextSetter(stack *middleware.Stack, o Options) error {
-	return stack.Initialize.Add(&legacyEndpointContextSetter{
-		LegacyResolver: o.EndpointResolver,
-	}, middleware.Before)
-}
-
 func resolveDefaultLogger(o *Options) {
 	if o.Logger != nil {
 		return
@@ -541,8 +527,9 @@ func resolveDefaultLogger(o *Options) {
 	o.Logger = logging.Nop{}
 }
 
-func addSetLoggerMiddleware(stack *middleware.Stack, o Options) error {
-	return middleware.AddSetLoggerMiddleware(stack, o.Logger)
+func setLoggerContext(ctx context.Context, options Options, operation string) context.Context {
+	_ = operation
+	return middleware.SetLogger(ctx, options.Logger)
 }
 
 func setResolvedDefaultsMode(o *Options) {
@@ -621,6 +608,12 @@ func resolveHTTPClient(o *Options) {
 				transport.TLSHandshakeTimeout = tlsHandshakeTimeout
 			}
 		})
+	}
+
+	if _, ok := buildable.GetReadTimeout(); !ok {
+		if timeout, ok := timeouts.GetServiceReadTimeout(ServiceID); ok {
+			buildable = buildable.WithReadTimeout(timeout)
+		}
 	}
 
 	o.HTTPClient = buildable
@@ -762,10 +755,6 @@ func newDefaultV4Signer(o Options) *v4.Signer {
 
 func addClientRequestID(stack *middleware.Stack) error {
 	return stack.Build.Add(&awsmiddleware.ClientRequestID{}, middleware.After)
-}
-
-func addComputeContentLength(stack *middleware.Stack) error {
-	return stack.Build.Insert(&smithyhttp.ComputeContentLength{}, "ClientRequestID", middleware.After)
 }
 
 func addRawResponseToMetadata(stack *middleware.Stack) error {
@@ -928,35 +917,21 @@ func addUserAgentFeatureProtocolRPCV2CBOR(stack *middleware.Stack, options Optio
 	return nil
 }
 
-type setCredentialSourceMiddleware struct {
-	ua      *awsmiddleware.RequestUserAgent
-	options Options
-}
-
-func (m setCredentialSourceMiddleware) ID() string { return "SetCredentialSourceMiddleware" }
-
-func (m setCredentialSourceMiddleware) HandleBuild(ctx context.Context, in middleware.BuildInput, next middleware.BuildHandler) (
-	out middleware.BuildOutput, metadata middleware.Metadata, err error,
-) {
-	asProviderSource, ok := m.options.Credentials.(aws.CredentialProviderSource)
-	if !ok {
-		return next.HandleBuild(ctx, in)
-	}
-	providerSources := asProviderSource.ProviderSources()
-	for _, source := range providerSources {
-		m.ua.AddCredentialsSource(source)
-	}
-	return next.HandleBuild(ctx, in)
-}
-
 func addCredentialSource(stack *middleware.Stack, options Options) error {
 	ua, err := getOrAddRequestUserAgent(stack)
 	if err != nil {
 		return err
 	}
 
-	mw := setCredentialSourceMiddleware{ua: ua, options: options}
-	return stack.Build.Insert(&mw, "UserAgent", middleware.Before)
+	asProviderSource, ok := options.Credentials.(aws.CredentialProviderSource)
+	if !ok {
+		return nil
+	}
+
+	for _, source := range asProviderSource.ProviderSources() {
+		ua.AddCredentialsSource(source)
+	}
+	return nil
 }
 
 func resolveTracerProvider(options *Options) {
@@ -971,12 +946,16 @@ func resolveMeterProvider(options *Options) {
 	}
 }
 
-func newServiceMetadataMiddleware(region, operation string) *awsmiddleware.RegisterServiceMetadata {
-	return &awsmiddleware.RegisterServiceMetadata{
-		Region:        region,
-		ServiceID:     ServiceID,
-		OperationName: operation,
+func resolveServiceMetadata(ctx context.Context, options Options, operation string) context.Context {
+	ctx = awsmiddleware.SetServiceID(ctx, ServiceID)
+	if options.Region != "" {
+		ctx = awsmiddleware.SetRegion(ctx, options.Region)
 	}
+	ctx = awsmiddleware.SetOperationName(ctx, operation)
+	if options.EndpointResolver != nil {
+		ctx = awsmiddleware.SetRequiresLegacyEndpoints(ctx, true)
+	}
+	return ctx
 }
 
 func addRecursionDetection(stack *middleware.Stack) error {
