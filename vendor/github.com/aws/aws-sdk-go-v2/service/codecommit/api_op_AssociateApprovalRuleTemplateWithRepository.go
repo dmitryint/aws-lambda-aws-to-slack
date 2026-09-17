@@ -4,8 +4,9 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Creates an association between an approval rule template and a specified
@@ -45,6 +46,21 @@ type AssociateApprovalRuleTemplateWithRepositoryInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *AssociateApprovalRuleTemplateWithRepositoryInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.AssociateApprovalRuleTemplateWithRepositoryInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *AssociateApprovalRuleTemplateWithRepositoryInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ApprovalRuleTemplateName != nil {
+		s.WriteString(schemas.AssociateApprovalRuleTemplateWithRepositoryInput_approvalRuleTemplateName, *v.ApprovalRuleTemplateName)
+	}
+	if v.RepositoryName != nil {
+		s.WriteString(schemas.AssociateApprovalRuleTemplateWithRepositoryInput_repositoryName, *v.RepositoryName)
+	}
+}
+
 type AssociateApprovalRuleTemplateWithRepositoryOutput struct {
 	// Metadata pertaining to the operation's result.
 	ResultMetadata middleware.Metadata
@@ -52,22 +68,29 @@ type AssociateApprovalRuleTemplateWithRepositoryOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *AssociateApprovalRuleTemplateWithRepositoryOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(nil)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *AssociateApprovalRuleTemplateWithRepositoryOutput) SerializeMembers(s smithy.ShapeSerializer) {
+}
+func (v *AssociateApprovalRuleTemplateWithRepositoryOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, nil, func(s *smithy.Schema) error {
+		switch s {
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationAssociateApprovalRuleTemplateWithRepositoryMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpAssociateApprovalRuleTemplateWithRepository{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.AssociateApprovalRuleTemplateWithRepository, schemas.AssociateApprovalRuleTemplateWithRepositoryInput, nil)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpAssociateApprovalRuleTemplateWithRepository{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.AssociateApprovalRuleTemplateWithRepository, schemas.AssociateApprovalRuleTemplateWithRepositoryInput, nil), output: &AssociateApprovalRuleTemplateWithRepositoryOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -77,19 +100,10 @@ func (c *Client) addOperationAssociateApprovalRuleTemplateWithRepositoryMiddlewa
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpAssociateApprovalRuleTemplateWithRepositoryValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "AssociateApprovalRuleTemplateWithRepository"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

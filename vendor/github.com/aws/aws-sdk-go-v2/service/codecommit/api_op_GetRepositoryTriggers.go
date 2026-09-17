@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Gets information about triggers configured for a repository.
@@ -36,6 +37,18 @@ type GetRepositoryTriggersInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetRepositoryTriggersInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetRepositoryTriggersInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetRepositoryTriggersInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.RepositoryName != nil {
+		s.WriteString(schemas.GetRepositoryTriggersInput_repositoryName, *v.RepositoryName)
+	}
+}
+
 // Represents the output of a get repository triggers operation.
 type GetRepositoryTriggersOutput struct {
 
@@ -51,22 +64,38 @@ type GetRepositoryTriggersOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetRepositoryTriggersOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetRepositoryTriggersOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetRepositoryTriggersOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ConfigurationId != nil {
+		s.WriteString(schemas.GetRepositoryTriggersOutput_configurationId, *v.ConfigurationId)
+	}
+	serializeRepositoryTriggersList(s, schemas.GetRepositoryTriggersOutput_triggers, v.Triggers)
+}
+func (v *GetRepositoryTriggersOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetRepositoryTriggersOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetRepositoryTriggersOutput_configurationId:
+			v.ConfigurationId = new(string)
+			return d.ReadString(schemas.GetRepositoryTriggersOutput_configurationId, v.ConfigurationId)
+		case schemas.GetRepositoryTriggersOutput_triggers:
+			return deserializeRepositoryTriggersList(d, schemas.GetRepositoryTriggersOutput_triggers, &v.Triggers)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetRepositoryTriggersMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetRepositoryTriggers{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetRepositoryTriggers, schemas.GetRepositoryTriggersInput, schemas.GetRepositoryTriggersOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetRepositoryTriggers{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetRepositoryTriggers, schemas.GetRepositoryTriggersInput, schemas.GetRepositoryTriggersOutput), output: &GetRepositoryTriggersOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -76,19 +105,10 @@ func (c *Client) addOperationGetRepositoryTriggersMiddlewares(stack *middleware.
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetRepositoryTriggersValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetRepositoryTriggers"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
