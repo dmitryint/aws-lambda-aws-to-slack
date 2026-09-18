@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns information about one or more repositories.
@@ -45,6 +46,16 @@ type BatchGetRepositoriesInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *BatchGetRepositoriesInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.BatchGetRepositoriesInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *BatchGetRepositoriesInput) SerializeMembers(s smithy.ShapeSerializer) {
+	serializeRepositoryNameList(s, schemas.BatchGetRepositoriesInput_repositoryNames, v.RepositoryNames)
+}
+
 // Represents the output of a batch get repositories operation.
 type BatchGetRepositoriesOutput struct {
 
@@ -64,22 +75,38 @@ type BatchGetRepositoriesOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *BatchGetRepositoriesOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.BatchGetRepositoriesOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *BatchGetRepositoriesOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	serializeBatchGetRepositoriesErrorsList(s, schemas.BatchGetRepositoriesOutput_errors, v.Errors)
+	serializeRepositoryMetadataList(s, schemas.BatchGetRepositoriesOutput_repositories, v.Repositories)
+	serializeRepositoryNotFoundList(s, schemas.BatchGetRepositoriesOutput_repositoriesNotFound, v.RepositoriesNotFound)
+}
+func (v *BatchGetRepositoriesOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.BatchGetRepositoriesOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.BatchGetRepositoriesOutput_errors:
+			return deserializeBatchGetRepositoriesErrorsList(d, schemas.BatchGetRepositoriesOutput_errors, &v.Errors)
+		case schemas.BatchGetRepositoriesOutput_repositories:
+			return deserializeRepositoryMetadataList(d, schemas.BatchGetRepositoriesOutput_repositories, &v.Repositories)
+		case schemas.BatchGetRepositoriesOutput_repositoriesNotFound:
+			return deserializeRepositoryNotFoundList(d, schemas.BatchGetRepositoriesOutput_repositoriesNotFound, &v.RepositoriesNotFound)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationBatchGetRepositoriesMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpBatchGetRepositories{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.BatchGetRepositories, schemas.BatchGetRepositoriesInput, schemas.BatchGetRepositoriesOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpBatchGetRepositories{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.BatchGetRepositories, schemas.BatchGetRepositoriesInput, schemas.BatchGetRepositoriesOutput), output: &BatchGetRepositoriesOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -89,19 +116,10 @@ func (c *Client) addOperationBatchGetRepositoriesMiddlewares(stack *middleware.S
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpBatchGetRepositoriesValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "BatchGetRepositories"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Tests the functionality of repository triggers by sending information to the
@@ -43,6 +44,19 @@ type TestRepositoryTriggersInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *TestRepositoryTriggersInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.TestRepositoryTriggersInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *TestRepositoryTriggersInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.RepositoryName != nil {
+		s.WriteString(schemas.TestRepositoryTriggersInput_repositoryName, *v.RepositoryName)
+	}
+	serializeRepositoryTriggersList(s, schemas.TestRepositoryTriggersInput_triggers, v.Triggers)
+}
+
 // Represents the output of a test repository triggers operation.
 type TestRepositoryTriggersOutput struct {
 
@@ -60,22 +74,35 @@ type TestRepositoryTriggersOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *TestRepositoryTriggersOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.TestRepositoryTriggersOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *TestRepositoryTriggersOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	serializeRepositoryTriggerExecutionFailureList(s, schemas.TestRepositoryTriggersOutput_failedExecutions, v.FailedExecutions)
+	serializeRepositoryTriggerNameList(s, schemas.TestRepositoryTriggersOutput_successfulExecutions, v.SuccessfulExecutions)
+}
+func (v *TestRepositoryTriggersOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.TestRepositoryTriggersOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.TestRepositoryTriggersOutput_failedExecutions:
+			return deserializeRepositoryTriggerExecutionFailureList(d, schemas.TestRepositoryTriggersOutput_failedExecutions, &v.FailedExecutions)
+		case schemas.TestRepositoryTriggersOutput_successfulExecutions:
+			return deserializeRepositoryTriggerNameList(d, schemas.TestRepositoryTriggersOutput_successfulExecutions, &v.SuccessfulExecutions)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationTestRepositoryTriggersMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpTestRepositoryTriggers{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.TestRepositoryTriggers, schemas.TestRepositoryTriggersInput, schemas.TestRepositoryTriggersOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpTestRepositoryTriggers{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.TestRepositoryTriggers, schemas.TestRepositoryTriggersInput, schemas.TestRepositoryTriggersOutput), output: &TestRepositoryTriggersOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -85,19 +112,10 @@ func (c *Client) addOperationTestRepositoryTriggersMiddlewares(stack *middleware
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpTestRepositoryTriggersValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "TestRepositoryTriggers"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

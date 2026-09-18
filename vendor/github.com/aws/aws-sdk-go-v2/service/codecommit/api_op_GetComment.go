@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns the content of a comment made on a change, file, or commit in a
@@ -40,6 +41,18 @@ type GetCommentInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetCommentInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetCommentInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetCommentInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.CommentId != nil {
+		s.WriteString(schemas.GetCommentInput_commentId, *v.CommentId)
+	}
+}
+
 type GetCommentOutput struct {
 
 	// The contents of the comment.
@@ -51,22 +64,37 @@ type GetCommentOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetCommentOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetCommentOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetCommentOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.Comment != nil {
+		s.WriteStruct(schemas.GetCommentOutput_comment)
+		v.Comment.SerializeMembers(s)
+		s.CloseStruct()
+	}
+}
+func (v *GetCommentOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetCommentOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetCommentOutput_comment:
+			v.Comment = &types.Comment{}
+			return v.Comment.Deserialize(d)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetCommentMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetComment{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetComment, schemas.GetCommentInput, schemas.GetCommentOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetComment{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetComment, schemas.GetCommentInput, schemas.GetCommentOutput), output: &GetCommentOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -76,19 +104,10 @@ func (c *Client) addOperationGetCommentMiddlewares(stack *middleware.Stack, opti
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetCommentValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetComment"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
