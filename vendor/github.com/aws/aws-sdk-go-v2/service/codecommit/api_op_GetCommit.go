@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns information about a commit, including commit message and committer
@@ -42,6 +43,21 @@ type GetCommitInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetCommitInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetCommitInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetCommitInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.CommitId != nil {
+		s.WriteString(schemas.GetCommitInput_commitId, *v.CommitId)
+	}
+	if v.RepositoryName != nil {
+		s.WriteString(schemas.GetCommitInput_repositoryName, *v.RepositoryName)
+	}
+}
+
 // Represents the output of a get commit operation.
 type GetCommitOutput struct {
 
@@ -56,22 +72,37 @@ type GetCommitOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetCommitOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetCommitOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetCommitOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.Commit != nil {
+		s.WriteStruct(schemas.GetCommitOutput_commit)
+		v.Commit.SerializeMembers(s)
+		s.CloseStruct()
+	}
+}
+func (v *GetCommitOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetCommitOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetCommitOutput_commit:
+			v.Commit = &types.Commit{}
+			return v.Commit.Deserialize(d)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetCommitMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetCommit{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetCommit, schemas.GetCommitInput, schemas.GetCommitOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetCommit{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetCommit, schemas.GetCommitInput, schemas.GetCommitOutput), output: &GetCommitOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -81,19 +112,10 @@ func (c *Client) addOperationGetCommitMiddlewares(stack *middleware.Stack, optio
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetCommitValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetCommit"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

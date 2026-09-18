@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns the contents of a specified folder in a repository.
@@ -48,6 +49,24 @@ type GetFolderInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetFolderInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetFolderInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetFolderInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.CommitSpecifier != nil {
+		s.WriteString(schemas.GetFolderInput_commitSpecifier, *v.CommitSpecifier)
+	}
+	if v.FolderPath != nil {
+		s.WriteString(schemas.GetFolderInput_folderPath, *v.FolderPath)
+	}
+	if v.RepositoryName != nil {
+		s.WriteString(schemas.GetFolderInput_repositoryName, *v.RepositoryName)
+	}
+}
+
 type GetFolderOutput struct {
 
 	// The full commit ID used as a reference for the returned version of the folder
@@ -84,22 +103,59 @@ type GetFolderOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetFolderOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetFolderOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetFolderOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.CommitId != nil {
+		s.WriteString(schemas.GetFolderOutput_commitId, *v.CommitId)
+	}
+	serializeFileList(s, schemas.GetFolderOutput_files, v.Files)
+	if v.FolderPath != nil {
+		s.WriteString(schemas.GetFolderOutput_folderPath, *v.FolderPath)
+	}
+	serializeFolderList(s, schemas.GetFolderOutput_subFolders, v.SubFolders)
+	serializeSubModuleList(s, schemas.GetFolderOutput_subModules, v.SubModules)
+	serializeSymbolicLinkList(s, schemas.GetFolderOutput_symbolicLinks, v.SymbolicLinks)
+	if v.TreeId != nil {
+		s.WriteString(schemas.GetFolderOutput_treeId, *v.TreeId)
+	}
+}
+func (v *GetFolderOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetFolderOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetFolderOutput_commitId:
+			v.CommitId = new(string)
+			return d.ReadString(schemas.GetFolderOutput_commitId, v.CommitId)
+		case schemas.GetFolderOutput_files:
+			return deserializeFileList(d, schemas.GetFolderOutput_files, &v.Files)
+		case schemas.GetFolderOutput_folderPath:
+			v.FolderPath = new(string)
+			return d.ReadString(schemas.GetFolderOutput_folderPath, v.FolderPath)
+		case schemas.GetFolderOutput_subFolders:
+			return deserializeFolderList(d, schemas.GetFolderOutput_subFolders, &v.SubFolders)
+		case schemas.GetFolderOutput_subModules:
+			return deserializeSubModuleList(d, schemas.GetFolderOutput_subModules, &v.SubModules)
+		case schemas.GetFolderOutput_symbolicLinks:
+			return deserializeSymbolicLinkList(d, schemas.GetFolderOutput_symbolicLinks, &v.SymbolicLinks)
+		case schemas.GetFolderOutput_treeId:
+			v.TreeId = new(string)
+			return d.ReadString(schemas.GetFolderOutput_treeId, v.TreeId)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetFolderMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetFolder{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetFolder, schemas.GetFolderInput, schemas.GetFolderOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetFolder{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetFolder, schemas.GetFolderInput, schemas.GetFolderOutput), output: &GetFolderOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -109,19 +165,10 @@ func (c *Client) addOperationGetFolderMiddlewares(stack *middleware.Stack, optio
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetFolderValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetFolder"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
