@@ -9,7 +9,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/cloudwatch v1.72.0
 	github.com/aws/aws-sdk-go-v2/service/codecommit v1.36.3
 	github.com/aws/aws-sdk-go-v2/service/dynamodb v1.63.4
-	github.com/aws/aws-sdk-go-v2/service/kms v1.59.0
+	github.com/aws/aws-sdk-go-v2/service/kms v1.60.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.106.2
 	github.com/google/go-cmp v0.7.0
 	golang.org/x/sync v0.22.0
