@@ -1,6 +1,6 @@
 module github.com/esai-dev/aws-lambda-aws-to-slack
 
-go 1.26
+go 1.26.0
 
 require (
 	github.com/aws/aws-lambda-go v1.54.0
@@ -12,7 +12,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/kms v1.60.0
 	github.com/aws/aws-sdk-go-v2/service/s3 v1.106.2
 	github.com/google/go-cmp v0.7.0
-	golang.org/x/sync v0.22.0
+	golang.org/x/sync v0.23.0
 )
 
 require (
