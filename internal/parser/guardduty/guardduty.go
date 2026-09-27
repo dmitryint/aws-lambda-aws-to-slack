@@ -6,8 +6,8 @@
 // The parser branches on detail.service.action.actionType for the body
 // (PORT_PROBE, AWS_API_CALL, anything else → JSON dump) and on
 // detail.resource.resourceType for the trailer (Instance, AccessKey,
-// anything else → JSON dump). Unknown action and resource types render
-// with a "${actionType}" / "(<resourceType>)" header followed by a
+// S3Bucket, anything else → JSON dump). Unknown action and resource types
+// render with a "${actionType}" / "(<resourceType>)" header followed by a
 // pretty-printed JSON dump so archived log lines stay readable.
 package guardduty
 
@@ -16,6 +16,7 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/console"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 )
@@ -29,6 +30,7 @@ const (
 
 	resourceInstance  = "Instance"
 	resourceAccessKey = "AccessKey"
+	resourceS3Bucket  = "S3Bucket"
 
 	severityMediumGate = 4
 	severityHighGate   = 7
@@ -173,14 +175,35 @@ type instanceTag struct {
 	Value string `json:"value"`
 }
 
+// accessKeyDetail captures detail.resource.accessKeyDetails.
+type accessKeyDetail struct {
+	AccessKeyID string `json:"accessKeyId"`
+	PrincipalID string `json:"principalId"`
+	UserType    string `json:"userType"`
+	UserName    string `json:"userName"`
+}
+
 // accessKeyResource captures the AccessKey resource branch.
 type accessKeyResource struct {
-	AccessKeyDetails struct {
-		AccessKeyID string `json:"accessKeyId"`
-		PrincipalID string `json:"principalId"`
-		UserType    string `json:"userType"`
-		UserName    string `json:"userName"`
-	} `json:"accessKeyDetails"`
+	AccessKeyDetails accessKeyDetail `json:"accessKeyDetails"`
+}
+
+// s3BucketPublicInfo carries the effective public-access verdict for a bucket.
+type s3BucketPublicInfo struct {
+	EffectivePermission string `json:"effectivePermission"`
+}
+
+// s3BucketDetail is one element of detail.resource.s3BucketDetails.
+type s3BucketDetail struct {
+	Name         string             `json:"name"`
+	Type         string             `json:"type"`
+	PublicAccess s3BucketPublicInfo `json:"publicAccess"`
+}
+
+// s3BucketResource captures the S3Bucket resource branch.
+type s3BucketResource struct {
+	S3BucketDetails  []s3BucketDetail `json:"s3BucketDetails"`
+	AccessKeyDetails accessKeyDetail  `json:"accessKeyDetails"`
 }
 
 // Parse renders the Notification for a GuardDuty finding.
@@ -194,7 +217,7 @@ func (Parser) Parse(_ context.Context, e *envelope.Event) (*notify.Notification,
 	fields = append(fields, renderAction(f.Service.Action)...)
 	fields = append(fields, renderCountFields(f.Service)...)
 	fields = append(fields, notify.Field{Key: "Resource Type", Value: f.ResourceTyp.ResourceType})
-	fields = append(fields, renderResource(f.ResourceTyp.ResourceType, f.Resource)...)
+	fields = append(fields, renderResource(f.Region, f.ResourceTyp.ResourceType, f.Resource)...)
 
 	severity := severityFor(f.Severity)
 	fallback := fmt.Sprintf("%s %s", f.Title, f.Description)
@@ -316,12 +339,14 @@ func renderCountFields(svc findingService) []notify.Field {
 }
 
 // renderResource emits resource-specific rows.
-func renderResource(resourceType string, raw json.RawMessage) []notify.Field {
+func renderResource(region, resourceType string, raw json.RawMessage) []notify.Field {
 	switch resourceType {
 	case resourceInstance:
 		return renderInstance(raw)
 	case resourceAccessKey:
 		return renderAccessKey(raw)
+	case resourceS3Bucket:
+		return renderS3Bucket(region, raw)
 	default:
 		return renderUnknownResource(resourceType, raw)
 	}
@@ -350,18 +375,50 @@ func renderAccessKey(raw json.RawMessage) []notify.Field {
 	if len(raw) > 0 {
 		_ = json.Unmarshal(raw, &r)
 	}
+	return renderAccessKeyDetail(r.AccessKeyDetails)
+}
+
+// renderAccessKeyDetail emits the access-key principal rows.
+func renderAccessKeyDetail(d accessKeyDetail) []notify.Field {
 	return []notify.Field{
-		{Key: "AccessKeyId", Value: r.AccessKeyDetails.AccessKeyID},
-		{Key: "PrincipalId", Value: r.AccessKeyDetails.PrincipalID},
-		{Key: "User Type", Value: r.AccessKeyDetails.UserType},
-		{Key: "User Name", Value: r.AccessKeyDetails.UserName},
+		{Key: "AccessKeyId", Value: d.AccessKeyID},
+		{Key: "PrincipalId", Value: d.PrincipalID},
+		{Key: "User Type", Value: d.UserType},
+		{Key: "User Name", Value: d.UserName},
 	}
+}
+
+// renderS3Bucket emits the S3Bucket resource rows.
+func renderS3Bucket(region string, raw json.RawMessage) []notify.Field {
+	var r s3BucketResource
+	if len(raw) > 0 {
+		_ = json.Unmarshal(raw, &r)
+	}
+	fields := make([]notify.Field, 0, 3*len(r.S3BucketDetails)+4)
+	for i, b := range r.S3BucketDetails {
+		label := "Bucket"
+		if len(r.S3BucketDetails) > 1 {
+			label = fmt.Sprintf("Bucket %d", i+1)
+		}
+		bucketURL := console.URL(region, "s3/buckets/"+b.Name)
+		fields = append(fields,
+			notify.Field{Key: label, Value: notify.Link(bucketURL, b.Name)},
+			notify.Field{Key: label + " Role", Value: b.Type},
+		)
+		if b.PublicAccess.EffectivePermission != "" {
+			fields = append(fields, notify.Field{Key: label + " Public Access", Value: b.PublicAccess.EffectivePermission})
+		}
+	}
+	if r.AccessKeyDetails.AccessKeyID != "" {
+		fields = append(fields, renderAccessKeyDetail(r.AccessKeyDetails)...)
+	}
+	return fields
 }
 
 // renderUnknownResource emits the catch-all field for unrecognized resource
 // types — the full resource block is dumped as pretty JSON. This covers
-// S3Bucket, EKSCluster, RDSDBInstance, Lambda, Container, and any future
-// resource type GuardDuty introduces.
+// EKSCluster, RDSDBInstance, Lambda, Container, and any future resource type
+// GuardDuty introduces.
 func renderUnknownResource(resourceType string, raw json.RawMessage) []notify.Field {
 	pretty := prettyJSON(raw)
 	return []notify.Field{{Key: "Unknown Resource Type (" + resourceType + ")", Value: pretty}}

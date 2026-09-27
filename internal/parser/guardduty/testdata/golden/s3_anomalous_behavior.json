@@ -1,14 +1,14 @@
 {
   "Source": "guardduty",
-  "Severity": 4,
-  "Title": "The S3 account-level block public access feature was disabled.",
+  "Severity": 5,
+  "Title": "An IAM entity invoked an S3 API in an unusual way.",
   "TitleURL": "",
   "Subtitle": "Amazon GuardDuty",
   "Summary": "",
   "Fields": [
     {
       "Key": "Description",
-      "Value": "The S3 account-level block public access feature was disabled, exposing buckets to public access."
+      "Value": "An IAM entity invoked an S3 API that reads objects from an S3 bucket in a way that differs from the established baseline for this account."
     },
     {
       "Key": "Account",
@@ -20,11 +20,11 @@
     },
     {
       "Key": "Type",
-      "Value": "Policy:S3/AccountBlockPublicAccessDisabled"
+      "Value": "Exfiltration:S3/AnomalousBehavior"
     },
     {
       "Key": "Severity",
-      "Value": "5"
+      "Value": "8"
     },
     {
       "Key": "",
@@ -32,15 +32,15 @@
     },
     {
       "Key": "Service",
-      "Value": "s3.amazonaws.com - DeleteAccountPublicAccessBlock"
+      "Value": "s3.amazonaws.com - GetObject"
     },
     {
       "Key": "API origin",
-      "Value": "\n - "
+      "Value": "198.51.100.10\nExample Networks - Example Networks"
     },
     {
       "Key": "Location",
-      "Value": " - "
+      "Value": "Example - Example City"
     },
     {
       "Key": "Resource Type",
@@ -48,7 +48,7 @@
     },
     {
       "Key": "Bucket",
-      "Value": "\u003chttps://console.aws.amazon.com/s3/buckets/example-bucket?region=us-east-1|example-bucket\u003e"
+      "Value": "\u003chttps://console.aws.amazon.com/s3/buckets/example-data-bucket?region=us-east-1|example-data-bucket\u003e"
     },
     {
       "Key": "Bucket Role",
@@ -56,11 +56,11 @@
     },
     {
       "Key": "Bucket Public Access",
-      "Value": "PUBLIC"
+      "Value": "NOT_PUBLIC"
     },
     {
       "Key": "AccessKeyId",
-      "Value": "AKIAIOSFODNN7EXAMPLE"
+      "Value": "ASIAIOSFODNN7EXAMPLE"
     },
     {
       "Key": "PrincipalId",
@@ -76,6 +76,6 @@
     }
   ],
   "ImageURL": "",
-  "Fallback": "The S3 account-level block public access feature was disabled. The S3 account-level block public access feature was disabled, exposing buckets to public access.",
+  "Fallback": "An IAM entity invoked an S3 API in an unusual way. An IAM entity invoked an S3 API that reads objects from an S3 bucket in a way that differs from the established baseline for this account.",
   "Footnotes": null
 }
