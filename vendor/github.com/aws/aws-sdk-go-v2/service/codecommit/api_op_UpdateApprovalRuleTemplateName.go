@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Updates the name of a specified approval rule template.
@@ -40,6 +41,21 @@ type UpdateApprovalRuleTemplateNameInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *UpdateApprovalRuleTemplateNameInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.UpdateApprovalRuleTemplateNameInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *UpdateApprovalRuleTemplateNameInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.NewApprovalRuleTemplateName != nil {
+		s.WriteString(schemas.UpdateApprovalRuleTemplateNameInput_newApprovalRuleTemplateName, *v.NewApprovalRuleTemplateName)
+	}
+	if v.OldApprovalRuleTemplateName != nil {
+		s.WriteString(schemas.UpdateApprovalRuleTemplateNameInput_oldApprovalRuleTemplateName, *v.OldApprovalRuleTemplateName)
+	}
+}
+
 type UpdateApprovalRuleTemplateNameOutput struct {
 
 	// The structure and content of the updated approval rule template.
@@ -53,22 +69,37 @@ type UpdateApprovalRuleTemplateNameOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *UpdateApprovalRuleTemplateNameOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.UpdateApprovalRuleTemplateNameOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *UpdateApprovalRuleTemplateNameOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ApprovalRuleTemplate != nil {
+		s.WriteStruct(schemas.UpdateApprovalRuleTemplateNameOutput_approvalRuleTemplate)
+		v.ApprovalRuleTemplate.SerializeMembers(s)
+		s.CloseStruct()
+	}
+}
+func (v *UpdateApprovalRuleTemplateNameOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.UpdateApprovalRuleTemplateNameOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.UpdateApprovalRuleTemplateNameOutput_approvalRuleTemplate:
+			v.ApprovalRuleTemplate = &types.ApprovalRuleTemplate{}
+			return v.ApprovalRuleTemplate.Deserialize(d)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationUpdateApprovalRuleTemplateNameMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpUpdateApprovalRuleTemplateName{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.UpdateApprovalRuleTemplateName, schemas.UpdateApprovalRuleTemplateNameInput, schemas.UpdateApprovalRuleTemplateNameOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpUpdateApprovalRuleTemplateName{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.UpdateApprovalRuleTemplateName, schemas.UpdateApprovalRuleTemplateNameInput, schemas.UpdateApprovalRuleTemplateNameOutput), output: &UpdateApprovalRuleTemplateNameOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -78,19 +109,10 @@ func (c *Client) addOperationUpdateApprovalRuleTemplateNameMiddlewares(stack *mi
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpUpdateApprovalRuleTemplateNameValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "UpdateApprovalRuleTemplateName"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
