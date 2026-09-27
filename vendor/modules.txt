@@ -1,10 +1,10 @@
-# github.com/aws/aws-lambda-go v1.54.0
-## explicit; go 1.18
+# github.com/aws/aws-lambda-go v1.55.1
+## explicit; go 1.26
 github.com/aws/aws-lambda-go/lambda
 github.com/aws/aws-lambda-go/lambda/handlertrace
 github.com/aws/aws-lambda-go/lambda/messages
 github.com/aws/aws-lambda-go/lambdacontext
-# github.com/aws/aws-sdk-go-v2 v1.47.0
+# github.com/aws/aws-sdk-go-v2 v1.47.1
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/aws
 github.com/aws/aws-sdk-go-v2/aws/arn
@@ -32,7 +32,7 @@ github.com/aws/aws-sdk-go-v2/internal/strings
 github.com/aws/aws-sdk-go-v2/internal/sync/singleflight
 github.com/aws/aws-sdk-go-v2/internal/timeconv
 github.com/aws/aws-sdk-go-v2/internal/timeouts
-# github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.15
+# github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.20
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream
 github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream/eventstreamapi
@@ -54,13 +54,13 @@ github.com/aws/aws-sdk-go-v2/credentials/stscreds
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds
 github.com/aws/aws-sdk-go-v2/feature/ec2/imds/internal/config
-# github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.3
+# github.com/aws/aws-sdk-go-v2/internal/configsources v1.5.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/internal/configsources
-# github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.3
+# github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.8.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/internal/endpoints/v2
-# github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.38
+# github.com/aws/aws-sdk-go-v2/internal/v4a v1.5.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/internal/v4a
 github.com/aws/aws-sdk-go-v2/internal/v4a/internal/crypto
@@ -71,30 +71,32 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatch
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/schemas
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/types
-# github.com/aws/aws-sdk-go-v2/service/codecommit v1.36.3
+# github.com/aws/aws-sdk-go-v2/service/codecommit v1.43.1
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/codecommit
 github.com/aws/aws-sdk-go-v2/service/codecommit/internal/endpoints
+github.com/aws/aws-sdk-go-v2/service/codecommit/schemas
 github.com/aws/aws-sdk-go-v2/service/codecommit/types
-# github.com/aws/aws-sdk-go-v2/service/dynamodb v1.63.4
+# github.com/aws/aws-sdk-go-v2/service/dynamodb v1.69.0
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/dynamodb
 github.com/aws/aws-sdk-go-v2/service/dynamodb/internal/customizations
 github.com/aws/aws-sdk-go-v2/service/dynamodb/internal/endpoints
+github.com/aws/aws-sdk-go-v2/service/dynamodb/schemas
 github.com/aws/aws-sdk-go-v2/service/dynamodb/types
-# github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.17
+# github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.19
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding
-# github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.9.26
+# github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.5
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/checksum
-# github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.12.15
+# github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.13.3
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery
-# github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.37
+# github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/presigned-url
-# github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.34
+# github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.20.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared
 github.com/aws/aws-sdk-go-v2/service/internal/s3shared/arn
@@ -104,7 +106,7 @@ github.com/aws/aws-sdk-go-v2/service/internal/s3shared/config
 github.com/aws/aws-sdk-go-v2/service/kms
 github.com/aws/aws-sdk-go-v2/service/kms/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/kms/types
-# github.com/aws/aws-sdk-go-v2/service/s3 v1.106.2
+# github.com/aws/aws-sdk-go-v2/service/s3 v1.113.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/s3
 github.com/aws/aws-sdk-go-v2/service/s3/internal/arn
@@ -140,6 +142,8 @@ github.com/aws/smithy-go/container/private/cache
 github.com/aws/smithy-go/container/private/cache/lru
 github.com/aws/smithy-go/context
 github.com/aws/smithy-go/document
+github.com/aws/smithy-go/document/internal/serde
+github.com/aws/smithy-go/document/json
 github.com/aws/smithy-go/encoding
 github.com/aws/smithy-go/encoding/cbor
 github.com/aws/smithy-go/encoding/httpbinding
@@ -168,7 +172,10 @@ github.com/aws/smithy-go/tracing
 github.com/aws/smithy-go/traits
 github.com/aws/smithy-go/transport/http
 github.com/aws/smithy-go/transport/http/internal/io
+github.com/aws/smithy-go/transport/http/protocol/awsjson
 github.com/aws/smithy-go/transport/http/protocol/internal/cbor
+github.com/aws/smithy-go/transport/http/protocol/internal/json
+github.com/aws/smithy-go/transport/http/protocol/internal/json/internal/stdlib
 github.com/aws/smithy-go/transport/http/protocol/rpcv2
 github.com/aws/smithy-go/waiter
 # github.com/google/go-cmp v0.7.0
@@ -179,6 +186,6 @@ github.com/google/go-cmp/cmp/internal/diff
 github.com/google/go-cmp/cmp/internal/flags
 github.com/google/go-cmp/cmp/internal/function
 github.com/google/go-cmp/cmp/internal/value
-# golang.org/x/sync v0.22.0
-## explicit; go 1.25.0
+# golang.org/x/sync v0.23.0
+## explicit; go 1.26.0
 golang.org/x/sync/errgroup

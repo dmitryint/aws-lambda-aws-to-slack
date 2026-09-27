@@ -9,19 +9,23 @@ import (
 	"testing"
 	"time"
 
+	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb"
 	"github.com/aws/aws-sdk-go-v2/service/dynamodb/types"
 )
 
-// fakePutItemAPI is a hand-rolled PutItemAPI implementation that captures the
+// fakeDynamoDBAPI is a hand-rolled DynamoDBAPI implementation that captures the
 // last call and returns the configured error.
-type fakePutItemAPI struct {
-	gotInput *dynamodb.PutItemInput
-	err      error
-	calls    int
+type fakeDynamoDBAPI struct {
+	gotInput    *dynamodb.PutItemInput
+	err         error
+	calls       int
+	gotDelete   *dynamodb.DeleteItemInput
+	deleteErr   error
+	deleteCalls int
 }
 
-func (f *fakePutItemAPI) PutItem(_ context.Context, in *dynamodb.PutItemInput,
+func (f *fakeDynamoDBAPI) PutItem(_ context.Context, in *dynamodb.PutItemInput,
 	_ ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error) {
 	f.calls++
 	f.gotInput = in
@@ -29,6 +33,16 @@ func (f *fakePutItemAPI) PutItem(_ context.Context, in *dynamodb.PutItemInput,
 		return nil, f.err
 	}
 	return &dynamodb.PutItemOutput{}, nil
+}
+
+func (f *fakeDynamoDBAPI) DeleteItem(_ context.Context, in *dynamodb.DeleteItemInput,
+	_ ...func(*dynamodb.Options)) (*dynamodb.DeleteItemOutput, error) {
+	f.deleteCalls++
+	f.gotDelete = in
+	if f.deleteErr != nil {
+		return nil, f.deleteErr
+	}
+	return &dynamodb.DeleteItemOutput{}, nil
 }
 
 func TestDynamoDB_Disabled_ReturnsTrue(t *testing.T) {
@@ -55,7 +69,7 @@ func TestDynamoDB_Disabled_ReturnsTrue(t *testing.T) {
 }
 
 func TestDynamoDB_FirstSeen_ReturnsTrue(t *testing.T) {
-	api := &fakePutItemAPI{}
+	api := &fakeDynamoDBAPI{}
 	store := NewDynamoDBWithClient(api, "test-table", 24*time.Hour)
 	got, err := store.TryReserve(context.Background(), "key-1", map[string]string{"finding_arn": "arn:x"})
 	if err != nil {
@@ -77,7 +91,7 @@ func TestDynamoDB_FirstSeen_ReturnsTrue(t *testing.T) {
 // persisted as a DynamoDB N attribute, not S, so the TTL scanner recognizes
 // it.
 func TestDynamoDB_ExpireAt_IsNumberAttribute(t *testing.T) {
-	api := &fakePutItemAPI{}
+	api := &fakeDynamoDBAPI{}
 	store := NewDynamoDBWithClient(api, "test-table", 7*24*time.Hour)
 	if _, err := store.TryReserve(context.Background(), "key", nil); err != nil {
 		t.Fatalf("TryReserve: %v", err)
@@ -98,7 +112,7 @@ func TestDynamoDB_ExpireAt_IsNumberAttribute(t *testing.T) {
 // uses errors.As to detect the conditional-check exception and returns
 // (false, nil).
 func TestDynamoDB_ConditionalCheckFailed_ReturnsFalse(t *testing.T) {
-	api := &fakePutItemAPI{err: &types.ConditionalCheckFailedException{Message: stringPtr("exists")}}
+	api := &fakeDynamoDBAPI{err: &types.ConditionalCheckFailedException{Message: stringPtr("exists")}}
 	store := NewDynamoDBWithClient(api, "t", time.Hour)
 	got, err := store.TryReserve(context.Background(), "key", nil)
 	if err != nil {
@@ -112,7 +126,7 @@ func TestDynamoDB_ConditionalCheckFailed_ReturnsFalse(t *testing.T) {
 // TestDynamoDB_ConditionalCheckFailed_WrappedError covers the wrapped-error
 // branch — errors.As must unwrap through fmt.Errorf %w.
 func TestDynamoDB_ConditionalCheckFailed_WrappedError(t *testing.T) {
-	api := &fakePutItemAPI{err: wrap("smithy operation error",
+	api := &fakeDynamoDBAPI{err: wrap("smithy operation error",
 		&types.ConditionalCheckFailedException{Message: stringPtr("exists")})}
 	store := NewDynamoDBWithClient(api, "t", time.Hour)
 	got, err := store.TryReserve(context.Background(), "key", nil)
@@ -129,7 +143,7 @@ func TestDynamoDB_ConditionalCheckFailed_WrappedError(t *testing.T) {
 func TestDynamoDB_OtherError_FailsOpen(t *testing.T) {
 	buf := &bytes.Buffer{}
 	logger := slog.New(slog.NewJSONHandler(buf, nil))
-	api := &fakePutItemAPI{err: errors.New("RequestLimitExceeded")}
+	api := &fakeDynamoDBAPI{err: errors.New("RequestLimitExceeded")}
 	store := NewDynamoDBWithClient(api, "t", time.Hour).WithLogger(logger)
 	got, err := store.TryReserve(context.Background(), "key", nil)
 	if err != nil {
@@ -150,7 +164,7 @@ func TestDynamoDB_OtherError_FailsOpen(t *testing.T) {
 // TestDynamoDB_MetadataMerged ensures user metadata is merged into the item
 // (without overriding the reserved attribute names).
 func TestDynamoDB_MetadataMerged(t *testing.T) {
-	api := &fakePutItemAPI{}
+	api := &fakeDynamoDBAPI{}
 	store := NewDynamoDBWithClient(api, "t", time.Hour)
 	meta := map[string]string{
 		"finding_arn": "arn:1",
@@ -166,6 +180,58 @@ func TestDynamoDB_MetadataMerged(t *testing.T) {
 	}
 	if v, ok := api.gotInput.Item[attrDedupKey].(*types.AttributeValueMemberS); !ok || v.Value != "k" {
 		t.Fatalf("dedup_key was overwritten by metadata: %v", api.gotInput.Item[attrDedupKey])
+	}
+}
+
+func TestDynamoDB_Release_DeletesKey(t *testing.T) {
+	api := &fakeDynamoDBAPI{}
+	store := NewDynamoDBWithClient(api, "test-table", time.Hour)
+	if err := store.Release(context.Background(), "key-1"); err != nil {
+		t.Fatalf("Release: %v", err)
+	}
+	if api.deleteCalls != 1 {
+		t.Fatalf("DeleteItem calls = %d, want 1", api.deleteCalls)
+	}
+	if got := aws.ToString(api.gotDelete.TableName); got != "test-table" {
+		t.Fatalf("table = %q, want test-table", got)
+	}
+	if len(api.gotDelete.Key) != 1 {
+		t.Fatalf("key attributes = %v, want only %s", api.gotDelete.Key, attrDedupKey)
+	}
+	if v, ok := api.gotDelete.Key[attrDedupKey].(*types.AttributeValueMemberS); !ok || v.Value != "key-1" {
+		t.Fatalf("dedup_key = %v, want S 'key-1'", api.gotDelete.Key[attrDedupKey])
+	}
+}
+
+func TestDynamoDB_Release_Disabled_NoOp(t *testing.T) {
+	api := &fakeDynamoDBAPI{}
+	cases := []struct {
+		name  string
+		store *DynamoDBStore
+	}{
+		{name: "nil-receiver", store: nil},
+		{name: "empty-table", store: NewDynamoDBWithClient(api, "", time.Hour)},
+		{name: "nil-client", store: &DynamoDBStore{TableName: "t"}},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			if err := tc.store.Release(context.Background(), "key"); err != nil {
+				t.Fatalf("Release: %v", err)
+			}
+		})
+	}
+	if api.deleteCalls != 0 {
+		t.Fatalf("DeleteItem calls = %d, want 0 for a disabled store", api.deleteCalls)
+	}
+}
+
+func TestDynamoDB_Release_ReturnsSDKError(t *testing.T) {
+	sdkErr := errors.New("AccessDeniedException")
+	api := &fakeDynamoDBAPI{deleteErr: sdkErr}
+	store := NewDynamoDBWithClient(api, "t", time.Hour)
+	err := store.Release(context.Background(), "key")
+	if !errors.Is(err, sdkErr) {
+		t.Fatalf("Release error = %v, want wrapped %v", err, sdkErr)
 	}
 }
 

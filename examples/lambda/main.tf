@@ -82,7 +82,7 @@ data "aws_iam_policy_document" "dynamodb_dedup" {
 
   statement {
     sid       = "DedupTablePut"
-    actions   = ["dynamodb:PutItem"]
+    actions   = ["dynamodb:PutItem", "dynamodb:DeleteItem"]
     resources = ["arn:${data.aws_partition.current.partition}:dynamodb:${data.aws_region.current.name}:${data.aws_caller_identity.current.account_id}:table/${var.dedup_table_name}"]
   }
 }
