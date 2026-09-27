@@ -14,6 +14,7 @@ import (
 
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/config"
 	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/envelope"
+	"github.com/esai-dev/aws-lambda-aws-to-slack/internal/notify"
 	autoscalingparser "github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser/autoscaling"
 	awshealthparser "github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser/awshealth"
 	batchparser "github.com/esai-dev/aws-lambda-aws-to-slack/internal/parser/batch"
@@ -41,6 +42,8 @@ import (
 // burst rates below Slack's 429 threshold while still completing well
 // within the Lambda deadline.
 const maxInFlight = 4
+
+const dedupReleaseTimeout = 2 * time.Second
 
 // Handler wires the envelope → router → transport pipeline.
 //
@@ -226,6 +229,7 @@ func (h *Handler) processRecord(ctx context.Context, rec *envelope.Event) error 
 		delivered++
 	}
 	if len(errs) > 0 {
+		h.releaseDedup(ctx, rec, n)
 		return errors.Join(errs...)
 	}
 	h.log.InfoContext(ctx, "alert delivered",
@@ -234,4 +238,25 @@ func (h *Handler) processRecord(ctx context.Context, rec *envelope.Event) error 
 		"transports", delivered,
 	)
 	return nil
+}
+
+func (h *Handler) releaseDedup(ctx context.Context, rec *envelope.Event, n *notify.Notification) {
+	key := n.DedupKey()
+	if key == "" {
+		return
+	}
+	rctx, cancel := context.WithTimeout(context.WithoutCancel(ctx), dedupReleaseTimeout)
+	defer cancel()
+	if err := n.ReleaseDedup(rctx); err != nil {
+		h.log.ErrorContext(ctx, "dedup release failed",
+			"err", err,
+			"dedup_key", key,
+			"source", rec.Source(),
+		)
+		return
+	}
+	h.log.InfoContext(ctx, "dedup reservation released",
+		"dedup_key", key,
+		"source", rec.Source(),
+	)
 }

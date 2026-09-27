@@ -197,6 +197,7 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notifica
 	dedupKey := buildDedupKey(f, res)
 	region := findingRegion(f.FindingArn, e.Region())
 
+	reserved := false
 	if p.dedup != nil {
 		meta := map[string]string{
 			"severity":          f.Severity,
@@ -217,6 +218,7 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notifica
 			)
 			return nil, nil //nolint:nilnil // silence — duplicate finding inside TTL window
 		}
+		reserved = err == nil && firstSeen
 		p.logger().InfoContext(ctx, "inspector2 alert reserved",
 			"dedup_key", dedupKey,
 			"finding_arn", f.FindingArn,
@@ -239,7 +241,7 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notifica
 	consoleURL := findingConsoleURL(region, f.FindingArn)
 
 	fallback := vulnID + ": " + truncate(f.Description, fallbackTruncate)
-	return &notify.Notification{
+	n := &notify.Notification{
 		Source:   name,
 		Severity: severity,
 		Title:    titleText,
@@ -248,7 +250,11 @@ func (p *Parser) Parse(ctx context.Context, e *envelope.Event) (*notify.Notifica
 		Summary:  truncate(f.Description, descriptionTruncate),
 		Fields:   buildFields(f, res, region),
 		Fallback: fallback,
-	}, nil
+	}
+	if reserved {
+		n.SetDedupRelease(dedupKey, p.dedup.Release)
+	}
+	return n, nil
 }
 
 // decode extracts the typed detail block from the inner event message.

@@ -343,3 +343,98 @@ func buildSyntheticSNSEnvelope(t *testing.T, n int) json.RawMessage {
 // pointer assertion used to compile-time verify that erroringParser pointer
 // receivers also satisfy the parser.Parser interface.
 var _ parser.Parser = (*erroringParser)(nil)
+
+type releasingParser struct {
+	releaseErr error
+
+	mu          sync.Mutex
+	calls       int
+	key         string
+	ctxErr      error
+	hasDeadline bool
+}
+
+func (*releasingParser) Name() string               { return "releasing" }
+func (*releasingParser) Match(*envelope.Event) bool { return true }
+func (p *releasingParser) Parse(context.Context, *envelope.Event) (*notify.Notification, error) {
+	n := &notify.Notification{Source: "releasing", Severity: notify.SeverityWarning, Title: "t"}
+	n.SetDedupRelease("key-1", p.release)
+	return n, nil
+}
+
+func (p *releasingParser) release(ctx context.Context, key string) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	p.calls++
+	p.key = key
+	p.ctxErr = ctx.Err()
+	_, p.hasDeadline = ctx.Deadline()
+	return p.releaseErr
+}
+
+var _ parser.Parser = (*releasingParser)(nil)
+
+func newReleasingHandler(p *releasingParser, rec *recordingRenderer) *Handler {
+	r := router.New()
+	r.Register(p)
+	cfg := &config.Config{SlackHookURL: "http://invalid.example"}
+	return New(cfg, aws.Config{}, WithRouter(r), WithRenderers(rec))
+}
+
+func TestHandle_DedupRelease(t *testing.T) {
+	postErr := errors.New("slack: exhausted 3 attempts: status 429")
+	releaseErr := errors.New("AccessDeniedException")
+	cases := []struct {
+		name       string
+		sendErr    error
+		releaseErr error
+		wantCalls  int
+	}{
+		{name: "delivered-keeps-reservation"},
+		{name: "failed-delivery-releases", sendErr: postErr, wantCalls: 1},
+		{name: "release-failure-keeps-delivery-error", sendErr: postErr, releaseErr: releaseErr, wantCalls: 1},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			p := &releasingParser{releaseErr: tc.releaseErr}
+			rec := &recordingRenderer{errFunc: func(int) error { return tc.sendErr }}
+			h := newReleasingHandler(p, rec)
+
+			err := h.Handle(t.Context(), readSample(t, "single_record.json"))
+			if !errors.Is(err, tc.sendErr) || (tc.sendErr == nil) != (err == nil) {
+				t.Fatalf("Handle error = %v, want %v", err, tc.sendErr)
+			}
+			if tc.releaseErr != nil && errors.Is(err, tc.releaseErr) {
+				t.Fatalf("release error leaked into Handle result: %v", err)
+			}
+			if p.calls != tc.wantCalls {
+				t.Fatalf("release calls = %d, want %d", p.calls, tc.wantCalls)
+			}
+			if tc.wantCalls > 0 && p.key != "key-1" {
+				t.Fatalf("released key = %q, want key-1", p.key)
+			}
+		})
+	}
+}
+
+func TestHandle_DedupRelease_OutlivesCanceledContext(t *testing.T) {
+	p := &releasingParser{}
+	rec := &recordingRenderer{delay: time.Minute}
+	h := newReleasingHandler(p, rec)
+
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	err := h.Handle(ctx, readSample(t, "single_record.json"))
+	if !errors.Is(err, context.Canceled) {
+		t.Fatalf("Handle error = %v, want context.Canceled", err)
+	}
+	if p.calls != 1 {
+		t.Fatalf("release calls = %d, want 1", p.calls)
+	}
+	if p.ctxErr != nil {
+		t.Fatalf("release ran on a done context: %v", p.ctxErr)
+	}
+	if !p.hasDeadline {
+		t.Fatal("release context has no deadline")
+	}
+}

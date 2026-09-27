@@ -10,6 +10,8 @@
 // cycles arise because parsers never import a transport.
 package notify
 
+import "context"
+
 // Severity classifies a notification's operational urgency. Parsers
 // translate AWS-domain signals (CloudWatch state, GuardDuty score, build
 // status, etc.) into one of these five buckets; transports decide how to
@@ -72,4 +74,27 @@ type Notification struct {
 	ImageURL  string   // optional pre-signed chart URL
 	Fallback  string   // plain-text rendering for low-fidelity transports
 	Footnotes []string // small contextual lines (timestamps, etc.)
+
+	dedupKey     string
+	dedupRelease func(ctx context.Context, key string) error
+}
+
+// SetDedupRelease registers release as the function that frees the dedup
+// reservation the parser holds under key for this notification.
+func (n *Notification) SetDedupRelease(key string, release func(ctx context.Context, key string) error) {
+	n.dedupKey = key
+	n.dedupRelease = release
+}
+
+// DedupKey returns the key registered with SetDedupRelease, or "" when the
+// notification holds no dedup reservation.
+func (n *Notification) DedupKey() string { return n.dedupKey }
+
+// ReleaseDedup frees the dedup reservation registered with SetDedupRelease.
+// It returns nil when no release is registered.
+func (n *Notification) ReleaseDedup(ctx context.Context) error {
+	if n.dedupRelease == nil {
+		return nil
+	}
+	return n.dedupRelease(ctx, n.dedupKey)
 }

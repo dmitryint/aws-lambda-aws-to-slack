@@ -103,7 +103,7 @@ module "aws_to_slack" {
     },
     {
       "Effect": "Allow",
-      "Action": ["dynamodb:GetItem", "dynamodb:PutItem"],
+      "Action": ["dynamodb:GetItem", "dynamodb:PutItem", "dynamodb:DeleteItem"],
       "Resource": "<dedup-table-arn>"
     },
     {
