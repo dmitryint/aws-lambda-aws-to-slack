@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns information about a specified approval rule template.
@@ -35,6 +36,18 @@ type GetApprovalRuleTemplateInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetApprovalRuleTemplateInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetApprovalRuleTemplateInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetApprovalRuleTemplateInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ApprovalRuleTemplateName != nil {
+		s.WriteString(schemas.GetApprovalRuleTemplateInput_approvalRuleTemplateName, *v.ApprovalRuleTemplateName)
+	}
+}
+
 type GetApprovalRuleTemplateOutput struct {
 
 	// The content and structure of the approval rule template.
@@ -48,22 +61,37 @@ type GetApprovalRuleTemplateOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetApprovalRuleTemplateOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetApprovalRuleTemplateOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetApprovalRuleTemplateOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ApprovalRuleTemplate != nil {
+		s.WriteStruct(schemas.GetApprovalRuleTemplateOutput_approvalRuleTemplate)
+		v.ApprovalRuleTemplate.SerializeMembers(s)
+		s.CloseStruct()
+	}
+}
+func (v *GetApprovalRuleTemplateOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetApprovalRuleTemplateOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetApprovalRuleTemplateOutput_approvalRuleTemplate:
+			v.ApprovalRuleTemplate = &types.ApprovalRuleTemplate{}
+			return v.ApprovalRuleTemplate.Deserialize(d)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetApprovalRuleTemplateMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetApprovalRuleTemplate{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetApprovalRuleTemplate, schemas.GetApprovalRuleTemplateInput, schemas.GetApprovalRuleTemplateOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetApprovalRuleTemplate{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetApprovalRuleTemplate, schemas.GetApprovalRuleTemplateInput, schemas.GetApprovalRuleTemplateOutput), output: &GetApprovalRuleTemplateOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -73,19 +101,10 @@ func (c *Client) addOperationGetApprovalRuleTemplateMiddlewares(stack *middlewar
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetApprovalRuleTemplateValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetApprovalRuleTemplate"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

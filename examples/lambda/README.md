@@ -38,7 +38,7 @@ here are spec-only.
 resource "aws_lambda_function" "aws_to_slack" { /* the Lambda */ }
 resource "aws_iam_role"        "aws_to_slack" { /* exec role  */ }
 # inline policies: kms:Decrypt, s3:Put/GetObject on charts bucket,
-# dynamodb:PutItem on dedup table, cloudwatch:GetMetricWidgetImage
+# dynamodb:PutItem/DeleteItem on dedup table, cloudwatch:GetMetricWidgetImage
 ```
 
 In the recipes, `module.aws_to_slack.function_name` and
