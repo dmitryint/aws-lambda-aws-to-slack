@@ -1,0 +1,150 @@
+{
+  "version": "0",
+  "id": "5b1e7c3a-2f4d-4a8b-9c61-0123456789cd",
+  "detail-type": "GuardDuty Finding",
+  "source": "aws.guardduty",
+  "account": "123456789012",
+  "time": "2024-06-02T09:30:00Z",
+  "region": "us-east-1",
+  "resources": [],
+  "detail": {
+    "schemaVersion": "2.0",
+    "accountId": "123456789012",
+    "region": "us-east-1",
+    "partition": "aws",
+    "id": "f2c8a1d4-5555-6666-7777-1234567890cd",
+    "arn": "arn:aws:guardduty:us-east-1:123456789012:detector/12abc34d567e8fa901bc2d34eEXAMPLE/finding/f2c8a1d4-5555-6666-7777-1234567890cd",
+    "type": "Exfiltration:S3/AnomalousBehavior",
+    "resource": {
+      "resourceType": "S3Bucket",
+      "accessKeyDetails": {
+        "accessKeyId": "ASIAIOSFODNN7EXAMPLE",
+        "principalId": "AROAJTAAAAAAAAAAAAAAA:example-session",
+        "userName": "example-role",
+        "userType": "AssumedRole"
+      },
+      "s3BucketDetails": [
+        {
+          "arn": "arn:aws:s3:::example-data-bucket",
+          "name": "example-data-bucket",
+          "type": "Destination",
+          "createdAt": "2024-01-15T08:00:00.000Z",
+          "owner": {
+            "id": "abcd1234567890abcd1234567890abcd1234567890abcd1234567890abcd1234"
+          },
+          "tags": [
+            {
+              "key": "Name",
+              "value": "example-data-bucket"
+            },
+            {
+              "key": "Environment",
+              "value": "production"
+            },
+            {
+              "key": "Application",
+              "value": "example-application"
+            },
+            {
+              "key": "Owner",
+              "value": "platform-team"
+            },
+            {
+              "key": "CostCenter",
+              "value": "cc-0000"
+            },
+            {
+              "key": "ManagedBy",
+              "value": "terraform"
+            },
+            {
+              "key": "DataClassification",
+              "value": "confidential"
+            },
+            {
+              "key": "Backup",
+              "value": "true"
+            }
+          ],
+          "defaultServerSideEncryption": {
+            "encryptionType": "aws:kms",
+            "kmsMasterKeyArn": "arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab"
+          },
+          "publicAccess": {
+            "permissionConfiguration": {
+              "bucketLevelPermissions": {
+                "accessControlList": {
+                  "allowsPublicReadAccess": false,
+                  "allowsPublicWriteAccess": false
+                },
+                "bucketPolicy": {
+                  "allowsPublicReadAccess": false,
+                  "allowsPublicWriteAccess": false
+                },
+                "blockPublicAccess": {
+                  "ignorePublicAcls": true,
+                  "restrictPublicBuckets": true,
+                  "blockPublicAcls": true,
+                  "blockPublicPolicy": true
+                }
+              },
+              "accountLevelPermissions": {
+                "blockPublicAccess": {
+                  "ignorePublicAcls": true,
+                  "restrictPublicBuckets": true,
+                  "blockPublicAcls": true,
+                  "blockPublicPolicy": true
+                }
+              }
+            },
+            "effectivePermission": "NOT_PUBLIC"
+          }
+        }
+      ]
+    },
+    "service": {
+      "serviceName": "guardduty",
+      "detectorId": "12abc34d567e8fa901bc2d34eEXAMPLE",
+      "action": {
+        "actionType": "AWS_API_CALL",
+        "awsApiCallAction": {
+          "api": "GetObject",
+          "serviceName": "s3.amazonaws.com",
+          "callerType": "Remote IP",
+          "remoteIpDetails": {
+            "ipAddressV4": "198.51.100.10",
+            "organization": {
+              "asn": "64500",
+              "asnOrg": "Example Networks",
+              "isp": "Example Networks",
+              "org": "Example Networks"
+            },
+            "country": {
+              "countryName": "Example"
+            },
+            "city": {
+              "cityName": "Example City"
+            },
+            "geoLocation": {
+              "lat": 0,
+              "lon": 0
+            }
+          },
+          "affectedResources": {}
+        }
+      },
+      "resourceRole": "TARGET",
+      "additionalInfo": {},
+      "evidence": null,
+      "eventFirstSeen": "2024-06-02T09:10:00.000Z",
+      "eventLastSeen": "2024-06-02T09:20:00.000Z",
+      "archived": false,
+      "count": 1
+    },
+    "severity": 8,
+    "createdAt": "2024-06-02T09:25:00.000Z",
+    "updatedAt": "2024-06-02T09:30:00.000Z",
+    "title": "An IAM entity invoked an S3 API in an unusual way.",
+    "description": "An IAM entity invoked an S3 API that reads objects from an S3 bucket in a way that differs from the established baseline for this account."
+  }
+}
