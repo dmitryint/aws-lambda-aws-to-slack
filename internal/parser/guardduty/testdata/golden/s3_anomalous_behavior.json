@@ -47,8 +47,32 @@
       "Value": "S3Bucket"
     },
     {
-      "Key": "Unknown Resource Type (S3Bucket)",
-      "Value": "{\n  \"accessKeyDetails\": {\n    \"accessKeyId\": \"ASIAIOSFODNN7EXAMPLE\",\n    \"principalId\": \"AROAJTAAAAAAAAAAAAAAA:example-session\",\n    \"userName\": \"example-role\",\n    \"userType\": \"AssumedRole\"\n  },\n  \"resourceType\": \"S3Bucket\",\n  \"s3BucketDetails\": [\n    {\n      \"arn\": \"arn:aws:s3:::example-data-bucket\",\n      \"createdAt\": \"2024-01-15T08:00:00.000Z\",\n      \"defaultServerSideEncryption\": {\n        \"encryptionType\": \"aws:kms\",\n        \"kmsMasterKeyArn\": \"arn:aws:kms:us-east-1:123456789012:key/1234abcd-12ab-34cd-56ef-1234567890ab\"\n      },\n      \"name\": \"example-data-bucket\",\n      \"owner\": {\n        \"id\": \"abcd1234567890abcd1234567890abcd1234567890abcd1234567890abcd1234\"\n      },\n      \"publicAccess\": {\n        \"effectivePermission\": \"NOT_PUBLIC\",\n        \"permissionConfiguration\": {\n          \"accountLevelPermissions\": {\n            \"blockPublicAccess\": {\n              \"blockPublicAcls\": true,\n              \"blockPublicPolicy\": true,\n              \"ignorePublicAcls\": true,\n              \"restrictPublicBuckets\": true\n            }\n          },\n          \"bucketLevelPermissions\": {\n            \"accessControlList\": {\n              \"allowsPublicReadAccess\": false,\n              \"allowsPublicWriteAccess\": false\n            },\n            \"blockPublicAccess\": {\n              \"blockPublicAcls\": true,\n              \"blockPublicPolicy\": true,\n              \"ignorePublicAcls\": true,\n              \"restrictPublicBuckets\": true\n            },\n            \"bucketPolicy\": {\n              \"allowsPublicReadAccess\": false,\n              \"allowsPublicWriteAccess\": false\n            }\n          }\n        }\n      },\n      \"tags\": [\n        {\n          \"key\": \"Name\",\n          \"value\": \"example-data-bucket\"\n        },\n        {\n          \"key\": \"Environment\",\n          \"value\": \"production\"\n        },\n        {\n          \"key\": \"Application\",\n          \"value\": \"example-application\"\n        },\n        {\n          \"key\": \"Owner\",\n          \"value\": \"platform-team\"\n        },\n        {\n          \"key\": \"CostCenter\",\n          \"value\": \"cc-0000\"\n        },\n        {\n          \"key\": \"ManagedBy\",\n          \"value\": \"terraform\"\n        },\n        {\n          \"key\": \"DataClassification\",\n          \"value\": \"confidential\"\n        },\n        {\n          \"key\": \"Backup\",\n          \"value\": \"true\"\n        }\n      ],\n      \"type\": \"Destination\"\n    }\n  ]\n}"
+      "Key": "Bucket",
+      "Value": "\u003chttps://console.aws.amazon.com/s3/buckets/example-data-bucket?region=us-east-1|example-data-bucket\u003e"
+    },
+    {
+      "Key": "Bucket Role",
+      "Value": "Destination"
+    },
+    {
+      "Key": "Bucket Public Access",
+      "Value": "NOT_PUBLIC"
+    },
+    {
+      "Key": "AccessKeyId",
+      "Value": "ASIAIOSFODNN7EXAMPLE"
+    },
+    {
+      "Key": "PrincipalId",
+      "Value": "AROAJTAAAAAAAAAAAAAAA:example-session"
+    },
+    {
+      "Key": "User Type",
+      "Value": "AssumedRole"
+    },
+    {
+      "Key": "User Name",
+      "Value": "example-role"
     }
   ],
   "ImageURL": "",

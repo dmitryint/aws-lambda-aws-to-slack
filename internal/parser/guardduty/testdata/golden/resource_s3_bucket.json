@@ -47,8 +47,32 @@
       "Value": "S3Bucket"
     },
     {
-      "Key": "Unknown Resource Type (S3Bucket)",
-      "Value": "{\n  \"accessKeyDetails\": {\n    \"accessKeyId\": \"AKIAIOSFODNN7EXAMPLE\",\n    \"principalId\": \"AROAJTAAAAAAAAAAAAAAA:example-session\",\n    \"userName\": \"example-role\",\n    \"userType\": \"AssumedRole\"\n  },\n  \"resourceType\": \"S3Bucket\",\n  \"s3BucketDetails\": [\n    {\n      \"arn\": \"arn:aws:s3:::example-bucket\",\n      \"createdAt\": \"2024-05-01T12:00:00Z\",\n      \"defaultServerSideEncryption\": {\n        \"encryptionType\": \"AES256\"\n      },\n      \"name\": \"example-bucket\",\n      \"owner\": {\n        \"id\": \"abcd1234567890\"\n      },\n      \"publicAccess\": {\n        \"effectivePermission\": \"PUBLIC\",\n        \"permissionConfiguration\": {\n          \"bucketLevelPermissions\": {\n            \"bucketLevelPermissions\": \"PUBLIC\"\n          }\n        }\n      },\n      \"tags\": [],\n      \"type\": \"Destination\"\n    }\n  ]\n}"
+      "Key": "Bucket",
+      "Value": "\u003chttps://console.aws.amazon.com/s3/buckets/example-bucket?region=us-east-1|example-bucket\u003e"
+    },
+    {
+      "Key": "Bucket Role",
+      "Value": "Destination"
+    },
+    {
+      "Key": "Bucket Public Access",
+      "Value": "PUBLIC"
+    },
+    {
+      "Key": "AccessKeyId",
+      "Value": "AKIAIOSFODNN7EXAMPLE"
+    },
+    {
+      "Key": "PrincipalId",
+      "Value": "AROAJTAAAAAAAAAAAAAAA:example-session"
+    },
+    {
+      "Key": "User Type",
+      "Value": "AssumedRole"
+    },
+    {
+      "Key": "User Name",
+      "Value": "example-role"
     }
   ],
   "ImageURL": "",

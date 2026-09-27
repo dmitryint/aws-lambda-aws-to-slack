@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - CloudWatch alarm charts for alarms whose statistic is not a single word. Alarm SNS payloads publish named statistics upper-cased (`SAMPLECOUNT`), which was rendered as `Samplecount` and rejected by `GetMetricWidgetImage` with a `ValidationError`, dropping the chart from the alert. Statistics are now normalized case-insensitively to the spelling the metric widget schema accepts, percentiles are lower-cased (`P99` → `p99`), and an empty statistic omits `stat` instead of sending an empty string.
+- GuardDuty findings on an `S3Bucket` resource (e.g. `Exfiltration:S3/AnomalousBehavior`) were rejected by Slack with `400 invalid_attachments` because the fallback renderer dumped the whole resource block as pretty-printed JSON into a single field, well over Slack's 2000-character field limit. `S3Bucket` now has a dedicated renderer that lists each affected bucket with a console link, its role in the finding, and its effective public-access verdict, plus the calling principal when the finding carries `accessKeyDetails`.
 
 ## [0.1.0] - 2026-05-22
 
