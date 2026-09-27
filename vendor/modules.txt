@@ -71,10 +71,11 @@ github.com/aws/aws-sdk-go-v2/service/cloudwatch
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/schemas
 github.com/aws/aws-sdk-go-v2/service/cloudwatch/types
-# github.com/aws/aws-sdk-go-v2/service/codecommit v1.36.3
+# github.com/aws/aws-sdk-go-v2/service/codecommit v1.43.1
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/codecommit
 github.com/aws/aws-sdk-go-v2/service/codecommit/internal/endpoints
+github.com/aws/aws-sdk-go-v2/service/codecommit/schemas
 github.com/aws/aws-sdk-go-v2/service/codecommit/types
 # github.com/aws/aws-sdk-go-v2/service/dynamodb v1.69.0
 ## explicit; go 1.24

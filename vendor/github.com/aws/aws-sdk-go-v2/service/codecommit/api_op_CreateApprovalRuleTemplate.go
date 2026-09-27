@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Creates a template for approval rules that can then be associated with one or
@@ -82,6 +83,24 @@ type CreateApprovalRuleTemplateInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *CreateApprovalRuleTemplateInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.CreateApprovalRuleTemplateInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *CreateApprovalRuleTemplateInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ApprovalRuleTemplateContent != nil {
+		s.WriteString(schemas.CreateApprovalRuleTemplateInput_approvalRuleTemplateContent, *v.ApprovalRuleTemplateContent)
+	}
+	if v.ApprovalRuleTemplateDescription != nil {
+		s.WriteString(schemas.CreateApprovalRuleTemplateInput_approvalRuleTemplateDescription, *v.ApprovalRuleTemplateDescription)
+	}
+	if v.ApprovalRuleTemplateName != nil {
+		s.WriteString(schemas.CreateApprovalRuleTemplateInput_approvalRuleTemplateName, *v.ApprovalRuleTemplateName)
+	}
+}
+
 type CreateApprovalRuleTemplateOutput struct {
 
 	// The content and structure of the created approval rule template.
@@ -95,22 +114,37 @@ type CreateApprovalRuleTemplateOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *CreateApprovalRuleTemplateOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.CreateApprovalRuleTemplateOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *CreateApprovalRuleTemplateOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.ApprovalRuleTemplate != nil {
+		s.WriteStruct(schemas.CreateApprovalRuleTemplateOutput_approvalRuleTemplate)
+		v.ApprovalRuleTemplate.SerializeMembers(s)
+		s.CloseStruct()
+	}
+}
+func (v *CreateApprovalRuleTemplateOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.CreateApprovalRuleTemplateOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.CreateApprovalRuleTemplateOutput_approvalRuleTemplate:
+			v.ApprovalRuleTemplate = &types.ApprovalRuleTemplate{}
+			return v.ApprovalRuleTemplate.Deserialize(d)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationCreateApprovalRuleTemplateMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpCreateApprovalRuleTemplate{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.CreateApprovalRuleTemplate, schemas.CreateApprovalRuleTemplateInput, schemas.CreateApprovalRuleTemplateOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpCreateApprovalRuleTemplate{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.CreateApprovalRuleTemplate, schemas.CreateApprovalRuleTemplateInput, schemas.CreateApprovalRuleTemplateOutput), output: &CreateApprovalRuleTemplateOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -120,19 +154,10 @@ func (c *Client) addOperationCreateApprovalRuleTemplateMiddlewares(stack *middle
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpCreateApprovalRuleTemplateValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "CreateApprovalRuleTemplate"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

@@ -4,9 +4,10 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
 	"github.com/aws/aws-sdk-go-v2/service/codecommit/types"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns information about a repository branch, including its name and the last
@@ -39,6 +40,21 @@ type GetBranchInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetBranchInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetBranchInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetBranchInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.BranchName != nil {
+		s.WriteString(schemas.GetBranchInput_branchName, *v.BranchName)
+	}
+	if v.RepositoryName != nil {
+		s.WriteString(schemas.GetBranchInput_repositoryName, *v.RepositoryName)
+	}
+}
+
 // Represents the output of a get branch operation.
 type GetBranchOutput struct {
 
@@ -51,22 +67,37 @@ type GetBranchOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetBranchOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetBranchOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetBranchOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.Branch != nil {
+		s.WriteStruct(schemas.GetBranchOutput_branch)
+		v.Branch.SerializeMembers(s)
+		s.CloseStruct()
+	}
+}
+func (v *GetBranchOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetBranchOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetBranchOutput_branch:
+			v.Branch = &types.BranchInfo{}
+			return v.Branch.Deserialize(d)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetBranchMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetBranch{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetBranch, schemas.GetBranchInput, schemas.GetBranchOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetBranch{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetBranch, schemas.GetBranchInput, schemas.GetBranchOutput), output: &GetBranchOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -76,16 +107,7 @@ func (c *Client) addOperationGetBranchMiddlewares(stack *middleware.Stack, optio
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetBranch"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {

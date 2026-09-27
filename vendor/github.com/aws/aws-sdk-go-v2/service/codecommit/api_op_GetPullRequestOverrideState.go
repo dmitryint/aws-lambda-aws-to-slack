@@ -4,8 +4,9 @@ package codecommit
 
 import (
 	"context"
+	"github.com/aws/aws-sdk-go-v2/service/codecommit/schemas"
+	smithy "github.com/aws/smithy-go"
 	"github.com/aws/smithy-go/middleware"
-	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
 // Returns information about whether approval rules have been set aside
@@ -44,6 +45,21 @@ type GetPullRequestOverrideStateInput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetPullRequestOverrideStateInput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetPullRequestOverrideStateInput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetPullRequestOverrideStateInput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.PullRequestId != nil {
+		s.WriteString(schemas.GetPullRequestOverrideStateInput_pullRequestId, *v.PullRequestId)
+	}
+	if v.RevisionId != nil {
+		s.WriteString(schemas.GetPullRequestOverrideStateInput_revisionId, *v.RevisionId)
+	}
+}
+
 type GetPullRequestOverrideStateOutput struct {
 
 	// A Boolean value that indicates whether a pull request has had its rules set
@@ -60,22 +76,40 @@ type GetPullRequestOverrideStateOutput struct {
 	noSmithyDocumentSerde
 }
 
+func (v *GetPullRequestOverrideStateOutput) Serialize(s smithy.ShapeSerializer) {
+	s.WriteStruct(schemas.GetPullRequestOverrideStateOutput)
+	v.SerializeMembers(s)
+	s.CloseStruct()
+}
+
+func (v *GetPullRequestOverrideStateOutput) SerializeMembers(s smithy.ShapeSerializer) {
+	if v.Overridden != false {
+		s.WriteBool(schemas.GetPullRequestOverrideStateOutput_overridden, v.Overridden)
+	}
+	if v.Overrider != nil {
+		s.WriteString(schemas.GetPullRequestOverrideStateOutput_overrider, *v.Overrider)
+	}
+}
+func (v *GetPullRequestOverrideStateOutput) Deserialize(d smithy.ShapeDeserializer) error {
+	return smithy.ReadStruct(d, schemas.GetPullRequestOverrideStateOutput, func(s *smithy.Schema) error {
+		switch s {
+		case schemas.GetPullRequestOverrideStateOutput_overridden:
+			return d.ReadBool(schemas.GetPullRequestOverrideStateOutput_overridden, &v.Overridden)
+		case schemas.GetPullRequestOverrideStateOutput_overrider:
+			v.Overrider = new(string)
+			return d.ReadString(schemas.GetPullRequestOverrideStateOutput_overrider, v.Overrider)
+		}
+		return nil
+	})
+}
 func (c *Client) addOperationGetPullRequestOverrideStateMiddlewares(stack *middleware.Stack, options Options) (err error) {
-	err = stack.Serialize.Add(&awsAwsjson11_serializeOpGetPullRequestOverrideState{}, middleware.After)
-	if err != nil {
+	if err := stack.Serialize.Add(&serializeRequestMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetPullRequestOverrideState, schemas.GetPullRequestOverrideStateInput, schemas.GetPullRequestOverrideStateOutput)}, middleware.After); err != nil {
 		return err
 	}
-	err = stack.Deserialize.Add(&awsAwsjson11_deserializeOpGetPullRequestOverrideState{}, middleware.After)
-	if err != nil {
+	if err := stack.Deserialize.Add(&deserializeResponseMiddleware{options: &options, operationSchema: smithy.NewOperationSchema(schemas.GetPullRequestOverrideState, schemas.GetPullRequestOverrideStateInput, schemas.GetPullRequestOverrideStateOutput), output: &GetPullRequestOverrideStateOutput{}}, middleware.After); err != nil {
 		return err
 	}
 
-	if err = addlegacyEndpointContextSetter(stack, options); err != nil {
-		return err
-	}
-	if err = addComputeContentLength(stack); err != nil {
-		return err
-	}
 	if err = addResolveEndpointMiddleware(stack, options); err != nil {
 		return err
 	}
@@ -85,19 +119,10 @@ func (c *Client) addOperationGetPullRequestOverrideStateMiddlewares(stack *middl
 	if err = addRecordResponseTiming(stack, options); err != nil {
 		return err
 	}
-	if err = smithyhttp.AddErrorCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
-	if err = smithyhttp.AddCloseResponseBodyMiddleware(stack); err != nil {
-		return err
-	}
 	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetPullRequestOverrideStateValidationMiddleware(stack); err != nil {
-		return err
-	}
-	if err = stack.Initialize.Add(newServiceMetadataMiddleware(options.Region, "GetPullRequestOverrideState"), middleware.Before); err != nil {
 		return err
 	}
 	if err = addRequestIDRetrieverMiddleware(stack); err != nil {
