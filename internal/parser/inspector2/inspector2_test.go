@@ -112,11 +112,13 @@ func TestInspector2_Parse_ErrorOnMissingDetail(t *testing.T) {
 // fakeDedup is a hand-rolled Deduplicator that records the last call and
 // drives the result with the configured firstSeen + err.
 type fakeDedup struct {
-	firstSeen bool
-	err       error
-	calls     int
-	gotKey    string
-	gotMeta   map[string]string
+	firstSeen    bool
+	err          error
+	calls        int
+	gotKey       string
+	gotMeta      map[string]string
+	releaseCalls int
+	releasedKey  string
 }
 
 func (f *fakeDedup) TryReserve(_ context.Context, key string, meta map[string]string) (bool, error) {
@@ -124,6 +126,12 @@ func (f *fakeDedup) TryReserve(_ context.Context, key string, meta map[string]st
 	f.gotKey = key
 	f.gotMeta = meta
 	return f.firstSeen, f.err
+}
+
+func (f *fakeDedup) Release(_ context.Context, key string) error {
+	f.releaseCalls++
+	f.releasedKey = key
+	return nil
 }
 
 // TestInspector2_Parse_DedupHit_Silences covers the (false, nil) branch from
@@ -214,6 +222,59 @@ func TestInspector2_Parse_DedupError_FailsOpen(t *testing.T) {
 	}
 	if msg == nil {
 		t.Fatal("dedup SDK error should fail open and render the message")
+	}
+}
+
+func TestInspector2_Parse_DedupReleaseAttachedOnlyWhenReserved(t *testing.T) {
+	const wantKey = "CVE-2024-LAMBDA#AWS_LAMBDA_FUNCTION#arn:aws:lambda:us-east-1:123456789012:function:example-fn"
+	cases := []struct {
+		name        string
+		dedup       *fakeDedup
+		wantRelease bool
+	}{
+		{name: "reserved", dedup: &fakeDedup{firstSeen: true}, wantRelease: true},
+		{name: "store-error-fail-open", dedup: &fakeDedup{firstSeen: true, err: errors.New("DynamoDB transient")}},
+		{name: "store-error-not-first-seen", dedup: &fakeDedup{err: errors.New("DynamoDB transient")}},
+		{name: "dedup-disabled"},
+	}
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			ev := readEvent(t, filepath.Join(samplesRoot, "finding_high_lambda.json"))
+			p := New()
+			if tc.dedup != nil {
+				p = NewWithDedup(tc.dedup)
+			}
+			msg, err := p.Parse(context.Background(), ev)
+			if err != nil {
+				t.Fatalf("Parse: %v", err)
+			}
+			if msg == nil {
+				t.Fatal("Parse: nil message")
+			}
+			wantDedupKey := ""
+			if tc.wantRelease {
+				wantDedupKey = wantKey
+			}
+			if got := msg.DedupKey(); got != wantDedupKey {
+				t.Fatalf("DedupKey = %q, want %q", got, wantDedupKey)
+			}
+			if err := msg.ReleaseDedup(context.Background()); err != nil {
+				t.Fatalf("ReleaseDedup: %v", err)
+			}
+			if tc.dedup == nil {
+				return
+			}
+			wantCalls := 0
+			if tc.wantRelease {
+				wantCalls = 1
+			}
+			if tc.dedup.releaseCalls != wantCalls {
+				t.Fatalf("Release calls = %d, want %d", tc.dedup.releaseCalls, wantCalls)
+			}
+			if tc.wantRelease && tc.dedup.releasedKey != wantKey {
+				t.Fatalf("released key = %q, want %q", tc.dedup.releasedKey, wantKey)
+			}
+		})
 	}
 }
 

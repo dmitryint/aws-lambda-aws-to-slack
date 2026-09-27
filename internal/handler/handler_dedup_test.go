@@ -34,6 +34,13 @@ func (m *memoryDedup) TryReserve(_ context.Context, key string, _ map[string]str
 	return true, nil
 }
 
+func (m *memoryDedup) Release(_ context.Context, key string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+	delete(m.keys, key)
+	return nil
+}
+
 var _ dedup.Deduplicator = (*memoryDedup)(nil)
 
 func newInspector2DedupHandler(t *testing.T, rec *recordingRenderer) (h *Handler, raw []byte) {

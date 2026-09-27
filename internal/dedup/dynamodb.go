@@ -2,7 +2,8 @@
 // at-least-once delivery semantics (Inspector2, future GuardDuty, etc.). The
 // Store contract is a conditional PutItem with TTL: first sighting → true
 // (caller owns the key, proceed with alerting), subsequent sightings → false
-// (silenced).
+// (silenced). Release deletes a reserved key with DeleteItem so the next
+// sighting is treated as the first again.
 //
 // Implementation contract:
 //   - ConditionalCheckFailedException detection uses errors.As, never string
@@ -14,6 +15,7 @@ package dedup
 import (
 	"context"
 	"errors"
+	"fmt"
 	"log/slog"
 	"strconv"
 	"time"
@@ -37,13 +39,19 @@ type Deduplicator interface {
 	// (return true, nil) so a transient DynamoDB outage never silences a
 	// security alert.
 	TryReserve(ctx context.Context, key string, metadata map[string]string) (bool, error)
+
+	// Release deletes a key reserved by TryReserve so the next TryReserve
+	// for it returns true. Errors are returned to the caller.
+	Release(ctx context.Context, key string) error
 }
 
-// PutItemAPI is the subset of the DynamoDB SDK the store depends on. Tests
+// DynamoDBAPI is the subset of the DynamoDB SDK the store depends on. Tests
 // inject a fake; production wires the real *dynamodb.Client.
-type PutItemAPI interface {
+type DynamoDBAPI interface {
 	PutItem(ctx context.Context, in *dynamodb.PutItemInput,
 		optFns ...func(*dynamodb.Options)) (*dynamodb.PutItemOutput, error)
+	DeleteItem(ctx context.Context, in *dynamodb.DeleteItemInput,
+		optFns ...func(*dynamodb.Options)) (*dynamodb.DeleteItemOutput, error)
 }
 
 // Store is the legacy interface name kept for API parity with Step 1.
@@ -52,11 +60,12 @@ type Store = Deduplicator
 
 // DynamoDBStore is the production Deduplicator implementation backed by
 // DynamoDB. When TableName is empty the store is disabled — TryReserve
-// returns (true, nil) so the parser proceeds without dedup.
+// returns (true, nil) so the parser proceeds without dedup, and Release is a
+// no-op.
 type DynamoDBStore struct {
 	TableName string
 	TTL       time.Duration
-	client    PutItemAPI
+	client    DynamoDBAPI
 	log       *slog.Logger
 }
 
@@ -72,8 +81,8 @@ func NewDynamoDB(cfg aws.Config, tableName string, ttl time.Duration) *DynamoDBS
 	}
 }
 
-// NewDynamoDBWithClient is the test seam — inject a PutItemAPI fake.
-func NewDynamoDBWithClient(client PutItemAPI, tableName string, ttl time.Duration) *DynamoDBStore {
+// NewDynamoDBWithClient is the test seam — inject a DynamoDBAPI fake.
+func NewDynamoDBWithClient(client DynamoDBAPI, tableName string, ttl time.Duration) *DynamoDBStore {
 	return &DynamoDBStore{
 		TableName: tableName,
 		TTL:       ttl,
@@ -132,6 +141,24 @@ func (s *DynamoDBStore) TryReserve(ctx context.Context, key string, metadata map
 		"table", s.TableName,
 	)
 	return true, nil
+}
+
+// Release deletes key from the table. A disabled store returns nil without
+// contacting DynamoDB; SDK errors are returned wrapped.
+func (s *DynamoDBStore) Release(ctx context.Context, key string) error {
+	if s == nil || s.TableName == "" || s.client == nil {
+		return nil
+	}
+	_, err := s.client.DeleteItem(ctx, &dynamodb.DeleteItemInput{
+		TableName: aws.String(s.TableName),
+		Key: map[string]types.AttributeValue{
+			attrDedupKey: &types.AttributeValueMemberS{Value: key},
+		},
+	})
+	if err != nil {
+		return fmt.Errorf("dedup DeleteItem on table %s: %w", s.TableName, err)
+	}
+	return nil
 }
 
 // logger returns the configured slog logger, falling back to slog.Default() if

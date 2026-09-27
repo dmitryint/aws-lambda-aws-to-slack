@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 - CloudWatch alarm charts for alarms whose statistic is not a single word. Alarm SNS payloads publish named statistics upper-cased (`SAMPLECOUNT`), which was rendered as `Samplecount` and rejected by `GetMetricWidgetImage` with a `ValidationError`, dropping the chart from the alert. Statistics are now normalized case-insensitively to the spelling the metric widget schema accepts, percentiles are lower-cased (`P99` → `p99`), and an empty statistic omits `stat` instead of sending an empty string.
+- Inspector2 findings silenced after a failed Slack delivery. The dedup key was reserved while the finding was parsed, so when the post failed (for example on HTTP 429 after the client's retries) the Lambda retry found the key already taken and dropped the finding as a duplicate for the whole dedup TTL. A failed delivery now deletes the reservation so the retry is delivered; a successful delivery still silences repeats. The dedup table's IAM policy must now also allow `dynamodb:DeleteItem` — without it the release is logged as failed and the retry stays deduped as before.
 
 ## [0.1.0] - 2026-05-22
 
