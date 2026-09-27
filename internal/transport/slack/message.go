@@ -79,7 +79,7 @@ func NewMessage(color, fallback string, blocks ...Block) *Message {
 func SectionBlock(mrkdwn string) Block {
 	return Block{
 		Type: BlockTypeSection,
-		Text: &TextObject{Type: TextTypeMrkdwn, Text: mrkdwn},
+		Text: &TextObject{Type: TextTypeMrkdwn, Text: truncateText(mrkdwn, maxSectionTextLength)},
 	}
 }
 
@@ -89,7 +89,7 @@ func SectionBlock(mrkdwn string) Block {
 func ContextBlock(mrkdwnElements ...string) Block {
 	elems := make([]TextObject, 0, len(mrkdwnElements))
 	for _, e := range mrkdwnElements {
-		elems = append(elems, TextObject{Type: TextTypeMrkdwn, Text: e})
+		elems = append(elems, TextObject{Type: TextTypeMrkdwn, Text: truncateText(e, maxContextTextLength)})
 	}
 	return Block{Type: BlockTypeContext, Elements: elems}
 }
@@ -98,13 +98,13 @@ func ContextBlock(mrkdwnElements ...string) Block {
 // inside Block Kit images; the legacy attachment.image_url path silently
 // drops long URLs.
 func ImageBlock(url, altText string) Block {
-	return Block{Type: BlockTypeImage, ImageURL: url, AltText: altText}
+	return Block{Type: BlockTypeImage, ImageURL: url, AltText: truncateText(altText, maxImageAltTextLength)}
 }
 
 // FieldsSection returns a section block carrying a fields array — used by
 // parsers that emit key/value rows underneath the main mrkdwn body.
 func FieldsSection(fields []TextObject) Block {
-	return Block{Type: BlockTypeSection, Fields: fields}
+	return Block{Type: BlockTypeSection, Fields: truncateFields(fields)}
 }
 
 // MaxFieldsPerSection is Slack's hard limit on Block Kit section.fields.
