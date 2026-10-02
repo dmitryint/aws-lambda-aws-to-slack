@@ -77,7 +77,7 @@ github.com/aws/aws-sdk-go-v2/service/codecommit
 github.com/aws/aws-sdk-go-v2/service/codecommit/internal/endpoints
 github.com/aws/aws-sdk-go-v2/service/codecommit/schemas
 github.com/aws/aws-sdk-go-v2/service/codecommit/types
-# github.com/aws/aws-sdk-go-v2/service/dynamodb v1.69.0
+# github.com/aws/aws-sdk-go-v2/service/dynamodb v1.69.1
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/dynamodb
 github.com/aws/aws-sdk-go-v2/service/dynamodb/internal/customizations
@@ -90,7 +90,7 @@ github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding
 # github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.11.5
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/checksum
-# github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.13.3
+# github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery v1.13.4
 ## explicit; go 1.24
 github.com/aws/aws-sdk-go-v2/service/internal/endpoint-discovery
 # github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.14.4
