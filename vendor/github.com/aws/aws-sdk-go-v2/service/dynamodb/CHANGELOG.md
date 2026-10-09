@@ -1,3 +1,11 @@
+# v1.70.0 (2026-09-30)
+
+* **Feature**: Adds support for filtering exported table data using FilterExpression, ProjectionExpression and KeyConditionExpression with ExportTableToPointInTime.
+
+# v1.69.1 (2026-09-24)
+
+* **Dependency Update**: Updated to the latest SDK module versions
+
 # v1.69.0 (2026-09-15)
 
 * **Feature**: Enable schema-based (de)serialization for this service.
