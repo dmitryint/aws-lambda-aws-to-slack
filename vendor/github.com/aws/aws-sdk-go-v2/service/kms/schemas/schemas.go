@@ -38,6 +38,11 @@ var CreateKey = smithy.NewSchema(smithy.ShapeID{
 	Name:      "CreateKey",
 }, smithy.ShapeTypeOperation, 0)
 
+var Decapsulate = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "Decapsulate",
+}, smithy.ShapeTypeOperation, 0)
+
 var Decrypt = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "Decrypt",
@@ -96,6 +101,11 @@ var EnableKey = smithy.NewSchema(smithy.ShapeID{
 var EnableKeyRotation = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "EnableKeyRotation",
+}, smithy.ShapeTypeOperation, 0)
+
+var Encapsulate = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "Encapsulate",
 }, smithy.ShapeTypeOperation, 0)
 
 var Encrypt = smithy.NewSchema(smithy.ShapeID{
@@ -334,7 +344,8 @@ var _AliasNameType = smithy.NewSchema(smithy.ShapeID{
 var AlreadyExistsException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "AlreadyExistsException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 409},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 409},
 	&smithytraits.AWSQueryError{ErrorCode: "AlreadyExists",
 		StatusCode: 409})
 var AlreadyExistsException_message *smithy.Schema
@@ -382,7 +393,8 @@ var _CloudHsmClusterIdType = smithy.NewSchema(smithy.ShapeID{
 var CloudHsmClusterInUseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CloudHsmClusterInUseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CloudHsmClusterInUseException",
 		StatusCode: 400})
 var CloudHsmClusterInUseException_message *smithy.Schema
@@ -390,7 +402,8 @@ var CloudHsmClusterInUseException_message *smithy.Schema
 var CloudHsmClusterInvalidConfigurationException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CloudHsmClusterInvalidConfigurationException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CloudHsmClusterInvalidConfigurationException",
 		StatusCode: 400})
 var CloudHsmClusterInvalidConfigurationException_message *smithy.Schema
@@ -398,7 +411,8 @@ var CloudHsmClusterInvalidConfigurationException_message *smithy.Schema
 var CloudHsmClusterNotActiveException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CloudHsmClusterNotActiveException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CloudHsmClusterNotActiveException",
 		StatusCode: 400})
 var CloudHsmClusterNotActiveException_message *smithy.Schema
@@ -406,7 +420,8 @@ var CloudHsmClusterNotActiveException_message *smithy.Schema
 var CloudHsmClusterNotFoundException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CloudHsmClusterNotFoundException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CloudHsmClusterNotFoundException",
 		StatusCode: 400})
 var CloudHsmClusterNotFoundException_message *smithy.Schema
@@ -414,7 +429,8 @@ var CloudHsmClusterNotFoundException_message *smithy.Schema
 var CloudHsmClusterNotRelatedException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CloudHsmClusterNotRelatedException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CloudHsmClusterNotRelatedException",
 		StatusCode: 400})
 var CloudHsmClusterNotRelatedException_message *smithy.Schema
@@ -427,7 +443,8 @@ var _CloudTrailEventIdType = smithy.NewSchema(smithy.ShapeID{
 var ConflictException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "ConflictException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 409},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 409},
 	&smithytraits.AWSQueryError{ErrorCode: "ConflictException",
 		StatusCode: 409})
 var ConflictException_message *smithy.Schema
@@ -519,7 +536,8 @@ var CustomerMasterKeySpec_SM2 *smithy.Schema
 var CustomKeyStoreHasCMKsException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CustomKeyStoreHasCMKsException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CustomKeyStoreHasCMKsException",
 		StatusCode: 400})
 var CustomKeyStoreHasCMKsException_message *smithy.Schema
@@ -532,7 +550,8 @@ var _CustomKeyStoreIdType = smithy.NewSchema(smithy.ShapeID{
 var CustomKeyStoreInvalidStateException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CustomKeyStoreInvalidStateException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CustomKeyStoreInvalidStateException",
 		StatusCode: 400})
 var CustomKeyStoreInvalidStateException_message *smithy.Schema
@@ -540,7 +559,8 @@ var CustomKeyStoreInvalidStateException_message *smithy.Schema
 var CustomKeyStoreNameInUseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CustomKeyStoreNameInUseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CustomKeyStoreNameInUseException",
 		StatusCode: 400})
 var CustomKeyStoreNameInUseException_message *smithy.Schema
@@ -553,7 +573,8 @@ var _CustomKeyStoreNameType = smithy.NewSchema(smithy.ShapeID{
 var CustomKeyStoreNotFoundException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "CustomKeyStoreNotFoundException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "CustomKeyStoreNotFoundException",
 		StatusCode: 400})
 var CustomKeyStoreNotFoundException_message *smithy.Schema
@@ -597,7 +618,7 @@ var CustomKeyStoreType_EXTERNAL_KEY_STORE *smithy.Schema
 var DataKeyPairSpec = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "DataKeyPairSpec",
-}, smithy.ShapeTypeEnum, 9)
+}, smithy.ShapeTypeEnum, 12)
 var DataKeyPairSpec_RSA_2048 *smithy.Schema
 
 var DataKeyPairSpec_RSA_3072 *smithy.Schema
@@ -616,6 +637,12 @@ var DataKeyPairSpec_SM2 *smithy.Schema
 
 var DataKeyPairSpec_ECC_NIST_EDWARDS25519 *smithy.Schema
 
+var DataKeyPairSpec_ML_KEM_512 *smithy.Schema
+
+var DataKeyPairSpec_ML_KEM_768 *smithy.Schema
+
+var DataKeyPairSpec_ML_KEM_1024 *smithy.Schema
+
 var DataKeySpec = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "DataKeySpec",
@@ -632,7 +659,8 @@ var _DateType = smithy.NewSchema(smithy.ShapeID{
 var DependencyTimeoutException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "DependencyTimeoutException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 503},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "server"},
+	&smithytraits.HTTPError{Code: 503},
 	&smithytraits.AWSQueryError{ErrorCode: "DependencyTimeout",
 		StatusCode: 503})
 var DependencyTimeoutException_message *smithy.Schema
@@ -645,7 +673,8 @@ var _DescriptionType = smithy.NewSchema(smithy.ShapeID{
 var DisabledException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "DisabledException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 409},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 409},
 	&smithytraits.AWSQueryError{ErrorCode: "Disabled",
 		StatusCode: 409})
 var DisabledException_message *smithy.Schema
@@ -665,10 +694,23 @@ var DryRunModifierType_IGNORE_CIPHERTEXT *smithy.Schema
 var DryRunOperationException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "DryRunOperationException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 412},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 412},
 	&smithytraits.AWSQueryError{ErrorCode: "DryRunOperation",
 		StatusCode: 412})
 var DryRunOperationException_message *smithy.Schema
+
+var EncapsulationAlgorithmSpec = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "EncapsulationAlgorithmSpec",
+}, smithy.ShapeTypeEnum, 1)
+var EncapsulationAlgorithmSpec_ML_KEM *smithy.Schema
+
+var _EncapsulationAlgorithmSpecList = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "EncapsulationAlgorithmSpecList",
+}, smithy.ShapeTypeList, 1)
+var _EncapsulationAlgorithmSpecList_member *smithy.Schema
 
 var EncryptionAlgorithmSpec = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
@@ -722,7 +764,8 @@ var ExpirationModelType_KEY_MATERIAL_DOES_NOT_EXPIRE *smithy.Schema
 var ExpiredImportTokenException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "ExpiredImportTokenException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "ExpiredImportTokenException",
 		StatusCode: 400})
 var ExpiredImportTokenException_message *smithy.Schema
@@ -787,7 +830,7 @@ var _GrantNameType = smithy.NewSchema(smithy.ShapeID{
 var GrantOperation = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "GrantOperation",
-}, smithy.ShapeTypeEnum, 17)
+}, smithy.ShapeTypeEnum, 19)
 var GrantOperation_Decrypt *smithy.Schema
 
 var GrantOperation_Encrypt *smithy.Schema
@@ -821,6 +864,10 @@ var GrantOperation_GenerateMac *smithy.Schema
 var GrantOperation_VerifyMac *smithy.Schema
 
 var GrantOperation_DeriveSharedSecret *smithy.Schema
+
+var GrantOperation_Encapsulate *smithy.Schema
+
+var GrantOperation_Decapsulate *smithy.Schema
 
 var _GrantOperationList = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
@@ -866,7 +913,8 @@ var IncludeKeyMaterial_ROTATIONS_ONLY *smithy.Schema
 var IncorrectKeyException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "IncorrectKeyException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "IncorrectKeyException",
 		StatusCode: 400})
 var IncorrectKeyException_message *smithy.Schema
@@ -874,7 +922,8 @@ var IncorrectKeyException_message *smithy.Schema
 var IncorrectKeyMaterialException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "IncorrectKeyMaterialException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "IncorrectKeyMaterialException",
 		StatusCode: 400})
 var IncorrectKeyMaterialException_message *smithy.Schema
@@ -882,7 +931,8 @@ var IncorrectKeyMaterialException_message *smithy.Schema
 var IncorrectTrustAnchorException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "IncorrectTrustAnchorException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "IncorrectTrustAnchorException",
 		StatusCode: 400})
 var IncorrectTrustAnchorException_message *smithy.Schema
@@ -890,7 +940,8 @@ var IncorrectTrustAnchorException_message *smithy.Schema
 var InvalidAliasNameException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidAliasNameException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidAliasName",
 		StatusCode: 400})
 var InvalidAliasNameException_message *smithy.Schema
@@ -898,7 +949,8 @@ var InvalidAliasNameException_message *smithy.Schema
 var InvalidArnException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidArnException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidArn",
 		StatusCode: 400})
 var InvalidArnException_message *smithy.Schema
@@ -906,7 +958,8 @@ var InvalidArnException_message *smithy.Schema
 var InvalidCiphertextException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidCiphertextException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidCiphertext",
 		StatusCode: 400})
 var InvalidCiphertextException_message *smithy.Schema
@@ -914,7 +967,8 @@ var InvalidCiphertextException_message *smithy.Schema
 var InvalidGrantIdException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidGrantIdException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidGrantId",
 		StatusCode: 400})
 var InvalidGrantIdException_message *smithy.Schema
@@ -922,7 +976,8 @@ var InvalidGrantIdException_message *smithy.Schema
 var InvalidGrantTokenException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidGrantTokenException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidGrantToken",
 		StatusCode: 400})
 var InvalidGrantTokenException_message *smithy.Schema
@@ -930,7 +985,8 @@ var InvalidGrantTokenException_message *smithy.Schema
 var InvalidImportTokenException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidImportTokenException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidImportTokenException",
 		StatusCode: 400})
 var InvalidImportTokenException_message *smithy.Schema
@@ -938,7 +994,8 @@ var InvalidImportTokenException_message *smithy.Schema
 var InvalidKeyUsageException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidKeyUsageException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidKeyUsage",
 		StatusCode: 400})
 var InvalidKeyUsageException_message *smithy.Schema
@@ -946,7 +1003,8 @@ var InvalidKeyUsageException_message *smithy.Schema
 var InvalidMarkerException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "InvalidMarkerException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "InvalidMarker",
 		StatusCode: 400})
 var InvalidMarkerException_message *smithy.Schema
@@ -989,7 +1047,7 @@ var KeyLastUsageData_KmsRequestId *smithy.Schema
 var KeyLastUsageTrackingOperation = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KeyLastUsageTrackingOperation",
-}, smithy.ShapeTypeEnum, 12)
+}, smithy.ShapeTypeEnum, 14)
 var KeyLastUsageTrackingOperation_Decrypt *smithy.Schema
 
 var KeyLastUsageTrackingOperation_DeriveSharedSecret *smithy.Schema
@@ -1013,6 +1071,10 @@ var KeyLastUsageTrackingOperation_Sign *smithy.Schema
 var KeyLastUsageTrackingOperation_Verify *smithy.Schema
 
 var KeyLastUsageTrackingOperation_VerifyMac *smithy.Schema
+
+var KeyLastUsageTrackingOperation_Encapsulate *smithy.Schema
+
+var KeyLastUsageTrackingOperation_Decapsulate *smithy.Schema
 
 var _KeyList = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
@@ -1056,7 +1118,7 @@ var KeyMaterialState_PENDING_MULTI_REGION_IMPORT_AND_ROTATION *smithy.Schema
 var KeyMetadata = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KeyMetadata",
-}, smithy.ShapeTypeStructure, 26)
+}, smithy.ShapeTypeStructure, 27)
 var KeyMetadata_AWSAccountId *smithy.Schema
 
 var KeyMetadata_KeyId *smithy.Schema
@@ -1097,6 +1159,8 @@ var KeyMetadata_SigningAlgorithms *smithy.Schema
 
 var KeyMetadata_KeyAgreementAlgorithms *smithy.Schema
 
+var KeyMetadata_EncapsulationAlgorithms *smithy.Schema
+
 var KeyMetadata_MultiRegion *smithy.Schema
 
 var KeyMetadata_MultiRegionConfiguration *smithy.Schema
@@ -1112,7 +1176,7 @@ var KeyMetadata_CurrentKeyMaterialId *smithy.Schema
 var KeySpec = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KeySpec",
-}, smithy.ShapeTypeEnum, 17)
+}, smithy.ShapeTypeEnum, 20)
 var KeySpec_RSA_2048 *smithy.Schema
 
 var KeySpec_RSA_3072 *smithy.Schema
@@ -1147,6 +1211,12 @@ var KeySpec_ML_DSA_87 *smithy.Schema
 
 var KeySpec_ECC_NIST_EDWARDS25519 *smithy.Schema
 
+var KeySpec_ML_KEM_512 *smithy.Schema
+
+var KeySpec_ML_KEM_768 *smithy.Schema
+
+var KeySpec_ML_KEM_1024 *smithy.Schema
+
 var KeyState = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KeyState",
@@ -1175,7 +1245,8 @@ var _KeyStorePasswordType = smithy.NewSchema(smithy.ShapeID{
 var KeyUnavailableException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KeyUnavailableException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 500},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "server"},
+	&smithytraits.HTTPError{Code: 500},
 	&smithytraits.AWSQueryError{ErrorCode: "KeyUnavailable",
 		StatusCode: 500})
 var KeyUnavailableException_message *smithy.Schema
@@ -1183,7 +1254,7 @@ var KeyUnavailableException_message *smithy.Schema
 var KeyUsageType = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KeyUsageType",
-}, smithy.ShapeTypeEnum, 4)
+}, smithy.ShapeTypeEnum, 5)
 var KeyUsageType_SIGN_VERIFY *smithy.Schema
 
 var KeyUsageType_ENCRYPT_DECRYPT *smithy.Schema
@@ -1192,10 +1263,13 @@ var KeyUsageType_GENERATE_VERIFY_MAC *smithy.Schema
 
 var KeyUsageType_KEY_AGREEMENT *smithy.Schema
 
+var KeyUsageType_ENCAPSULATE_DECAPSULATE *smithy.Schema
+
 var KMSInternalException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KMSInternalException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 500},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "server"},
+	&smithytraits.HTTPError{Code: 500},
 	&smithytraits.AWSQueryError{ErrorCode: "KMSInternal",
 		StatusCode: 500})
 var KMSInternalException_message *smithy.Schema
@@ -1203,7 +1277,8 @@ var KMSInternalException_message *smithy.Schema
 var KMSInvalidMacException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KMSInvalidMacException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "KMSInvalidMac",
 		StatusCode: 400})
 var KMSInvalidMacException_message *smithy.Schema
@@ -1211,7 +1286,8 @@ var KMSInvalidMacException_message *smithy.Schema
 var KMSInvalidSignatureException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KMSInvalidSignatureException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "KMSInvalidSignature",
 		StatusCode: 400})
 var KMSInvalidSignatureException_message *smithy.Schema
@@ -1219,7 +1295,8 @@ var KMSInvalidSignatureException_message *smithy.Schema
 var KMSInvalidStateException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "KMSInvalidStateException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 409},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 409},
 	&smithytraits.AWSQueryError{ErrorCode: "KMSInvalidStateException",
 		StatusCode: 409})
 var KMSInvalidStateException_message *smithy.Schema
@@ -1232,7 +1309,8 @@ var _KmsRequestIdType = smithy.NewSchema(smithy.ShapeID{
 var LimitExceededException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "LimitExceededException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "LimitExceeded",
 		StatusCode: 400})
 var LimitExceededException_message *smithy.Schema
@@ -1263,7 +1341,8 @@ var _MacAlgorithmSpecList_member *smithy.Schema
 var MalformedPolicyDocumentException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "MalformedPolicyDocumentException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "MalformedPolicyDocument",
 		StatusCode: 400})
 var MalformedPolicyDocumentException_message *smithy.Schema
@@ -1318,7 +1397,8 @@ var MultiRegionKeyType_REPLICA *smithy.Schema
 var NotFoundException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "NotFoundException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 404},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 404},
 	&smithytraits.AWSQueryError{ErrorCode: "NotFound",
 		StatusCode: 404})
 var NotFoundException_message *smithy.Schema
@@ -1487,7 +1567,8 @@ var Tag_TagValue *smithy.Schema
 var TagException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "TagException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "TagException",
 		StatusCode: 400})
 var TagException_message *smithy.Schema
@@ -1522,7 +1603,8 @@ var _TrustAnchorCertificateType = smithy.NewSchema(smithy.ShapeID{
 var UnsupportedOperationException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "UnsupportedOperationException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "UnsupportedOperation",
 		StatusCode: 400})
 var UnsupportedOperationException_message *smithy.Schema
@@ -1542,7 +1624,8 @@ var WrappingKeySpec_SM2 *smithy.Schema
 var XksKeyAlreadyInUseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksKeyAlreadyInUseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksKeyAlreadyInUse",
 		StatusCode: 400})
 var XksKeyAlreadyInUseException_message *smithy.Schema
@@ -1561,7 +1644,8 @@ var _XksKeyIdType = smithy.NewSchema(smithy.ShapeID{
 var XksKeyInvalidConfigurationException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksKeyInvalidConfigurationException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksKeyInvalidConfiguration",
 		StatusCode: 400})
 var XksKeyInvalidConfigurationException_message *smithy.Schema
@@ -1569,7 +1653,8 @@ var XksKeyInvalidConfigurationException_message *smithy.Schema
 var XksKeyNotFoundException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksKeyNotFoundException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksKeyNotFoundException",
 		StatusCode: 400})
 var XksKeyNotFoundException_message *smithy.Schema
@@ -1619,7 +1704,8 @@ var XksProxyConnectivityType_VPC_ENDPOINT_SERVICE *smithy.Schema
 var XksProxyIncorrectAuthenticationCredentialException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyIncorrectAuthenticationCredentialException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyIncorrectAuthenticationCredentialException",
 		StatusCode: 400})
 var XksProxyIncorrectAuthenticationCredentialException_message *smithy.Schema
@@ -1627,7 +1713,8 @@ var XksProxyIncorrectAuthenticationCredentialException_message *smithy.Schema
 var XksProxyInvalidConfigurationException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyInvalidConfigurationException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyInvalidConfigurationException",
 		StatusCode: 400})
 var XksProxyInvalidConfigurationException_message *smithy.Schema
@@ -1635,7 +1722,8 @@ var XksProxyInvalidConfigurationException_message *smithy.Schema
 var XksProxyInvalidResponseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyInvalidResponseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyInvalidResponseException",
 		StatusCode: 400})
 var XksProxyInvalidResponseException_message *smithy.Schema
@@ -1643,7 +1731,8 @@ var XksProxyInvalidResponseException_message *smithy.Schema
 var XksProxyUriEndpointInUseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyUriEndpointInUseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyUriEndpointInUseException",
 		StatusCode: 400})
 var XksProxyUriEndpointInUseException_message *smithy.Schema
@@ -1656,7 +1745,8 @@ var _XksProxyUriEndpointType = smithy.NewSchema(smithy.ShapeID{
 var XksProxyUriInUseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyUriInUseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyUriInUseException",
 		StatusCode: 400})
 var XksProxyUriInUseException_message *smithy.Schema
@@ -1669,7 +1759,8 @@ var _XksProxyUriPathType = smithy.NewSchema(smithy.ShapeID{
 var XksProxyUriUnreachableException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyUriUnreachableException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyUriUnreachableException",
 		StatusCode: 400})
 var XksProxyUriUnreachableException_message *smithy.Schema
@@ -1677,7 +1768,8 @@ var XksProxyUriUnreachableException_message *smithy.Schema
 var XksProxyVpcEndpointServiceInUseException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyVpcEndpointServiceInUseException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyVpcEndpointServiceInUseException",
 		StatusCode: 400})
 var XksProxyVpcEndpointServiceInUseException_message *smithy.Schema
@@ -1685,7 +1777,8 @@ var XksProxyVpcEndpointServiceInUseException_message *smithy.Schema
 var XksProxyVpcEndpointServiceInvalidConfigurationException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyVpcEndpointServiceInvalidConfigurationException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyVpcEndpointServiceInvalidConfigurationException",
 		StatusCode: 400})
 var XksProxyVpcEndpointServiceInvalidConfigurationException_message *smithy.Schema
@@ -1698,7 +1791,8 @@ var _XksProxyVpcEndpointServiceNameType = smithy.NewSchema(smithy.ShapeID{
 var XksProxyVpcEndpointServiceNotFoundException = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "XksProxyVpcEndpointServiceNotFoundException",
-}, smithy.ShapeTypeStructure, 1, &smithytraits.HTTPError{Code: 400},
+}, smithy.ShapeTypeStructure, 1, &smithytraits.Error{Type: "client"},
+	&smithytraits.HTTPError{Code: 400},
 	&smithytraits.AWSQueryError{ErrorCode: "XksProxyVpcEndpointServiceNotFoundException",
 		StatusCode: 400})
 var XksProxyVpcEndpointServiceNotFoundException_message *smithy.Schema
@@ -1829,6 +1923,30 @@ var CreateKeyResponse = smithy.NewSchema(smithy.ShapeID{
 	Name:      "CreateKeyResponse",
 }, smithy.ShapeTypeStructure, 1)
 var CreateKeyResponse_KeyMetadata *smithy.Schema
+
+var DecapsulateRequest = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "DecapsulateRequest",
+}, smithy.ShapeTypeStructure, 5)
+var DecapsulateRequest_KeyId *smithy.Schema
+
+var DecapsulateRequest_SharedSecretCiphertextBlob *smithy.Schema
+
+var DecapsulateRequest_EncapsulationAlgorithm *smithy.Schema
+
+var DecapsulateRequest_GrantTokens *smithy.Schema
+
+var DecapsulateRequest_DryRun *smithy.Schema
+
+var DecapsulateResponse = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "DecapsulateResponse",
+}, smithy.ShapeTypeStructure, 3)
+var DecapsulateResponse_KeyId *smithy.Schema
+
+var DecapsulateResponse_SharedSecret *smithy.Schema
+
+var DecapsulateResponse_EncapsulationAlgorithm *smithy.Schema
 
 var DecryptRequest = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
@@ -1999,6 +2117,30 @@ var EnableKeyRotationRequest = smithy.NewSchema(smithy.ShapeID{
 var EnableKeyRotationRequest_KeyId *smithy.Schema
 
 var EnableKeyRotationRequest_RotationPeriodInDays *smithy.Schema
+
+var EncapsulateRequest = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "EncapsulateRequest",
+}, smithy.ShapeTypeStructure, 4)
+var EncapsulateRequest_KeyId *smithy.Schema
+
+var EncapsulateRequest_EncapsulationAlgorithm *smithy.Schema
+
+var EncapsulateRequest_GrantTokens *smithy.Schema
+
+var EncapsulateRequest_DryRun *smithy.Schema
+
+var EncapsulateResponse = smithy.NewSchema(smithy.ShapeID{
+	Namespace: "com.amazonaws.kms",
+	Name:      "EncapsulateResponse",
+}, smithy.ShapeTypeStructure, 4)
+var EncapsulateResponse_KeyId *smithy.Schema
+
+var EncapsulateResponse_SharedSecret *smithy.Schema
+
+var EncapsulateResponse_SharedSecretCiphertextBlob *smithy.Schema
+
+var EncapsulateResponse_EncapsulationAlgorithm *smithy.Schema
 
 var EncryptRequest = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
@@ -2275,7 +2417,7 @@ var GetPublicKeyRequest_GrantTokens *smithy.Schema
 var GetPublicKeyResponse = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
 	Name:      "GetPublicKeyResponse",
-}, smithy.ShapeTypeStructure, 8)
+}, smithy.ShapeTypeStructure, 9)
 var GetPublicKeyResponse_KeyId *smithy.Schema
 
 var GetPublicKeyResponse_PublicKey *smithy.Schema
@@ -2291,6 +2433,8 @@ var GetPublicKeyResponse_EncryptionAlgorithms *smithy.Schema
 var GetPublicKeyResponse_SigningAlgorithms *smithy.Schema
 
 var GetPublicKeyResponse_KeyAgreementAlgorithms *smithy.Schema
+
+var GetPublicKeyResponse_EncapsulationAlgorithms *smithy.Schema
 
 var ImportKeyMaterialRequest = smithy.NewSchema(smithy.ShapeID{
 	Namespace: "com.amazonaws.kms",
@@ -2920,6 +3064,12 @@ func init() {
 
 	DataKeyPairSpec_ECC_NIST_EDWARDS25519 = DataKeyPairSpec.AddMember("ECC_NIST_EDWARDS25519", smithyprelude.Unit)
 
+	DataKeyPairSpec_ML_KEM_512 = DataKeyPairSpec.AddMember("ML_KEM_512", smithyprelude.Unit)
+
+	DataKeyPairSpec_ML_KEM_768 = DataKeyPairSpec.AddMember("ML_KEM_768", smithyprelude.Unit)
+
+	DataKeyPairSpec_ML_KEM_1024 = DataKeyPairSpec.AddMember("ML_KEM_1024", smithyprelude.Unit)
+
 	DataKeySpec_AES_256 = DataKeySpec.AddMember("AES_256", smithyprelude.Unit)
 
 	DataKeySpec_AES_128 = DataKeySpec.AddMember("AES_128", smithyprelude.Unit)
@@ -2933,6 +3083,10 @@ func init() {
 	_DryRunModifierList_member = _DryRunModifierList.AddMember("member", DryRunModifierType)
 
 	DryRunOperationException_message = DryRunOperationException.AddMember("message", _ErrorMessageType)
+
+	EncapsulationAlgorithmSpec_ML_KEM = EncapsulationAlgorithmSpec.AddMember("ML_KEM", smithyprelude.Unit)
+
+	_EncapsulationAlgorithmSpecList_member = _EncapsulationAlgorithmSpecList.AddMember("member", EncapsulationAlgorithmSpec)
 
 	EncryptionAlgorithmSpec_SYMMETRIC_DEFAULT = EncryptionAlgorithmSpec.AddMember("SYMMETRIC_DEFAULT", smithyprelude.Unit)
 
@@ -2993,6 +3147,10 @@ func init() {
 	GrantOperation_VerifyMac = GrantOperation.AddMember("VerifyMac", smithyprelude.Unit)
 
 	GrantOperation_DeriveSharedSecret = GrantOperation.AddMember("DeriveSharedSecret", smithyprelude.Unit)
+
+	GrantOperation_Encapsulate = GrantOperation.AddMember("Encapsulate", smithyprelude.Unit)
+
+	GrantOperation_Decapsulate = GrantOperation.AddMember("Decapsulate", smithyprelude.Unit)
 
 	_GrantOperationList_member = _GrantOperationList.AddMember("member", GrantOperation)
 
@@ -3086,6 +3244,10 @@ func init() {
 
 	KeyLastUsageTrackingOperation_VerifyMac = KeyLastUsageTrackingOperation.AddMember("VerifyMac", smithyprelude.Unit)
 
+	KeyLastUsageTrackingOperation_Encapsulate = KeyLastUsageTrackingOperation.AddMember("Encapsulate", smithyprelude.Unit)
+
+	KeyLastUsageTrackingOperation_Decapsulate = KeyLastUsageTrackingOperation.AddMember("Decapsulate", smithyprelude.Unit)
+
 	KeyLastUsageData_Operation = KeyLastUsageData.AddMember("Operation", KeyLastUsageTrackingOperation)
 
 	KeyLastUsageData_Timestamp = KeyLastUsageData.AddMember("Timestamp", _DateType)
@@ -3119,6 +3281,8 @@ func init() {
 	KeyUsageType_GENERATE_VERIFY_MAC = KeyUsageType.AddMember("GENERATE_VERIFY_MAC", smithyprelude.Unit)
 
 	KeyUsageType_KEY_AGREEMENT = KeyUsageType.AddMember("KEY_AGREEMENT", smithyprelude.Unit)
+
+	KeyUsageType_ENCAPSULATE_DECAPSULATE = KeyUsageType.AddMember("ENCAPSULATE_DECAPSULATE", smithyprelude.Unit)
 
 	KeyState_Creating = KeyState.AddMember("Creating", smithyprelude.Unit)
 
@@ -3177,6 +3341,12 @@ func init() {
 	KeySpec_ML_DSA_87 = KeySpec.AddMember("ML_DSA_87", smithyprelude.Unit)
 
 	KeySpec_ECC_NIST_EDWARDS25519 = KeySpec.AddMember("ECC_NIST_EDWARDS25519", smithyprelude.Unit)
+
+	KeySpec_ML_KEM_512 = KeySpec.AddMember("ML_KEM_512", smithyprelude.Unit)
+
+	KeySpec_ML_KEM_768 = KeySpec.AddMember("ML_KEM_768", smithyprelude.Unit)
+
+	KeySpec_ML_KEM_1024 = KeySpec.AddMember("ML_KEM_1024", smithyprelude.Unit)
 
 	SigningAlgorithmSpec_RSASSA_PSS_SHA_256 = SigningAlgorithmSpec.AddMember("RSASSA_PSS_SHA_256", smithyprelude.Unit)
 
@@ -3273,6 +3443,8 @@ func init() {
 	KeyMetadata_SigningAlgorithms = KeyMetadata.AddMember("SigningAlgorithms", _SigningAlgorithmSpecList)
 
 	KeyMetadata_KeyAgreementAlgorithms = KeyMetadata.AddMember("KeyAgreementAlgorithms", _KeyAgreementAlgorithmSpecList)
+
+	KeyMetadata_EncapsulationAlgorithms = KeyMetadata.AddMember("EncapsulationAlgorithms", _EncapsulationAlgorithmSpecList)
 
 	KeyMetadata_MultiRegion = KeyMetadata.AddMember("MultiRegion", _NullableBooleanType)
 
@@ -3468,6 +3640,22 @@ func init() {
 
 	CreateKeyResponse_KeyMetadata = CreateKeyResponse.AddMember("KeyMetadata", KeyMetadata)
 
+	DecapsulateRequest_KeyId = DecapsulateRequest.AddMember("KeyId", _KeyIdType)
+
+	DecapsulateRequest_SharedSecretCiphertextBlob = DecapsulateRequest.AddMember("SharedSecretCiphertextBlob", _CiphertextType)
+
+	DecapsulateRequest_EncapsulationAlgorithm = DecapsulateRequest.AddMember("EncapsulationAlgorithm", EncapsulationAlgorithmSpec)
+
+	DecapsulateRequest_GrantTokens = DecapsulateRequest.AddMember("GrantTokens", _GrantTokenList)
+
+	DecapsulateRequest_DryRun = DecapsulateRequest.AddMember("DryRun", _NullableBooleanType)
+
+	DecapsulateResponse_KeyId = DecapsulateResponse.AddMember("KeyId", _KeyIdType)
+
+	DecapsulateResponse_SharedSecret = DecapsulateResponse.AddMember("SharedSecret", _PlaintextType)
+
+	DecapsulateResponse_EncapsulationAlgorithm = DecapsulateResponse.AddMember("EncapsulationAlgorithm", EncapsulationAlgorithmSpec)
+
 	DecryptRequest_CiphertextBlob = DecryptRequest.AddMember("CiphertextBlob", _CiphertextType)
 
 	DecryptRequest_EncryptionContext = DecryptRequest.AddMember("EncryptionContext", _EncryptionContextType)
@@ -3559,6 +3747,22 @@ func init() {
 	EnableKeyRotationRequest_KeyId = EnableKeyRotationRequest.AddMember("KeyId", _KeyIdType)
 
 	EnableKeyRotationRequest_RotationPeriodInDays = EnableKeyRotationRequest.AddMember("RotationPeriodInDays", _RotationPeriodInDaysType)
+
+	EncapsulateRequest_KeyId = EncapsulateRequest.AddMember("KeyId", _KeyIdType)
+
+	EncapsulateRequest_EncapsulationAlgorithm = EncapsulateRequest.AddMember("EncapsulationAlgorithm", EncapsulationAlgorithmSpec)
+
+	EncapsulateRequest_GrantTokens = EncapsulateRequest.AddMember("GrantTokens", _GrantTokenList)
+
+	EncapsulateRequest_DryRun = EncapsulateRequest.AddMember("DryRun", _NullableBooleanType)
+
+	EncapsulateResponse_KeyId = EncapsulateResponse.AddMember("KeyId", _KeyIdType)
+
+	EncapsulateResponse_SharedSecret = EncapsulateResponse.AddMember("SharedSecret", _PlaintextType)
+
+	EncapsulateResponse_SharedSecretCiphertextBlob = EncapsulateResponse.AddMember("SharedSecretCiphertextBlob", _CiphertextType)
+
+	EncapsulateResponse_EncapsulationAlgorithm = EncapsulateResponse.AddMember("EncapsulationAlgorithm", EncapsulationAlgorithmSpec)
 
 	EncryptRequest_KeyId = EncryptRequest.AddMember("KeyId", _KeyIdType)
 
@@ -3755,6 +3959,8 @@ func init() {
 	GetPublicKeyResponse_SigningAlgorithms = GetPublicKeyResponse.AddMember("SigningAlgorithms", _SigningAlgorithmSpecList)
 
 	GetPublicKeyResponse_KeyAgreementAlgorithms = GetPublicKeyResponse.AddMember("KeyAgreementAlgorithms", _KeyAgreementAlgorithmSpecList)
+
+	GetPublicKeyResponse_EncapsulationAlgorithms = GetPublicKeyResponse.AddMember("EncapsulationAlgorithms", _EncapsulationAlgorithmSpecList)
 
 	ImportKeyMaterialRequest_KeyId = ImportKeyMaterialRequest.AddMember("KeyId", _KeyIdType)
 
